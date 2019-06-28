@@ -5,33 +5,32 @@ from keyboard import mouse
 def start_game():
   # print('Game is starting')
   # doubleClick('start-pes.jpg')
-  # #wait('press-button.jpg',seconds=360)
-  # if isok('press-button.jpg', 180):
-  #     tysny()
-  # if isok('online-confirm.jpg', 25):
-  #     tysny()
-  # if isok('myclub-enter.JPG', 60):
-  #     tysny()
-  # if isok('proceed-btn.JPG', 25):
-  #     tysny()
-  # if isok('ack.JPG', 25):
-  #     tysny()
-  # if isok('proceed-small.JPG', 120):
-  #     tysny()
+  if isok('press-button.jpg', 180):
+      tysny()
+  if isok('online-confirm.jpg', 25):
+      tysny()
+  if isok('myclub-enter.JPG', 60):
+      tysny()
+  if isok('proceed-btn.JPG', 25):
+      tysny()
+  if isok('ack.JPG', 25):
+      tysny()
+  if isok('proceed-small.JPG', 120):
+      tysny()
 
   # if auction then hope:
-  # if isok('auction-report.jpg', 25):
-  #     tysny()
-  # if isok('big-ok.JPG', 20):
-  #     tysny()
+  if isok('auction-report.jpg', 25):
+      tysny()
+  if isok('big-ok.JPG', 20):
+      tysny()
 
-  # if isok('club-house.JPG', 20):
-  #      print("At home")
+  if isok('club-house.JPG', 20):
+       print("At home")
   return
 
 pes = App(r"D:\Steam\steamapps\common\PRO EVOLUTION SOCCER 2019\PES2019.exe")
 pesName = 'PRO EVOLUTION SOCCER 2019'
-#Click automation
+# Click automation
 # Send photo and delay it will focus on window and wait
 def isok(a, b):
     if exists(Pattern(a).similar(0.85), b):
@@ -48,6 +47,7 @@ def proceed(a, b):
     return
 
 def tysny():
+    time.sleep(0.8)
     keyDown(Key.ENTER)
     time.sleep(0.1)
     keyUp(Key.ENTER)
@@ -118,38 +118,33 @@ def team_change(squad):
     #keyboard.write('Hehehe')
 
 def play_one():
-    # if isok('club-house.JPG', 30):
-    #     turn_left(3)
-    # #
-    # if isok('sim-game.JPG', 30):
-    #     tysny()
-    # # Sim match start
-    # if isok('kickoff.JPG', 30):
-    #     tysny()
-    # # Match started - switch to stat look
-    # if isok('match-started.JPG', 160):
-    #     tysny()
-    # if isok('skip-graphic.JPG', 120):
-    #     keyDown(Key.CTRL)
-    #     time.sleep(0.1)
-    #     keyUp(Key.CTRL)
-    # # Halftime - click ok to start new match
-    # if isok('halftime.JPG', 650):
-    #     tysny()
-
-    # Edn game
-    if isok('fulltime.JPG', 650):
+    if isok('club-house.JPG', 30):
+        turn_left(3)
+    #
+    if isok('sim-game.JPG', 30):
         tysny()
-
+    # Sim match start
+    if isok('kickoff.JPG', 30):
+        tysny()
+    # Match started - switch to stat look
+    if isok('match-started.JPG', 160):
+        tysny()
+    if isok('skip-graphic.JPG', 120):
+        keyDown(Key.CTRL)
+        time.sleep(0.1)
+        keyUp(Key.CTRL)
+    # Halftime - click ok to start new match
+    if isok('halftime.JPG', 650):
+        tysny()
+    if isok('second-half.JPG', 120):
+        tysny()
     # Skip highlights
-    if isok('highlights.JPG', 20):
+    if isok('highlights.JPG', 820):
+        App.focus(pesName)
+        time.sleep(1)
         keyDown(Key.DIVIDE)
         time.sleep(0.1)
         keyUp(Key.DIVIDE)
-
-    # Enter enter
-    if isok('next-finish.JPG', 160):
-        tysny()
 
     # Experience
     if isok('next-finish.JPG', 30):
@@ -157,6 +152,8 @@ def play_one():
 
     # Experience points
     if isok('experience.JPG', 30):
+        tysny()
+        time.sleep(1)
         tysny()
 
     # Level up
@@ -200,30 +197,22 @@ def play_one():
 
     return
 
-
-#start_game()
-# proceed('online-confirm.jpg')
-# proceed('proceed-btn.JPG')
-# proceed('big-ok.jpg')
-# proceed('ack.JPG')
-# proceed('auction-report.jpg')
-
-#proceed('club-house.JPG')
-# turn_right(20)
-# turn_down(1)
-# turn_right(3)
-# turn_left(2)
-# turn_up(1)
-
+# Play one game after another changing squads in between
 def playing_loop():
+    game_number = 0
     while True:
         play_one()
+        game_number+=1
+        print('Number of games played: ' + game_number)
         team_change(1)
         play_one()
+        game_number+=1
+        print('Number of games played: ' + game_number)
         team_change(2)
+
     return
 
-start_game()
+#start_game()
 playing_loop()
 #proceed('club-house.JPG', 20)
 #play_one()
