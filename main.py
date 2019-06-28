@@ -4,7 +4,7 @@ from keyboard import mouse
 # Start game
 def start_game():
   # print('Game is starting')
-  # doubleClick('start-pes.jpg')
+  doubleClick('img/start-pes.jpg')
   if isok('press-button.jpg', 180):
       tysny()
   if isok('online-confirm.jpg', 25):
@@ -33,7 +33,7 @@ pesName = 'PRO EVOLUTION SOCCER 2019'
 # Click automation
 # Send photo and delay it will focus on window and wait
 def isok(a, b):
-    if exists(Pattern(a).similar(0.85), b):
+    if exists(Pattern('./img/' + a).similar(0.85), b):
         App.focus(pesName)
         time.sleep(0.7)
         return True
@@ -41,7 +41,7 @@ def isok(a, b):
         return False
 
 def proceed(a, b):
-    if exists(Pattern(a).similar(0.85), b):
+    if exists(Pattern('./img/' + a).similar(0.85), b):
        App.focus(pesName)
        tysny()
     return
@@ -100,13 +100,13 @@ def turn_down(n):
 
 # change team
 def team_change(squad):
-    if exists(Pattern('club-house.JPG').similar(0.85), 60):
+    if exists(Pattern('./img/club-house.JPG').similar(0.85), 60):
         App.focus(pesName)
         keyDown(Key.BACKSPACE)
         print('DOWN')
         time.sleep(0.1)
         keyUp(Key.BACKSPACE)
-    if exists(Pattern('squad-list.JPG').similar(0.85), 60):
+    if exists(Pattern('./img/squad-list.JPG').similar(0.85), 60):
         turn_down(squad)
         time.sleep(1)
         keyDown(Key.ENTER)
@@ -203,11 +203,11 @@ def playing_loop():
     while True:
         play_one()
         game_number+=1
-        print('Number of games played: ' + game_number)
+        print('Number of games played: ' + str(game_number))
         team_change(1)
         play_one()
         game_number+=1
-        print('Number of games played: ' + game_number)
+        print('Number of games played: ' + str(game_number))
         team_change(2)
 
     return
