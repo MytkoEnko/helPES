@@ -158,9 +158,7 @@ def play_one():
     if isok('match-started.JPG', 160):
         press_A()
     if isok('skip-graphic.JPG', 120):
-        keyDown(Key.CTRL)
-        time.sleep(0.1)
-        keyUp(Key.CTRL)
+        press_Y()
     # Halftime - click ok to start new match
     if isok('halftime.JPG', 650):
         press_A()
@@ -168,11 +166,7 @@ def play_one():
         press_A()
     # Skip highlights
     if isok('highlights.JPG', 820):
-        App.focus(pesName)
-        time.sleep(1)
-        keyDown(Key.DIVIDE)
-        time.sleep(0.1)
-        keyUp(Key.DIVIDE)
+        press_menu()
 
     # Experience
     if isok('next-finish.JPG', 30):
@@ -181,7 +175,7 @@ def play_one():
     # Experience points
     if isok('experience.JPG', 30):
         press_A()
-        time.sleep(1)
+        time.sleep(0.8)
         press_A()
 
     # Level up
