@@ -53,50 +53,8 @@ def tysny():
     keyUp(Key.ENTER)
     return
 
-def turn_right(n):
-    App.focus(pesName)
-    count=0
-    while n > count:
-        count+=1
-        keyDown(Key.RIGHT)
-        time.sleep(0.1)
-        keyUp(Key.RIGHT)
-        time.sleep(1)
-    del count
-    return
-def turn_left(n):
-    App.focus(pesName)
-    count=0
-    while n > count:
-        count+=1
-        keyDown(Key.LEFT)
-        time.sleep(0.1)
-        keyUp(Key.LEFT)
-        time.sleep(1)
-    del count
-    return
-def turn_up(n):
-    App.focus(pesName)
-    count=0
-    while n > count:
-        count+=1
-        keyDown(Key.UP)
-        time.sleep(0.1)
-        keyUp(Key.UP)
-        time.sleep(1)
-    del count
-    return
-def turn_down(n):
-    App.focus(pesName)
-    count=0
-    while n > count:
-        count+=1
-        keyDown(Key.DOWN)
-        time.sleep(0.1)
-        keyUp(Key.DOWN)
-        time.sleep(1)
-    del count
-    return
+
+
 
 # change team
 def team_change(squad):
@@ -203,17 +161,17 @@ def playing_loop():
     while True:
         play_one()
         game_number+=1
-        print('Number of games played: ' + game_number)
+        print('Number of games played: ' + str(game_number))
         team_change(1)
         play_one()
         game_number+=1
-        print('Number of games played: ' + game_number)
+        print('Number of games played: ' + str(game_number))
         team_change(2)
 
-    return
+    #return
 
 #start_game()
-playing_loop()
+#playing_loop()
 #proceed('club-house.JPG', 20)
 #play_one()
 #team_change(1)
@@ -226,3 +184,6 @@ def test1():
     keyUp(Key.DIVIDE)
     return
 #test1()
+
+def test2():
+    print('Import works')
