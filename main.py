@@ -108,34 +108,34 @@ def proceed(a, b):
 def start_game():
   # print('Game is starting')
   # doubleClick('start-pes.jpg')
-  if isok('press-button.jpg', 180):
+  if isok('img/press-button.jpg', 180):
       press_A()
-  if isok('online-confirm.jpg', 25):
+  if isok('img/online-confirm.jpg', 25):
       press_A()
-  if isok('myclub-enter.JPG', 60):
+  if isok('img/myclub-enter.JPG', 60):
       press_A()
-  if isok('proceed-btn.JPG', 25):
+  if isok('img/proceed-btn.JPG', 25):
       press_A()
-  if isok('ack.JPG', 25):
+  if isok('img/ack.JPG', 25):
       press_A()
-  if isok('proceed-small.JPG', 120):
+  if isok('img/proceed-small.JPG', 120):
       press_A()
 
   # if auction then hope:
-  if isok('auction-report.jpg', 25):
+  if isok('img/auction-report.jpg', 25):
       press_A()
-  if isok('big-ok.JPG', 20):
+  if isok('img/big-ok.JPG', 20):
       press_A()
 
-  if isok('club-house.JPG', 20):
+  if isok('img/club-house.JPG', 20):
        print("At home")
   return
 
 # Change team and get back to base
 def team_change(squad):
-    if isok('club-house.JPG', 60):
+    if isok('img/club-house.JPG', 60):
         press_X()
-    if isok('squad-list.JPG', 60):
+    if isok('img/squad-list.JPG', 60):
         turn_down(squad)
         time.sleep(1)
         press_A()
@@ -146,75 +146,75 @@ def team_change(squad):
 
 # Play one game and get back to base
 def play_one():
-    if isok('club-house.JPG', 30):
+    if isok('img/club-house.JPG', 30):
         turn_left(3)
     #
-    if isok('sim-game.JPG', 30):
+    if isok('img/sim-game.JPG', 30):
         press_A()
     # Sim match start
-    if isok('kickoff.JPG', 30):
+    if isok('img/kickoff.JPG', 30):
         press_A()
     # Match started - switch to stat look
-    if isok('match-started.JPG', 160):
+    if isok('img/match-started.JPG', 160):
         press_A()
-    if isok('skip-graphic.JPG', 120):
+    if isok('img/skip-graphic.JPG', 120):
         press_Y()
     # Halftime - click ok to start new match
-    if isok('halftime.JPG', 650):
+    if isok('img/halftime.JPG', 650):
         press_A()
-    if isok('second-half.JPG', 120):
+    if isok('img/second-half.JPG', 120):
         press_A()
     # Skip highlights
-    if isok('highlights.JPG', 820):
+    if isok('img/highlights.JPG', 820):
         press_menu()
 
     # Experience
-    if isok('next-finish.JPG', 30):
+    if isok('img/next-finish.JPG', 30):
         press_A()
 
     # Experience points
-    if isok('experience.JPG', 30):
+    if isok('img/experience.JPG', 30):
         press_A()
         time.sleep(0.8)
         press_A()
 
     # Level up
-    if isok('levelup.JPG', 20):
+    if isok('img/levelup.JPG', 20):
         press_A()
 
     # Changes rating
-    if isok('rating.JPG', 20):
+    if isok('img/rating.JPG', 20):
         press_A()
 
     # Rewards
-    if isok('reward.JPG', 20):
+    if isok('img/reward.JPG', 20):
         press_A()
 
-    if isok('reward2.JPG', 20):
+    if isok('img/reward2.JPG', 20):
         press_A()
 
     # Contract manager upd
-    if isok('contract-manager-upd.JPG', 160):
+    if isok('img/contract-manager-upd.JPG', 160):
         press_A()
 
-    if isok('contract-confirm1.JPG', 10):
+    if isok('img/contract-confirm1.JPG', 10):
         turn_right(1)
         press_A()
 
     # If contract expires players only (for now)
 
-    if isok('pay-gp.JPG', 10):
+    if isok('img/pay-gp.JPG', 10):
         press_A()
 
-    if isok('sure-pay.JPG', 10):
+    if isok('img/sure-pay.JPG', 10):
         turn_right(1)
         press_A()
 
-    if isok('contracts-renewed.JPG', 10):
+    if isok('img/contracts-renewed.JPG', 10):
         press_A()
 
     # Confirm got back to club house
-    if isok('club-house.JPG', 30):
+    if isok('img/club-house.JPG', 30):
         print('1 more game')
 
     return
@@ -236,7 +236,7 @@ def playing_loop():
 
 # Sign players using all available trainers one by one
 def sign_all():
-    if isok('club-house.JPG', 10):
+    if isok('img/club-house.JPG', 10):
         print('sign_all script started')
     turn_right(4)
     if isok('sign/scout.JPG', 3):
@@ -274,7 +274,7 @@ def sign_all():
         press_B()
     if isok('sign/scout.JPG', 5):
         turn_left(4)
-    if isok('club-house.JPG', 10):
+    if isok('img/club-house.JPG', 10):
         print('sign_all script finished')
     return
 
