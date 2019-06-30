@@ -104,6 +104,11 @@ def proceed(a, b):
     press_A()
     return
 
+def base_ok():
+    if isok('img/club-house.JPG', 5):
+        return True
+    else:
+        return False
 # Start game and go to "Club house" which is base point of the game
 def start_game():
   # print('Game is starting')
