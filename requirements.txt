@@ -1,0 +1,12 @@
+certifi==2019.6.16
+chardet==3.0.4
+idna==2.8
+keyboard==0.13.3
+Lackey==0.7.3
+mouse==0.7.0
+numpy==1.16.4
+opencv-python==4.1.0.25
+Pillow==6.0.0
+pyperclip==1.7.0
+requests==2.22.0
+urllib3==1.25.3
