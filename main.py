@@ -10,30 +10,35 @@ pesName = 'PRO EVOLUTION SOCCER 2019'
 # Define navigation (works together with settings file for PES controller)
 
 def press_A():
+    App.focus(pesName)
     time.sleep(0.8)
     keyDown(Key.ENTER)
     time.sleep(0.1)
     keyUp(Key.ENTER)
     return
 def press_B():
+    App.focus(pesName)
     time.sleep(0.8)
     keyDown(Key.ESC)
     time.sleep(0.1)
     keyUp(Key.ESC)
     return
 def press_X():
+    App.focus(pesName)
     time.sleep(0.8)
     keyDown(Key.BACKSPACE)
     time.sleep(0.1)
     keyUp(Key.BACKSPACE)
     return
 def press_Y():
+    App.focus(pesName)
     time.sleep(0.8)
     keyDown(Key.CTRL)
     time.sleep(0.1)
     keyUp(Key.CTRL)
     return
 def press_menu():
+    App.focus(pesName)
     time.sleep(0.8)
     keyDown(Key.DIVIDE)
     time.sleep(0.1)
@@ -128,18 +133,12 @@ def start_game():
 
 # Change team and get back to base
 def team_change(squad):
-    if exists(Pattern('club-house.JPG').similar(0.85), 60):
-        App.focus(pesName)
-        keyDown(Key.BACKSPACE)
-        print('DOWN')
-        time.sleep(0.1)
-        keyUp(Key.BACKSPACE)
-    if exists(Pattern('squad-list.JPG').similar(0.85), 60):
+    if isok('club-house.JPG', 60):
+        press_X()
+    if isok('squad-list.JPG', 60):
         turn_down(squad)
         time.sleep(1)
-        keyDown(Key.ENTER)
-        time.sleep(0.1)
-        keyUp(Key.ENTER)
+        press_A()
     return
 
     #keyDown(Key.ESC)
