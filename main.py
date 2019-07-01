@@ -111,8 +111,8 @@ def base_ok():
         return False
 # Start game and go to "Club house" which is base point of the game
 def start_game():
-  # print('Game is starting')
-  # doubleClick('start-pes.jpg')
+  print('Game is starting')
+  doubleClick('img/start-pes.jpg')
   if isok('img/press-button.jpg', 180):
       press_A()
   if isok('img/online-confirm.jpg', 25):
