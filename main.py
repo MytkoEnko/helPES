@@ -92,7 +92,7 @@ def turn_down(n):
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b):
-    if exists(Pattern(a).similar(0.85), b):
+    if exists(Pattern(a).similar(0.98), b):
         App.focus(pesName)
         time.sleep(0.7)
         return True
