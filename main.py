@@ -6,6 +6,8 @@ from keyboard import mouse
 
 pes = App(r"D:\Steam\steamapps\common\PRO EVOLUTION SOCCER 2019\PES2019.exe")
 pesName = 'PRO EVOLUTION SOCCER 2019'
+pes_real = name=pes.getName()
+pesID = pes.getPID()
 
 # Define navigation (works together with settings file for PES controller)
 
@@ -93,6 +95,7 @@ def turn_down(n):
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b):
     if exists(Pattern(a).similar(0.98), b):
+        # highlight(True, 0.7, "#17ff93")
         App.focus(pesName)
         time.sleep(0.7)
         return True
