@@ -5,8 +5,10 @@ from keyboard import mouse
 #https://realpython.com/python-logging/
 # Define game variables
 
-pes = App(r"D:\Steam\steamapps\common\PRO EVOLUTION SOCCER 2019\PES2019.exe")
+pes = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\PES2019.exe"')
 pesName = 'PRO EVOLUTION SOCCER 2019'
+pes_real_name=pes.getName()
+pesID = pes.getPID()
 
 # Define navigation (works together with settings file for PES controller)
 
@@ -38,6 +40,7 @@ def press_Y():
     time.sleep(0.1)
     keyUp(Key.CTRL)
     return
+
 def press_menu():
     App.focus(pesName)
     time.sleep(0.8)
@@ -113,7 +116,8 @@ def base_ok():
 # Start game and go to "Club house" which is base point of the game
 def start_game():
   print('Game is starting')
-  doubleClick('img/start-pes.jpg')
+  #doubleClick('img/start-pes.jpg')
+  pes.open()
   if isok('img/press-button.jpg', 180):
       press_A()
   if isok('img/online-confirm.jpg', 25):
