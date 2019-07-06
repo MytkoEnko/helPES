@@ -2,6 +2,7 @@ from lackey import *
 from keyboard import mouse
 
 
+#https://realpython.com/python-logging/
 # Define game variables
 
 pes = App(r"D:\Steam\steamapps\common\PRO EVOLUTION SOCCER 2019\PES2019.exe")
