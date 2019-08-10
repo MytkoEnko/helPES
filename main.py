@@ -1,14 +1,14 @@
 from lackey import *
 from keyboard import mouse
 
-
-#https://realpython.com/python-logging/
+# https://realpython.com/python-logging/
 # Define game variables
 
 pes = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\PES2019.exe"')
 pesName = 'PRO EVOLUTION SOCCER 2019'
-pes_real_name=pes.getName()
+pes_real_name = pes.getName()
 pesID = pes.getPID()
+
 
 # Define navigation (works together with settings file for PES controller)
 
@@ -19,6 +19,8 @@ def press_A():
     time.sleep(0.1)
     keyUp(Key.ENTER)
     return
+
+
 def press_B():
     App.focus(pesName)
     time.sleep(0.8)
@@ -26,6 +28,8 @@ def press_B():
     time.sleep(0.1)
     keyUp(Key.ESC)
     return
+
+
 def press_X():
     App.focus(pesName)
     time.sleep(0.8)
@@ -33,6 +37,8 @@ def press_X():
     time.sleep(0.1)
     keyUp(Key.BACKSPACE)
     return
+
+
 def press_Y():
     App.focus(pesName)
     time.sleep(0.8)
@@ -40,6 +46,7 @@ def press_Y():
     time.sleep(0.1)
     keyUp(Key.CTRL)
     return
+
 
 def press_menu():
     App.focus(pesName)
@@ -49,44 +56,51 @@ def press_menu():
     keyUp(Key.DIVIDE)
     return
 
+
 def turn_right(n):
     App.focus(pesName)
-    count=0
+    count = 0
     while n > count:
-        count+=1
+        count += 1
         keyDown(Key.RIGHT)
         time.sleep(0.1)
         keyUp(Key.RIGHT)
         time.sleep(1)
     del count
     return
+
+
 def turn_left(n):
     App.focus(pesName)
-    count=0
+    count = 0
     while n > count:
-        count+=1
+        count += 1
         keyDown(Key.LEFT)
         time.sleep(0.1)
         keyUp(Key.LEFT)
         time.sleep(1)
     del count
     return
+
+
 def turn_up(n):
     App.focus(pesName)
-    count=0
+    count = 0
     while n > count:
-        count+=1
+        count += 1
         keyDown(Key.UP)
         time.sleep(0.1)
         keyUp(Key.UP)
         time.sleep(1)
     del count
     return
+
+
 def turn_down(n):
     App.focus(pesName)
-    count=0
+    count = 0
     while n > count:
-        count+=1
+        count += 1
         keyDown(Key.DOWN)
         time.sleep(0.1)
         keyUp(Key.DOWN)
@@ -94,52 +108,59 @@ def turn_down(n):
     del count
     return
 
+
 # Set check photo (a) and set timeout for check (b). It will focus on window.
-def isok(a, b):
-    if exists(Pattern(a).similar(0.89), b):
+def isok(a, b, c=0.89):
+    if exists(Pattern(a).similar(c), b):
         App.focus(pesName)
         time.sleep(0.7)
         return True
     else:
         return False
+
+
 # press_A when matched photo (a) within timeout (b)
 def proceed(a, b):
     isok(a, b)
     press_A()
     return
 
+
 def base_ok():
     if isok('img/club-house.JPG', 5):
         return True
     else:
         return False
+
+
 # Start game and go to "Club house" which is base point of the game
 def start_game():
-  print('Game is starting')
-  #doubleClick('img/start-pes.jpg')
-  pes.open()
-  if isok('img/press-button.jpg', 180):
-      press_A()
-  if isok('img/online-confirm.jpg', 25):
-      press_A()
-  if isok('img/myclub-enter.JPG', 60):
-      press_A()
-  if isok('img/proceed-btn.JPG', 25):
-      press_A()
-  if isok('img/ack.JPG', 25):
-      press_A()
-  if isok('img/proceed-small.JPG', 120):
-      press_A()
+    print('Game is starting')
+    # doubleClick('img/start-pes.jpg')
+    pes.open()
+    if isok('img/press-button.jpg', 180):
+        press_A()
+    if isok('img/online-confirm.jpg', 25):
+        press_A()
+    if isok('img/myclub-enter.JPG', 60):
+        press_A()
+    if isok('img/proceed-btn.JPG', 25):
+        press_A()
+    if isok('img/ack.JPG', 25):
+        press_A()
+    if isok('img/proceed-small.JPG', 120):
+        press_A()
 
-  # if auction then hope:
-  if isok('img/auction-report.jpg', 25):
-      press_A()
-  if isok('img/big-ok.JPG', 20):
-      press_A()
+    # if auction then hope:
+    if isok('img/auction-report.jpg', 25):
+        press_A()
+    if isok('img/big-ok.JPG', 20):
+        press_A()
 
-  if isok('img/club-house.JPG', 20):
-       print("At home")
-  return
+    if isok('img/club-house.JPG', 20):
+        print("At home")
+    return
+
 
 # Change team and get back to base
 def team_change(squad):
@@ -151,8 +172,9 @@ def team_change(squad):
         press_A()
     return
 
-    #keyDown(Key.ESC)
-    #keyboard.write('Hehehe')
+    # keyDown(Key.ESC)
+    # keyboard.write('Hehehe')
+
 
 # Play one game and get back to base
 def play_one():
@@ -229,68 +251,83 @@ def play_one():
 
     return
 
+
 # Play one game after another changing squads in between
 def playing_loop():
     game_number = 0
     while True:
         play_one()
-        game_number+=1
+        game_number += 1
         print('Number of games played: ' + str(game_number))
         team_change(1)
         play_one()
-        game_number+=1
+        game_number += 1
         print('Number of games played: ' + str(game_number))
         team_change(2)
 
-    #return
+    # return
 
-# Sign players using all available trainers one by one
-def sign_all():
+
+# Sign players using all available trainers one by one, skip 5stars (argument as nr of fivestars)
+def sign_all(fivestars=1):
+    # Initialize starting from home screen
     if isok('img/club-house.JPG', 10):
         print('sign_all script started')
-    turn_right(4)
-    if isok('sign/scout.JPG', 3):
-        press_A()
-    if isok('sign/sign-enter.JPG', 4):
-        press_A()
-    while True:
-      if isok('sign/choose-slot.JPG', 9):
-        press_A()
-      if isok('sign/no-scouts.JPG', 3):
-          # If no scouts - break
-        print('No scouts left, all signed')
-        press_A()
-        break
-      if isok('sign/confirm.JPG', 9):
-        press_A()
-      if isok('sign/chosed-trainer.JPG', 9):
-        turn_down(3)
-        press_A()
-      if isok('sign/sure.JPG', 9):
-        turn_right(1)
-        press_A()
-      if isok('sign/skip.JPG', 10):
-          press_menu()
-      if isok('sign/confirm-player.JPG', 9):
-        time.sleep(1.5)
-        press_A()
-      if isok('sign/next.JPG', 9):
-        press_A()
-      if isok('sign/added.JPG', 9):
-        press_A()
-    if isok('sign/choose-slot.JPG', 5):
-        press_B()
-    if isok('sign/sign-enter.JPG', 5):
-        press_B()
-    if isok('sign/scout.JPG', 5):
-        turn_left(4)
-    if isok('img/club-house.JPG', 10):
-        print('sign_all script finished')
-    return
+        turn_right(4)
+        if isok('sign/scout.JPG', 3):
+            press_A()
+        if isok('sign/sign-enter.JPG', 4):
+            press_A()
+        # TODO create logick to return back to home screen once all sold (or only fivestar left)
+        # While there is trainers sign them
+        while True:
+            if isok('sign/choose-slot.JPG', 9):
+                press_A()
+                # If no scouts - break
+                if isok('sign/no-scouts.JPG', 3):
+                    print('No scouts left, all signed')
+                    press_A()
+                    break
+                # If there is scouts - use them
+                #   If there is fivestars - skip them
+                # TODO Think of logick for skipping fivestars if there is
+                for i in range(fivestars):
+                    if isok('sign/five-star.JPG', 1, 0.96):
+                        print(i, ' in list is Five star player')
+                        turn_down(1)
+                    else:
+                        print(i, 'No fivestar players')
+                # Sign players
+                if isok('sign/confirm.JPG', 9):
+                    press_A()
+                if isok('sign/chosed-trainer.JPG', 9):
+                    turn_down(3)
+                    press_A()
+                if isok('sign/sure.JPG', 9):
+                    turn_right(1)
+                    press_A()
+                if isok('sign/skip.JPG', 10):
+                    press_menu()
+                if isok('sign/confirm-player.JPG', 9):
+                    time.sleep(1.5)
+                    press_A()
+                if isok('sign/next.JPG', 9):
+                    press_A()
+                if isok('sign/added.JPG', 9):
+                    press_A()
+        # Get back to home once all sold
+        if isok('sign/choose-slot.JPG', 5):
+            press_B()
+        if isok('sign/sign-enter.JPG', 5):
+            press_B()
+        if isok('sign/scout.JPG', 5):
+            turn_left(4)
+        if isok('img/club-house.JPG', 10):
+            print('sign_all script finished')
+        return
 
 
-
-#TESTS
+# TESTS
 def test1():
     App.focus(pesName)
     time.sleep(1)
@@ -298,7 +335,4 @@ def test1():
     time.sleep(0.1)
     keyUp(Key.ESC)
     return
-#test1()
-
-def test2():
-    print('Import works')
+# test1()
