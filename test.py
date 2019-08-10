@@ -1,8 +1,8 @@
 from main import *
 
+
 # Remove all players others than squad
 def players_convert(team):
-
     # internal var
     # team_is = 0
     # if base_ok():
@@ -20,6 +20,7 @@ def players_convert(team):
             return True
         else:
             return False
+
     # def which_color():
     #     if on_reserves():
     #         turn_up(1)
@@ -40,7 +41,7 @@ def players_convert(team):
     # Ensure on reserves
     def find_victim():
         if isok('conv/reserves-list.JPG', 5):
-            #create variable
+            # create variable
             # if team_is == 1:
             #     ball_path='conv/white-ball.JPG'
             # if team_is == 2:
@@ -52,16 +53,17 @@ def players_convert(team):
             keyUp(Key.DOWN)
             while not isok('conv/black-ball.JPG', 2):
                 for i in range(6):
-                    if isok('conv/white-ball.JPG',5):
+                    if isok('conv/bronze-ball.JPG', 5):
                         print('Found ' + 'white ball')
                         return
                     else:
                         turn_right(1)
                 turn_up(1)
+
     def exec_victim():
         print('Looking for victim')
         press_X()
-        if isok('conv/player-menu.JPG',5):
+        if isok('conv/player-menu.JPG', 5):
             turn_down(2)
         if isok('conv/convert.JPG', 5):
             press_A()
@@ -70,13 +72,21 @@ def players_convert(team):
             press_A()
         if isok('conv/converted.JPG', 5):
             press_A()
-    #on_reserves()
-#    which_color()
-#     exec_victim()
+
+    # on_reserves()
+    #    which_color()
+    #     exec_victim()
 
     while True:
         open_reserves()
         find_victim()
         exec_victim()
-
-players_convert(2)
+# start_game()
+# players_convert(2)
+# while True:
+#     if isok('sign/five-star.JPG', 3, 0.96):
+#         print('Five star player')
+#         turn_down(1)
+#     else:
+#         print('Not fivestar')
+#         turn_down(1)
