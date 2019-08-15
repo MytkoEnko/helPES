@@ -29,6 +29,8 @@ def revertbackup():
         print(settings_file, "removed, starting revert from ", settings_backup)
         os.rename(settings_backup,settings_file)
         print("Backup reverted", settings_file)
+    else:
+        print("No backup or something is wrong with file structure. Skipping")
 
 #makebkp()
 #revertbackup()
