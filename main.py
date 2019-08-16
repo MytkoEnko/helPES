@@ -78,7 +78,6 @@ pesID = pes.getPID()
 
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
-# TODO somplify these:
 
 def simulate_button(button):
     App.focus(pesName)
@@ -109,7 +108,6 @@ def press_menu():
     simulate_button(Key.DIVIDE)
     return
 
-# TODO think of how to pass object argument as variable tip - https://stackoverflow.com/questions/706721/how-do-i-pass-a-method-as-a-parameter-in-python
 # First simulate turn mechanism, than methods for each direction using it
 def simulate_turn(direction,times):
     count = 0
@@ -138,11 +136,13 @@ def turn_down(n):
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b, c=0.89):
+    App.focus(pesName)
     if exists(Pattern(a).similar(c), b):
-        App.focus(pesName)
         time.sleep(0.7)
+        logger.info('%s match found', a)
         return True
     else:
+        logger.warning('%s not found', a)
         return False
 
 
@@ -153,8 +153,9 @@ def proceed(a, b):
     return
 
 
-def base_ok():
-    if isok('img/club-house.JPG', 5):
+def base_ok(a=5):
+    if isok('img/club-house.JPG', a):
+        logger.info('On home menu')
         return True
     else:
         logger.error('Not on home base, can\' proceed')
@@ -164,7 +165,6 @@ def base_ok():
 # Start game and go to "Club house" which is base point of the game
 def start_game():
     logger.info('Game is starting')
-    # doubleClick('img/start-pes.jpg')
     pes.open()
     if isok('img/press-button.jpg', 180):
         press_A()
@@ -185,14 +185,14 @@ def start_game():
     if isok('img/big-ok.JPG', 20):
         press_A()
 
-    if isok('img/club-house.JPG', 20):
-        logger.info("Got back to home screen")
+    if base_ok(20):
+        logger.info("Game started successfully, can proceed with scripts")
     return
 
 
 # Change team and get back to base
 def team_change(squad):
-    if isok('img/club-house.JPG', 60):
+    if base_ok(60):
         press_X()
     if isok('img/squad-list.JPG', 60):
         turn_down(squad)
@@ -203,9 +203,9 @@ def team_change(squad):
 
 # Play one game and get back to base
 def play_one():
-    if isok('img/club-house.JPG', 30):
+    if base_ok(30):
         turn_left(3)
-    #
+    # On sim game
     if isok('img/sim-game.JPG', 30):
         press_A()
     # Sim match start
@@ -229,7 +229,7 @@ def play_one():
     if isok('img/next-finish.JPG', 30):
         press_A()
 
-    # Experience points
+    # Experience points (press A twice to proceed)
     if isok('img/experience.JPG', 30):
         press_A()
         time.sleep(0.8)
@@ -243,6 +243,7 @@ def play_one():
     if isok('img/rating.JPG', 20):
         press_A()
 
+    #TODO Find a way to recognize and write down reward (income) and spendings (expenses on contracts)
     # Rewards
     if isok('img/reward.JPG', 20):
         press_A()
@@ -271,10 +272,13 @@ def play_one():
         press_A()
 
     # Confirm got back to club house
-    if isok('img/club-house.JPG', 30):
+    if base_ok(30):
         logger.info('1 more game')
 
     return
+
+# TODO prepare scripts that simultaneously handle interrupters:
+#  lost connection, screen freeze, auction update, confirmation only screens etc.
 
 
 # Play one game after another changing squads in between
