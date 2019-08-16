@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Set format for logs
-formatter = logging.Formatter('%(levelname)s:%(asctime)s:%(name)s - %(funcName)20s() ]: %(message)s')
+formatter = logging.Formatter('[%(levelname)s:%(asctime)s:%(funcName)20s() ]: %(message)s')
 
 # File handler - file name, format, level
 file_handler = logging.FileHandler('pes-f.log')
@@ -76,102 +76,160 @@ pesID = pes.getPID()
 
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
+# TODO somplify these:
+#prototype:
+def simulate_button(button):
+    App.focus(pesName)
+    time.sleep(0.8)
+    keyDown(button)
+    time.sleep(0.1)
+    keyUp(button)
+    logger.info('Button %s pressed', button)
+    return
 
 def press_A():
-    App.focus(pesName)
-    time.sleep(0.8)
-    keyDown(Key.ENTER)
-    time.sleep(0.1)
-    keyUp(Key.ENTER)
+    simulate_button(Key.ENTER)
     return
-
 
 def press_B():
-    App.focus(pesName)
-    time.sleep(0.8)
-    keyDown(Key.ESC)
-    time.sleep(0.1)
-    keyUp(Key.ESC)
+    simulate_button(Key.ESC)
     return
-
 
 def press_X():
-    App.focus(pesName)
-    time.sleep(0.8)
-    keyDown(Key.BACKSPACE)
-    time.sleep(0.1)
-    keyUp(Key.BACKSPACE)
+    simulate_button(Key.BACKSPACE)
     return
-
 
 def press_Y():
-    App.focus(pesName)
-    time.sleep(0.8)
-    keyDown(Key.CTRL)
-    time.sleep(0.1)
-    keyUp(Key.CTRL)
+    simulate_button(Key.CTRL)
     return
-
 
 def press_menu():
-    App.focus(pesName)
-    time.sleep(0.8)
-    keyDown(Key.DIVIDE)
-    time.sleep(0.1)
-    keyUp(Key.DIVIDE)
+    simulate_button(Key.DIVIDE)
     return
 
+# BACKUP:
+# def press_A():
+#     App.focus(pesName)
+#     time.sleep(0.8)
+#     keyDown(Key.ENTER)
+#     time.sleep(0.1)
+#     keyUp(Key.ENTER)
+#     return
+#
+#
+# def press_B():
+#     App.focus(pesName)
+#     time.sleep(0.8)
+#     keyDown(Key.ESC)
+#     time.sleep(0.1)
+#     keyUp(Key.ESC)
+#     return
+#
+#
+# def press_X():
+#     App.focus(pesName)
+#     time.sleep(0.8)
+#     keyDown(Key.BACKSPACE)
+#     time.sleep(0.1)
+#     keyUp(Key.BACKSPACE)
+#     return
+#
+#
+# def press_Y():
+#     App.focus(pesName)
+#     time.sleep(0.8)
+#     keyDown(Key.CTRL)
+#     time.sleep(0.1)
+#     keyUp(Key.CTRL)
+#     return
+#
+#
+# def press_menu():
+#     App.focus(pesName)
+#     time.sleep(0.8)
+#     keyDown(Key.DIVIDE)
+#     time.sleep(0.1)
+#     keyUp(Key.DIVIDE)
+#     return
+
+# TODO think of how to pass object argument as variable tip - https://stackoverflow.com/questions/706721/how-do-i-pass-a-method-as-a-parameter-in-python
+# First simulate turn mechanism, than methods for each direction using it
+def simulate_turn(direction,times):
+    count = 0
+    while times > count:
+        count += 1
+        simulate_button(direction)
+        time.sleep(0.3)
+    logger.info('Turned %s %s times', str(direction), count)
+    del count
 
 def turn_right(n):
-    App.focus(pesName)
-    count = 0
-    while n > count:
-        count += 1
-        keyDown(Key.RIGHT)
-        time.sleep(0.1)
-        keyUp(Key.RIGHT)
-        time.sleep(1)
-    del count
+    simulate_turn(Key.RIGHT, n)
     return
-
 
 def turn_left(n):
-    App.focus(pesName)
-    count = 0
-    while n > count:
-        count += 1
-        keyDown(Key.LEFT)
-        time.sleep(0.1)
-        keyUp(Key.LEFT)
-        time.sleep(1)
-    del count
+    simulate_turn(Key.LEFT, n)
     return
-
 
 def turn_up(n):
-    App.focus(pesName)
-    count = 0
-    while n > count:
-        count += 1
-        keyDown(Key.UP)
-        time.sleep(0.1)
-        keyUp(Key.UP)
-        time.sleep(1)
-    del count
+    simulate_turn(Key.UP, n)
     return
-
 
 def turn_down(n):
-    App.focus(pesName)
-    count = 0
-    while n > count:
-        count += 1
-        keyDown(Key.DOWN)
-        time.sleep(0.1)
-        keyUp(Key.DOWN)
-        time.sleep(1)
-    del count
+    simulate_turn(Key.DOWN, n)
     return
+
+# BACKUP:
+# def turn_right(n):
+#     App.focus(pesName)
+#     count = 0
+#     while n > count:
+#         count += 1
+#         keyDown(Key.RIGHT)
+#         time.sleep(0.1)
+#         keyUp(Key.RIGHT)
+#         time.sleep(1)
+#     del count
+#     return
+#
+#
+# def turn_left(n):
+#     App.focus(pesName)
+#     count = 0
+#     while n > count:
+#         count += 1
+#         keyDown(Key.LEFT)
+#         time.sleep(0.1)
+#         keyUp(Key.LEFT)
+#         time.sleep(1)
+#     del count
+#     return
+#
+#
+# def turn_up(n):
+#     App.focus(pesName)
+#     count = 0
+#     while n > count:
+#         count += 1
+#         keyDown(Key.UP)
+#         time.sleep(0.1)
+#         keyUp(Key.UP)
+#         time.sleep(1)
+#     del count
+#     return
+#
+#
+# def turn_down(n):
+#     App.focus(pesName)
+#     count = 0
+#     while n > count:
+#         count += 1
+#         keyDown(Key.DOWN)
+#         time.sleep(0.1)
+#         keyUp(Key.DOWN)
+#         time.sleep(1)
+#     del count
+#     return
 
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
