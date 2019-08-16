@@ -322,11 +322,11 @@ def playing_loop():
     while True:
         play_one()
         game_number += 1
-        logger.info('Number of games played: ' + str(game_number))
+        logger.info('Number of games played: %s', str(game_number))
         team_change(1)
         play_one()
         game_number += 1
-        logger.info('Number of games played: ' + str(game_number))
+        logger.info('Number of games played: %s', str(game_number))
         team_change(2)
 
     # return
@@ -357,10 +357,10 @@ def sign_all(fivestars=1):
                 # TODO Think of logick for skipping fivestars if there is
                 for i in range(fivestars):
                     if isok('sign/five-star.JPG', 1, 0.96):
-                        logger.info(i, ' in list is Five star player')
+                        logger.info('%s in list is Five star player', i)
                         turn_down(1)
                     else:
-                        logger.info(i, 'No fivestar players')
+                        logger.info('No fivestar players %s', i)
                 # Sign players
                 if isok('sign/confirm.JPG', 9):
                     press_A()
@@ -397,7 +397,7 @@ def players_convert(team):
     # team_is = 0
     # if base_ok():
     #      logger.info('Starting players to EXP trainers convertion')
-    #      logger.info('Switch to team ' + str(team))
+    #      logger.info('Switch to team %s', str(team))
     #      # Change to desired team
     #      team_change(team)
     # if base_ok():
@@ -417,10 +417,10 @@ def players_convert(team):
     #         turn_right(1)
     #     if isok('conv/white-ball.JPG', 5):
     #         team_is = 1
-    #         logger.info('Team of whites ' + str(team_is))
+    #         logger.info('Team of whites %s', str(team_is))
     #     if isok('conv/bronze-ball.JPG', 5):
     #         team_is = 2
-    #         logger.info('Team of bronze' + str(team_is))
+    #         logger.info('Team of bronze %s',str(team_is))
     # # Open reserves
     def open_reserves():
         while not on_reserves():
@@ -444,7 +444,7 @@ def players_convert(team):
             while not isok('conv/black-ball.JPG', 2):
                 for i in range(6):
                     if isok('conv/bronze-ball.JPG', 5):
-                        logger.info('Found ' + 'white ball')
+                        logger.info('Found %s', 'white ball')
                         return
                     else:
                         turn_right(1)
