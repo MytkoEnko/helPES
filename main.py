@@ -47,7 +47,7 @@ def makebkp():
         logger.info("There is settings and settings backup files. We can start playing")
         return True
     if isthere(settings_file) and not isthere(settings_backup):
-        logger.info("Creating backup and importing pes script ready settings file")
+        logger.info("Creating backup and importing pes settings file")
         os.rename(settings_file, settings_backup)
         logger.info('Backup created: %s', os.listdir(settings_path))
         shutil.copy(settings_pesbot, settings_file)
@@ -60,9 +60,11 @@ def revertbackup():
     if isthere(settings_backup) and isthere(settings_file):
         logger.info("Backup is there, reverting:")
         os.remove(settings_file)
-        logger.info("%s removed, starting revert from %s",settings_file, settings_backup)
+        logger.info("%s removed, starting revert from %s",
+                    os.path.basename(settings_file),
+                    os.path.basename(settings_backup))
         os.rename(settings_backup, settings_file)
-        logger.info("Backup reverted %s", settings_file)
+        logger.info("Backup reverted to %s", os.path.basename(settings_file))
     else:
         logger.warn("No backup or something is wrong with file structure. Skipping")
 
@@ -77,7 +79,7 @@ pesID = pes.getPID()
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 # TODO somplify these:
-#prototype:
+
 def simulate_button(button):
     App.focus(pesName)
     time.sleep(0.8)
@@ -107,51 +109,6 @@ def press_menu():
     simulate_button(Key.DIVIDE)
     return
 
-# BACKUP:
-# def press_A():
-#     App.focus(pesName)
-#     time.sleep(0.8)
-#     keyDown(Key.ENTER)
-#     time.sleep(0.1)
-#     keyUp(Key.ENTER)
-#     return
-#
-#
-# def press_B():
-#     App.focus(pesName)
-#     time.sleep(0.8)
-#     keyDown(Key.ESC)
-#     time.sleep(0.1)
-#     keyUp(Key.ESC)
-#     return
-#
-#
-# def press_X():
-#     App.focus(pesName)
-#     time.sleep(0.8)
-#     keyDown(Key.BACKSPACE)
-#     time.sleep(0.1)
-#     keyUp(Key.BACKSPACE)
-#     return
-#
-#
-# def press_Y():
-#     App.focus(pesName)
-#     time.sleep(0.8)
-#     keyDown(Key.CTRL)
-#     time.sleep(0.1)
-#     keyUp(Key.CTRL)
-#     return
-#
-#
-# def press_menu():
-#     App.focus(pesName)
-#     time.sleep(0.8)
-#     keyDown(Key.DIVIDE)
-#     time.sleep(0.1)
-#     keyUp(Key.DIVIDE)
-#     return
-
 # TODO think of how to pass object argument as variable tip - https://stackoverflow.com/questions/706721/how-do-i-pass-a-method-as-a-parameter-in-python
 # First simulate turn mechanism, than methods for each direction using it
 def simulate_turn(direction,times):
@@ -178,59 +135,6 @@ def turn_up(n):
 def turn_down(n):
     simulate_turn(Key.DOWN, n)
     return
-
-# BACKUP:
-# def turn_right(n):
-#     App.focus(pesName)
-#     count = 0
-#     while n > count:
-#         count += 1
-#         keyDown(Key.RIGHT)
-#         time.sleep(0.1)
-#         keyUp(Key.RIGHT)
-#         time.sleep(1)
-#     del count
-#     return
-#
-#
-# def turn_left(n):
-#     App.focus(pesName)
-#     count = 0
-#     while n > count:
-#         count += 1
-#         keyDown(Key.LEFT)
-#         time.sleep(0.1)
-#         keyUp(Key.LEFT)
-#         time.sleep(1)
-#     del count
-#     return
-#
-#
-# def turn_up(n):
-#     App.focus(pesName)
-#     count = 0
-#     while n > count:
-#         count += 1
-#         keyDown(Key.UP)
-#         time.sleep(0.1)
-#         keyUp(Key.UP)
-#         time.sleep(1)
-#     del count
-#     return
-#
-#
-# def turn_down(n):
-#     App.focus(pesName)
-#     count = 0
-#     while n > count:
-#         count += 1
-#         keyDown(Key.DOWN)
-#         time.sleep(0.1)
-#         keyUp(Key.DOWN)
-#         time.sleep(1)
-#     del count
-#     return
-
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b, c=0.89):
