@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from keyboard import mouse
 
 from lackey import *
 

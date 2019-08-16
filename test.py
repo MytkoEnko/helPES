@@ -1,5 +1,7 @@
-from main import *
+import main
 
+makebkp()
+#revertbackup()
 # start_game()
 # players_convert(2)
 # while True:
