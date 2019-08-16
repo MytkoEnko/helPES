@@ -49,9 +49,9 @@ def makebkp():
     if isthere(settings_file) and not isthere(settings_backup):
         logger.info("Creating backup and importing pes script ready settings file")
         os.rename(settings_file, settings_backup)
-        logger.info('Backup created: ', os.listdir(settings_path))
+        logger.info('Backup created: %s', os.listdir(settings_path))
         shutil.copy(settings_pesbot, settings_file)
-        logger.info("Settings copied, folder contents: ", os.listdir(settings_path))
+        logger.info("Settings copied, folder contents: %s", os.listdir(settings_path))
     else:
         logger.warn("Something is wrong, please check settings folder")
 
@@ -60,9 +60,9 @@ def revertbackup():
     if isthere(settings_backup) and isthere(settings_file):
         logger.info("Backup is there, reverting:")
         os.remove(settings_file)
-        logger.info(settings_file, "removed, starting revert from ", settings_backup)
+        logger.info("%s removed, starting revert from %s",settings_file, settings_backup)
         os.rename(settings_backup, settings_file)
-        logger.info("Backup reverted", settings_file)
+        logger.info("Backup reverted %s", settings_file)
     else:
         logger.warn("No backup or something is wrong with file structure. Skipping")
 
