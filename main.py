@@ -10,12 +10,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Set format for logs
-formatter = logging.Formatter('%(levelname)s:%(asctime)s:%(name)s - %(funcName)20s() ] %(message)s')
+formatter = logging.Formatter('%(levelname)s:%(asctime)s:%(name)s - %(funcName)20s() ]: %(message)s')
 
 # File handler - file name, format, level
 file_handler = logging.FileHandler('pes-f.log')
 file_handler.setLevel(logging.DEBUG)
-file_handler.format(formatter)
+file_handler.setFormatter(formatter)
 
 # Stream hanlder
 stream_handler = logging.StreamHandler()
