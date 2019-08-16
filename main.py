@@ -194,7 +194,7 @@ def base_ok():
     if isok('img/club-house.JPG', 5):
         return True
     else:
-        logger.error('Not on home base, can\' proceed)
+        logger.error('Not on home base, can\' proceed')
         return False
 
 
