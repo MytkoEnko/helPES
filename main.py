@@ -74,6 +74,7 @@ def revertbackup():
 pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\PES2019.exe"')
 pesName = 'PRO EVOLUTION SOCCER 2019'
 pes = App() # Global variable to be used for app reference after initialization
+pes_region = None
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -135,7 +136,7 @@ def turn_down(n):
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b, c=0.89):
     pes.focus()
-    if exists(Pattern(a).similar(c), b):
+    if pes_region.exists(Pattern(a).similar(c), b):
         time.sleep(0.7)
         logger.info('%s match found', a)
         return True
@@ -162,7 +163,7 @@ def base_ok(a=5):
 
 # Start game and go to "Club house" which is base point of the game
 def start_game():
-    logger.info('Starting interaction with %n', pes.getName())
+    logger.info('Starting interaction with %s', pes.getName())
     pes.focus()
     if isok('img/press-button.jpg', 180):
         press_A()
@@ -178,9 +179,9 @@ def start_game():
         press_A()
 
     # if auction then hope:
-    if isok('img/auction-report.jpg', 25):
+    if isok('img/auction-report.jpg', 10):
         press_A()
-    if isok('img/big-ok.JPG', 20):
+    if isok('img/big-ok.JPG', 15):
         press_A()
 
     if base_ok(20):
@@ -283,9 +284,9 @@ def play_one():
 
 # Play one game after another changing squads in between
 #TODO find place for playing loop, find logick for number of games played etc.
-def playing_loop():
+def playing_loop(number=1000):
     game_number = 0
-    while True:
+    for i in range(number):
         play_one()
         game_number += 1
         logger.info('Number of games played: %s', str(game_number))
@@ -301,7 +302,7 @@ def playing_loop():
 # Sign players using all available trainers one by one, skip 5stars (argument as nr of fivestars)
 def sign_all(fivestars=1):
     # Initialize starting from home screen
-    if isok('img/club-house.JPG', 10):
+    if base_ok(10):
         logger.info('sign_all script started')
         turn_right(4)
         if isok('sign/scout.JPG', 3):
@@ -315,7 +316,7 @@ def sign_all(fivestars=1):
                 press_A()
                 # If no scouts - break
                 if isok('sign/no-scouts.JPG', 3):
-                    logger.warn('No scouts left, all signed')
+                    logger.warning('No scouts left, all signed')
                     press_A()
                     break
                 # If there is scouts - use them
@@ -442,11 +443,11 @@ def players_convert(team):
 # TESTS
 #TODO: put it all together
 
-# INITIALIZE GAME (make sure settings are ready, game has started and app instance created.
+# INITIALIZE GAME (make sure settings are ready, game has started and app instance created).
 def initialize_pes():
     global pes
+    App.focus(pesName)
     pes = App(pesName)
-    print(pes.getName())
     if not pes.isRunning():
         makebkp()
         pes_launcher.open()
@@ -459,3 +460,19 @@ def initialize_pes():
                 break
     else:
         logger.info('%s already running and initialized, we can proceed with scripts', pes.getName())
+    global pes_region
+    pes_region= pes.window()
+
+initialize_pes()
+pes.focus()
+print(pes.getPID(), pes.getName(), pes.hasWindow(), pes_region.getH(),pes_region.getW())
+playing_loop(10)
+#pes_region.saveScreenCapture('./shot','screen2')
+
+#TODO: implement pes_region.[....] to ifisok() to limit search area, same for other stuff
+# while True:
+#     if pes_region.exists(Pattern('sign/sign-enter.JPG').similar(0.9), 3):
+#             time.sleep(1)
+#             print('Pattern found')
+#     else:
+#         print('Not found')
