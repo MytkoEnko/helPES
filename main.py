@@ -78,7 +78,7 @@ pes = App() # Global variable to be used for app reference after initialization
 # Define navigation (works together with settings file for PES controller)
 
 def simulate_button(button):
-    App.focus(pesName)
+    pes.focus()
     time.sleep(0.8)
     keyDown(button)
     time.sleep(0.1)
@@ -134,7 +134,7 @@ def turn_down(n):
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b, c=0.89):
-    App.focus(pesName)
+    pes.focus()
     if exists(Pattern(a).similar(c), b):
         time.sleep(0.7)
         logger.info('%s match found', a)
@@ -162,8 +162,8 @@ def base_ok(a=5):
 
 # Start game and go to "Club house" which is base point of the game
 def start_game():
-    logger.info('Game is starting')
-    pes.open()
+    logger.info('Starting interaction with %n', pes.getName())
+    pes.focus()
     if isok('img/press-button.jpg', 180):
         press_A()
     if isok('img/online-confirm.jpg', 25):
@@ -184,7 +184,7 @@ def start_game():
         press_A()
 
     if base_ok(20):
-        logger.info("Game started successfully, can proceed with scripts")
+        logger.info("Game started successfully, logged in to game, can proceed with scripts")
     return
 
 
@@ -403,7 +403,8 @@ def players_convert(team):
             # if team_is == 2:
             #     ball_path='conv/bronze-ball.JPG'
             # Jump down
-            App.focus(pesName)
+            pes.focus()
+            # Scroll to the end
             keyDown(Key.DOWN)
             time.sleep(5)
             keyUp(Key.DOWN)
@@ -443,13 +444,18 @@ def players_convert(team):
 
 # INITIALIZE GAME (make sure settings are ready, game has started and app instance created.
 def initialize_pes():
-    makebkp()
     global pes
-    pes_launcher.open()
-    logger.info('%s has been launched, waiting for initialization', pesName)
-    # TODO: create logic for error if app not starting
-    while True:
-        pes = App(pesName)
-        if pes.isRunning(5) and pes.getName()!='Steam.exe':
-            logger.info('Global app is initialized and %s can be used for reference', pes.getName())
-            break
+    pes = App(pesName)
+    print(pes.getName())
+    if not pes.isRunning():
+        makebkp()
+        pes_launcher.open()
+        logger.info('%s has been launched, waiting for initialization', pesName)
+        # TODO: create logic for error if app not starting
+        while True:
+            pes = App(pesName)
+            if pes.isRunning(5) and pes.getName()!='Steam.exe':
+                logger.info('Global app is initialized and %s under PID %s can be used for reference', pes.getName(), pes.getPID())
+                break
+    else:
+        logger.info('%s already running and initialized, we can proceed with scripts', pes.getName())
