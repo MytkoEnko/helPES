@@ -53,7 +53,7 @@ def makebkp():
         shutil.copy(settings_pesbot, settings_file)
         logger.info("Settings copied, folder contents: %s", os.listdir(settings_path))
     else:
-        logger.warn("Something is wrong, please check settings folder")
+        logger.warning("Something is wrong, please check settings folder")
 
 
 def revertbackup():
@@ -71,11 +71,9 @@ def revertbackup():
 
 # ------------------------------------------ DEFINE GAME VARIABLES
 
-pes = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\PES2019.exe"')
+pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\PES2019.exe"')
 pesName = 'PRO EVOLUTION SOCCER 2019'
-pes_real_name = pes.getName()
-pesID = pes.getPID()
-
+pes = App() # Global variable to be used for app reference after initialization
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -278,7 +276,9 @@ def play_one():
     return
 
 # TODO prepare scripts that simultaneously handle interrupters:
-#  lost connection, screen freeze, auction update, confirmation only screens etc.
+#  lost connection, screen freeze, auction update, confirmation only screens etc. Help:
+#  https://answers.launchpad.net/sikuli/+question/199842
+#  https://www.youtube.com/watch?v=hbGn1XxJzC4
 
 
 # Play one game after another changing squads in between
@@ -440,11 +440,16 @@ def players_convert(team):
 
 # TESTS
 #TODO: put it all together
-def test1():
-    App.focus(pesName)
-    time.sleep(1)
-    keyDown(Key.ESC)
-    time.sleep(0.1)
-    keyUp(Key.ESC)
-    return
-# test1()
+
+# INITIALIZE GAME (make sure settings are ready, game has started and app instance created.
+def initialize_pes():
+    makebkp()
+    global pes
+    pes_launcher.open()
+    logger.info('%s has been launched, waiting for initialization', pesName)
+    # TODO: create logic for error if app not starting
+    while True:
+        pes = App(pesName)
+        if pes.isRunning(5) and pes.getName()!='Steam.exe':
+            logger.info('Global app is initialized and %s can be used for reference', pes.getName())
+            break
