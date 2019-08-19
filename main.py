@@ -2,6 +2,8 @@ import logging
 import os
 import shutil
 from keyboard import mouse
+import cv2
+import numpy as np
 
 from lackey import *
 
@@ -213,6 +215,8 @@ def play_one():
     # Match started - switch to stat look
     if isok('img/match-started.JPG', 160):
         press_A()
+        #TODO find another way:
+        pes_region.saveScreenCapture('./shot', 'test1')
     if isok('img/skip-graphic.JPG', 120):
         press_Y()
     # Halftime - click ok to start new match
@@ -280,24 +284,6 @@ def play_one():
 #  lost connection, screen freeze, auction update, confirmation only screens etc. Help:
 #  https://answers.launchpad.net/sikuli/+question/199842
 #  https://www.youtube.com/watch?v=hbGn1XxJzC4
-
-
-# Play one game after another changing squads in between
-#TODO find place for playing loop, find logick for number of games played etc.
-def playing_loop(number=1000):
-    game_number = 0
-    for i in range(number):
-        play_one()
-        game_number += 1
-        logger.info('Number of games played: %s', str(game_number))
-        team_change(1)
-        play_one()
-        game_number += 1
-        logger.info('Number of games played: %s', str(game_number))
-        team_change(2)
-
-    # return
-
 
 # Sign players using all available trainers one by one, skip 5stars (argument as nr of fivestars)
 def sign_all(fivestars=1):
@@ -476,3 +462,33 @@ playing_loop(10)
 #             print('Pattern found')
 #     else:
 #         print('Not found')
+
+
+# Play one game after another changing squads in between
+#TODO find place for playing loop, find logick for number of games played etc.
+def playing_loop(number=1000):
+    initialize_pes()
+    start_game()
+    game_number = 0
+    for i in range(number):
+        play_one()
+        game_number += 1
+        logger.info('Number of games played: %s', str(game_number))
+        team_change(1)
+        play_one()
+        game_number += 1
+        logger.info('Number of games played: %s', str(game_number))
+        team_change(2)
+        pes_region.saveScreenCapture('./shot', 'test2')
+        original = cv2.imread("./shot/test1.png")
+        duplicate = cv2.imread("./shot/test2.png")
+        if original.shape == duplicate.shape:
+            logger.info('Game seems to be working fine, continuing')
+            return True
+        else:
+            pes.close()
+            time.sleep(20)
+            playing_loop()
+
+    # return
+

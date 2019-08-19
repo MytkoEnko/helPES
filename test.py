@@ -1,6 +1,7 @@
-import main
+from main import *
 
-makebkp()
+
+#makebkp()
 #revertbackup()
 # start_game()
 # players_convert(2)
@@ -11,3 +12,8 @@ makebkp()
 #     else:
 #         print('Not fivestar')
 #         turn_down(1)
+
+initialize_pes()
+pes.focus()
+pes_region = pes.window()
+print(pes_region.getH(),pes_region.getW())
