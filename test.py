@@ -13,7 +13,17 @@ from main import *
 #         print('Not fivestar')
 #         turn_down(1)
 
+# initialize_pes()
+# pes.focus()
+# pes_region = pes.window()
+# print(pes_region.getH(),pes_region.getW())
+
+# original = cv2.imread("./shot/screen1.png.png")
+# duplicate = cv2.imread("./shot/test1.png")
+# if original.shape == duplicate.shape:
+#     print('Game seems to be working fine, continuing')
+# else:
+#     print('False')
 initialize_pes()
-pes.focus()
-pes_region = pes.window()
-print(pes_region.getH(),pes_region.getW())
+
+print('closing pes')

@@ -148,4 +148,5 @@ while True:
     print('first', note2020.getName(), note2020.getPID(), note2020.hasWindow())
     time.sleep(3)
     note_region = note2020.window()
-    print(note_region.getW(),note_region.getH())
+    note_region.setX(0)
+    print(note_region.getW(),note_region.getH(), note_region.getY(), note_region.getX())

@@ -2,8 +2,6 @@ import logging
 import os
 import shutil
 from keyboard import mouse
-import cv2
-import numpy as np
 
 from lackey import *
 
@@ -20,10 +18,10 @@ file_handler = logging.FileHandler('pes-f.log')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 
-# Stream hanlder
+# Stream handler
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
-stream_handler.setLevel(logging.INFO)
+stream_handler.setLevel(logging.DEBUG)
 
 # Add handlers to logger
 logger.addHandler(file_handler)
@@ -77,6 +75,7 @@ pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\P
 pesName = 'PRO EVOLUTION SOCCER 2019'
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
+team_nr = 0
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -138,9 +137,16 @@ def turn_down(n):
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(a, b, c=0.89):
     pes.focus()
+    # Update PES window
+    global pes_region
+    pes_region = pes.window()
+    logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
+
     if pes_region.exists(Pattern(a).similar(c), b):
         time.sleep(0.7)
         logger.info('%s match found', a)
+        # DEBUG:
+        pes_region.exists(Pattern(a).similar(c), b).highlight(2)
         return True
     else:
         logger.warning('%s not found', a)
@@ -199,6 +205,8 @@ def team_change(squad):
         turn_down(squad)
         time.sleep(1)
         press_A()
+    global team_nr
+    team_nr = squad
     return
 
 
@@ -216,7 +224,7 @@ def play_one():
     if isok('img/match-started.JPG', 160):
         press_A()
         #TODO find another way:
-        pes_region.saveScreenCapture('./shot', 'test1')
+        #pes_region.saveScreenCapture('./shot', 'test1')
     if isok('img/skip-graphic.JPG', 120):
         press_Y()
     # Halftime - click ok to start new match
@@ -286,7 +294,7 @@ def play_one():
 #  https://www.youtube.com/watch?v=hbGn1XxJzC4
 
 # Sign players using all available trainers one by one, skip 5stars (argument as nr of fivestars)
-def sign_all(fivestars=1):
+def sign_all(fivestars=0):
     # Initialize starting from home screen
     if base_ok(10):
         logger.info('sign_all script started')
@@ -308,12 +316,13 @@ def sign_all(fivestars=1):
                 # If there is scouts - use them
                 #   If there is fivestars - skip them
                 # TODO Think of logick for skipping fivestars if there is
-                for i in range(fivestars):
-                    if isok('sign/five-star.JPG', 1, 0.96):
-                        logger.info('%s in list is Five star player', i)
-                        turn_down(1)
-                    else:
-                        logger.info('No fivestar players %s', i)
+                if fivestars > 0:
+                    for i in range(fivestars):
+                        if isok('sign/five-star.JPG', 1, 0.96):
+                            logger.info('%s in list is Five star player', i)
+                            turn_down(1)
+                        else:
+                            logger.info('No fivestar players %s', i)
                 # Sign players
                 if isok('sign/confirm.JPG', 9):
                     press_A()
@@ -345,16 +354,15 @@ def sign_all(fivestars=1):
 
 # Remove all players others than squad
 
-def players_convert(team):
-    # internal var
-    # team_is = 0
-    # if base_ok():
-    #      logger.info('Starting players to EXP trainers convertion')
-    #      logger.info('Switch to team %s', str(team))
-    #      # Change to desired team
-    #      team_change(team)
-    # if base_ok():
-    #      press_A()
+def players_convert():
+    team_color = ''
+    if base_ok():
+         logger.info('Starting players to EXP trainers convertion')
+         # logger.info('Switch to team %s', str(team_nr))
+         # # Change to desired team DEBUG
+         team_change(team_nr)
+    if base_ok():
+         press_A()
     # Define if on reserves
     def on_reserves():
         # Define white or bronze team 0=no, 1=white, 2=bronze
@@ -364,17 +372,17 @@ def players_convert(team):
         else:
             return False
 
-    # def which_color():
-    #     if on_reserves():
-    #         turn_up(1)
-    #         turn_right(1)
-    #     if isok('conv/white-ball.JPG', 5):
-    #         team_is = 1
-    #         logger.info('Team of whites %s', str(team_is))
-    #     if isok('conv/bronze-ball.JPG', 5):
-    #         team_is = 2
-    #         logger.info('Team of bronze %s',str(team_is))
-    # # Open reserves
+    def which_color():
+        if on_reserves():
+            turn_up(1)
+            turn_right(1)
+        if isok('conv/white-ball.JPG', 5):
+            team_is = 1
+            logger.info('Team of whites %s', str(team_is))
+        if isok('conv/bronze-ball.JPG', 5):
+            team_is = 2
+            logger.info('Team of bronze %s',str(team_is))
+    # Open reserves
     def open_reserves():
         while not on_reserves():
             turn_down(1)
@@ -385,10 +393,13 @@ def players_convert(team):
     def find_victim():
         if isok('conv/reserves-list.JPG', 5):
             # create variable
-            # if team_is == 1:
-            #     ball_path='conv/white-ball.JPG'
-            # if team_is == 2:
-            #     ball_path='conv/bronze-ball.JPG'
+            ball_path = 'None'
+            if team_nr == 1:
+                del ball_path
+                ball_path='conv/white-ball.JPG'
+            if team_nr == 2:
+                del ball_path
+                ball_path='conv/bronze-ball.JPG'
             # Jump down
             pes.focus()
             # Scroll to the end
@@ -396,13 +407,20 @@ def players_convert(team):
             time.sleep(5)
             keyUp(Key.DOWN)
             while not isok('conv/black-ball.JPG', 2):
+                # and not isok('conv/gold-ball.JPG',2) and not isok('conv/silver-ball.JPG', 2)
                 for i in range(6):
-                    if isok('conv/bronze-ball.JPG', 5):
-                        logger.info('Found %s', 'white ball')
-                        return
+                    if isok(ball_path, 5):
+                        logger.info('Found %s', ball_path)
+                        return True
                     else:
                         turn_right(1)
                 turn_up(1)
+            press_B()
+            time.sleep(1)
+            press_B()
+            time.sleep(1)
+            logger.warning('Other than white or bronze ball found, escaping script')
+            return False
 
     def exec_victim():
         logger.info('Looking for victim')
@@ -417,14 +435,13 @@ def players_convert(team):
         if isok('conv/converted.JPG', 5):
             press_A()
 
-    # on_reserves()
-    #    which_color()
-    #     exec_victim()
     #TODO think on logick of how to execute, how many, when etc
     while True:
         open_reserves()
-        find_victim()
-        exec_victim()
+        if find_victim():
+            exec_victim()
+        else:
+            break
 
 # TESTS
 #TODO: put it all together
@@ -449,10 +466,10 @@ def initialize_pes():
     global pes_region
     pes_region= pes.window()
 
-initialize_pes()
-pes.focus()
-print(pes.getPID(), pes.getName(), pes.hasWindow(), pes_region.getH(),pes_region.getW())
-playing_loop(10)
+# initialize_pes()
+# pes.focus()
+# print(pes.getPID(), pes.getName(), pes.hasWindow(), pes_region.getH(),pes_region.getW())
+# playing_loop(10)
 #pes_region.saveScreenCapture('./shot','screen2')
 
 #TODO: implement pes_region.[....] to ifisok() to limit search area, same for other stuff
@@ -474,21 +491,19 @@ def playing_loop(number=1000):
         play_one()
         game_number += 1
         logger.info('Number of games played: %s', str(game_number))
-        team_change(1)
+        team_change(2)
         play_one()
         game_number += 1
         logger.info('Number of games played: %s', str(game_number))
-        team_change(2)
-        pes_region.saveScreenCapture('./shot', 'test2')
-        original = cv2.imread("./shot/test1.png")
-        duplicate = cv2.imread("./shot/test2.png")
-        if original.shape == duplicate.shape:
-            logger.info('Game seems to be working fine, continuing')
-            return True
-        else:
-            pes.close()
-            time.sleep(20)
-            playing_loop()
+        team_change(1)
+        # pes_region.saveScreenCapture('./shot', 'test2')
+        #original = cv2.imread("./shot/test1.png")
+        #duplicate = cv2.imread("./shot/test2.png")
+        # if original.shape == duplicate.shape:
+        #     logger.info('Game seems to be working fine, continuing')
+        # else:
+        #     pes.close()
+        #     time.sleep(20)
+        #     playing_loop()
 
     # return
-
