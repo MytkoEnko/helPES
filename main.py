@@ -189,8 +189,8 @@ def start_game():
     # if auction then hope:
     if isok('img/auction-report.jpg', 10):
         press_A()
-    if isok('img/big-ok.JPG', 15):
-        press_A()
+        if isok('img/big-ok.JPG', 15):
+            press_A()
 
     if base_ok(20):
         logger.info("Game started successfully, logged in to game, can proceed with scripts")
@@ -356,13 +356,13 @@ def sign_all(fivestars=0):
 
 def players_convert():
     team_color = ''
-    if base_ok():
-         logger.info('Starting players to EXP trainers convertion')
-         # logger.info('Switch to team %s', str(team_nr))
-         # # Change to desired team DEBUG
-         team_change(team_nr)
-    if base_ok():
-         press_A()
+    # if base_ok():
+    #      logger.info('Starting players to EXP trainers convertion')
+    #      # logger.info('Switch to team %s', str(team_nr))
+    #      # # Change to desired team DEBUG
+    #      #team_change(1)
+    # if base_ok():
+    #      press_A()
     # Define if on reserves
     def on_reserves():
         # Define white or bronze team 0=no, 1=white, 2=bronze
@@ -409,6 +409,9 @@ def players_convert():
             while not isok('conv/black-ball.JPG', 2):
                 # and not isok('conv/gold-ball.JPG',2) and not isok('conv/silver-ball.JPG', 2)
                 for i in range(6):
+                    if isok('conv/black-ball.JPG',2):
+                        logger.info('Found black ball, exiting')
+                        break
                     if isok(ball_path, 5):
                         logger.info('Found %s', ball_path)
                         return True
@@ -436,12 +439,18 @@ def players_convert():
             press_A()
 
     #TODO think on logick of how to execute, how many, when etc
-    while True:
-        open_reserves()
-        if find_victim():
-            exec_victim()
-        else:
-            break
+    for i in range(1,3):
+        if base_ok():
+            logger.info('Starting players to EXP trainers convertion')
+            team_change(i)
+        if base_ok():
+            press_A()
+        while True:
+            open_reserves()
+            if find_victim():
+                exec_victim()
+            else:
+                break
 
 # TESTS
 #TODO: put it all together
