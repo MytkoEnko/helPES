@@ -135,21 +135,21 @@ def turn_down(n):
     return
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
-def isok(a, b, c=0.89):
+def isok(img, seconds, similarity=0.89):
     pes.focus()
     # Update PES window
     global pes_region
     pes_region = pes.window()
-    logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
+    #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
-    if pes_region.exists(Pattern(a).similar(c), b):
+    if pes_region.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
-        logger.info('%s match found', a)
+        logger.info('%s match found', img)
         # DEBUG:
-        pes_region.exists(Pattern(a).similar(c), b).highlight(2)
+        pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(2)
         return True
     else:
-        logger.warning('%s not found', a)
+        logger.warning('%s not found', img)
         return False
 
 
@@ -352,6 +352,46 @@ def sign_all(fivestars=0):
             logger.info('sign_all script finished')
         return
 
+def sell_scouts():
+    scout_number = 0
+    if base_ok(3):
+        logger.info('Sell scouts script started')
+        turn_right(4)
+    if isok('sign/scout.JPG',3):
+        press_A()
+    if isok('sign/sign-enter.JPG', 4):
+        turn_down(2)
+        turn_right(1)
+    if isok('sign/sell-enter.JPG',3):
+        press_A()
+    if isok('sign/no-scouts-left.JPG',3):
+        press_A()
+        time.sleep(0.5)
+        press_B()
+    else:
+        while isok('sign/unchecked.JPG',2,0.99):
+            press_A()
+            turn_down(1)
+            scout_number += 1
+        if isok('sign/last-checked.JPG',0.7):
+             press_X()
+        if isok('sign/confirm-sell.JPG',0.7):
+            turn_right(1)
+            press_A()
+        if isok('sign/reward-received.JPG',0.7):
+            press_A()
+            logger.info('%s scouts sold, reward is received',scout_number)
+        if isok('sign/no-scouts-left.JPG',0.5):
+            press_A()
+            time.sleep(0.5)
+            press_B()
+    if isok('sign/scout.JPG',5):
+        turn_left(4)
+    if base_ok():
+        logger.info('Sell scouts script has finished')
+
+
+
 # Remove all players others than squad
 
 def players_convert():
@@ -409,10 +449,10 @@ def players_convert():
             while not isok('conv/black-ball.JPG', 2):
                 # and not isok('conv/gold-ball.JPG',2) and not isok('conv/silver-ball.JPG', 2)
                 for i in range(6):
-                    if isok('conv/black-ball.JPG',2):
+                    if isok('conv/black-ball.JPG',0.5):
                         logger.info('Found black ball, exiting')
                         break
-                    if isok(ball_path, 5):
+                    if isok(ball_path, 0.5):
                         logger.info('Found %s', ball_path)
                         return True
                     else:
@@ -474,6 +514,7 @@ def initialize_pes():
         logger.info('%s already running and initialized, we can proceed with scripts', pes.getName())
     global pes_region
     pes_region= pes.window()
+    return pes_region
 
 # initialize_pes()
 # pes.focus()
@@ -494,7 +535,7 @@ def initialize_pes():
 #TODO find place for playing loop, find logick for number of games played etc.
 def playing_loop(number=1000):
     initialize_pes()
-    start_game()
+    #start_game()
     game_number = 0
     for i in range(number):
         play_one()
