@@ -142,11 +142,14 @@ def starting_note():
                 break
             else:
                 print('No such app is running')
+    return note2020
 
 starting_note()
 while True:
-    print('first', note2020.getName(), note2020.getPID(), note2020.hasWindow())
-    time.sleep(3)
+    print(note2020.getName(), note2020.getPID(), note2020.hasWindow())
+    time.sleep(2)
     note_region = note2020.window()
-    note_region.setX(0)
+    #note_region.setSize(1000,150).highlight(1)
+    note_region.setRect(note_region.getX(),note_region.getY(), 90, 150).highlight(1)
+    note_region.setRect(note_region.getX(), note_region.getY(), 90, 150).saveScreenCapture('shot/', 'dupa')
     print(note_region.getW(),note_region.getH(), note_region.getY(), note_region.getX())
