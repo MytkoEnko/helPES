@@ -29,7 +29,7 @@ logger.addHandler(stream_handler)
 
 # -------------------------------------------- SETTINGS FILE HANDLING
 
-settings_path = os.path.expanduser('~/Documents/KONAMI/PRO EVOLUTION SOCCER 2019/')
+settings_path = os.path.expanduser('~/Documents/KONAMI/eFootball PES 2020/')
 settings_file = settings_path + 'settings.dat'
 settings_backup = settings_path + 'settings.dat.pes-bkp'
 settings_pesbot = 'settings.dat'
@@ -66,13 +66,13 @@ def revertbackup():
         os.rename(settings_backup, settings_file)
         logger.info("Backup reverted to %s", os.path.basename(settings_file))
     else:
-        logger.warn("No backup or something is wrong with file structure. Skipping")
+        logger.warning("No backup or something is wrong with file structure. Skipping")
 
 
 # ------------------------------------------ DEFINE GAME VARIABLES
 
-pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\PRO EVOLUTION SOCCER 2019\\PES2019.exe"')
-pesName = 'PRO EVOLUTION SOCCER 2019'
+pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"')
+pesName = 'eFootball PES 2020'
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
 team_nr = 0
@@ -244,7 +244,8 @@ def play_one():
     if isok('img/experience.JPG', 30):
         press_A()
         time.sleep(0.8)
-        press_A()
+        if isok('img/experience.JPG', 2):
+            press_A()
 
     # Level up
     if isok('img/levelup.JPG', 20):
@@ -266,21 +267,20 @@ def play_one():
     if isok('img/contract-manager-upd.JPG', 160):
         press_A()
 
+    # If contract expires players only (for now)
     if isok('img/contract-confirm1.JPG', 10):
         turn_right(1)
         press_A()
 
-    # If contract expires players only (for now)
+        if isok('img/pay-gp.JPG', 10):
+            press_A()
 
-    if isok('img/pay-gp.JPG', 10):
-        press_A()
+        if isok('img/sure-pay.JPG', 10):
+            turn_right(1)
+            press_A()
 
-    if isok('img/sure-pay.JPG', 10):
-        turn_right(1)
-        press_A()
-
-    if isok('img/contracts-renewed.JPG', 10):
-        press_A()
+        if isok('img/contracts-renewed.JPG', 10):
+            press_A()
 
     # Confirm got back to club house
     if base_ok(30):
