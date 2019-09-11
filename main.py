@@ -140,6 +140,7 @@ def isok(img, seconds, similarity=0.89):
     # Update PES window
     global pes_region
     pes_region = pes.window()
+    #pes_region.highlight(1)
     #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
@@ -175,16 +176,21 @@ def start_game():
     pes.focus()
     if isok('img/press-button.jpg', 180):
         press_A()
-    if isok('img/online-confirm.jpg', 25):
+    if isok('img/online-confirm.jpg', 25) or isok('img/no-new-updates.JPG', 20):
         press_A()
+    ########### There comes some ad
+    if isok('img/game-screen.JPG', 30):
+        turn_down(1)
     if isok('img/myclub-enter.JPG', 60):
         press_A()
-    if isok('img/proceed-btn.JPG', 25):
-        press_A()
-    if isok('img/ack.JPG', 25):
-        press_A()
-    if isok('img/proceed-small.JPG', 120):
-        press_A()
+        if isok('img/sure-start.JPG', 15):
+            press_A()
+    # if isok('img/proceed-btn.JPG', 25):
+    #     press_A()
+    # if isok('img/no-new-updates.JPG', 25):
+    #     press_A()
+    # if isok('img/proceed-small.JPG', 120):
+    #     press_A()
 
     # if auction then hope:
     if isok('img/auction-report.jpg', 10):
@@ -323,6 +329,10 @@ def sign_all(fivestars=0):
                             turn_down(1)
                         else:
                             logger.info('No fivestar players %s', i)
+                    if isok('sign/five-star.JPG', 1, 0.96):
+                        logger.info('More 4-5 stars than provided or all other used. Escaping.')
+                        press_B()
+                        break
                 # Sign players
                 if isok('sign/confirm.JPG', 9):
                     press_A()
@@ -535,7 +545,7 @@ def initialize_pes():
 #TODO find place for playing loop, find logick for number of games played etc.
 def playing_loop(number=1000):
     initialize_pes()
-    #start_game()
+    start_game()
     game_number = 0
     for i in range(number):
         play_one()
@@ -557,3 +567,6 @@ def playing_loop(number=1000):
         #     playing_loop()
 
     # return
+#playing_loop(10)
+initialize_pes()
+sign_all(3)

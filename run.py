@@ -13,6 +13,5 @@ from main import *
 #start_game()
 #sign_all()
 #players_convert()
-time.
 playing_loop()
 #sell_scouts()
