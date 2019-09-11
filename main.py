@@ -545,7 +545,10 @@ def initialize_pes():
 #TODO find place for playing loop, find logick for number of games played etc.
 def playing_loop(number=1000):
     initialize_pes()
-    start_game()
+    if base_ok():
+        logger.info('Game is on, no need to start')
+    else:
+        start_game()
     game_number = 0
     for i in range(number):
         play_one()
@@ -568,5 +571,3 @@ def playing_loop(number=1000):
 
     # return
 #playing_loop(10)
-initialize_pes()
-sign_all(3)
