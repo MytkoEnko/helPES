@@ -178,13 +178,18 @@ def start_game():
         press_A()
     if isok('img/online-confirm.jpg', 25) or isok('img/no-new-updates.JPG', 20):
         press_A()
-    ########### There comes some ad
-    if isok('img/game-screen.JPG', 30):
+    if isok('img/this-week-pick-up.JPG', 30):
+        press_B()
+    if isok('img/game-screen.JPG', 30, 0.7):
         turn_down(1)
-    if isok('img/myclub-enter.JPG', 60):
+    if isok('img/myclub-enter.JPG', 60, 0.7):
         press_A()
         if isok('img/sure-start.JPG', 15):
             press_A()
+    if isok('img/live-update.JPG', 7):
+        press_A()
+    if isok('img/featured-players.JPG', 8):
+        press_A()
     # if isok('img/proceed-btn.JPG', 25):
     #     press_A()
     # if isok('img/no-new-updates.JPG', 25):
@@ -192,12 +197,12 @@ def start_game():
     # if isok('img/proceed-small.JPG', 120):
     #     press_A()
 
-    # if auction then hope:
+    # TODO if auction then hope:
     if isok('img/auction-report.jpg', 10):
         press_A()
         if isok('img/big-ok.JPG', 15):
             press_A()
-
+    # Loaded successfully
     if base_ok(20):
         logger.info("Game started successfully, logged in to game, can proceed with scripts")
     return
@@ -540,6 +545,39 @@ def initialize_pes():
 #     else:
 #         print('Not found')
 
+########################################################### CONSTRUCTION AREA
+initialize_pes()
+pes.focus()
+pes_region.saveScreenCapture('./shot','test4')
+# pes_x = pes_region.getX()
+# pes_y = pes_region.getY()
+# pes_w = pes_region.getW()
+# pes_h = pes_region.getH()
+# print(pes_x, pes_y, pes_w, pes_h)
+# print(pes.getPID(), pes.getName(), pes.hasWindow(), pes_region.getX(), pes_region.getY(), pes_region.getH(),pes_region.getW())
+# dupa = pes_region.exists(Pattern('shot/money.JPG').similar(0.8), 5)
+# print('DUpa: ', dupa.getH(), dupa.getW())
+# dupa.highlight(1)
+#
+# player_position = [1, 2, 3, 4]
+# player_rating = [1, 2, 3, 4]
+# contract_duration = [1, 2, 3, 4]
+#
+# def pictaker(coordinates):
+#     # create pic based on received coordinates
+#     print('Something')
+#
+# def coordset():
+#     # get standard positions and align it to pes window
+#     print('Something')
+#
+# def screen_reader(coordinates, expected_value):
+#     # gets coordinates and expected value there - returns boolean if value match one in area or not
+#     print('Value')
+
+
+
+###########################################################
 
 # Play one game after another changing squads in between
 #TODO find place for playing loop, find logick for number of games played etc.
@@ -571,3 +609,4 @@ def playing_loop(number=1000):
 
     # return
 #playing_loop(10)
+

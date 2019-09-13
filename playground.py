@@ -2,7 +2,8 @@ import logging
 import os
 import shutil
 from keyboard import mouse
-
+import pytesseract
+import cv2
 from lackey import *
 
 # ---------------------------------------------- LOGGING HANDLING
@@ -144,12 +145,15 @@ def starting_note():
                 print('No such app is running')
     return note2020
 
-starting_note()
-while True:
-    print(note2020.getName(), note2020.getPID(), note2020.hasWindow())
-    time.sleep(2)
-    note_region = note2020.window()
-    #note_region.setSize(1000,150).highlight(1)
-    note_region.setRect(note_region.getX(),note_region.getY(), 90, 150).highlight(1)
-    note_region.setRect(note_region.getX(), note_region.getY(), 90, 150).saveScreenCapture('shot/', 'dupa')
-    print(note_region.getW(),note_region.getH(), note_region.getY(), note_region.getX())
+# starting_note()
+# while True:
+#     print(note2020.getName(), note2020.getPID(), note2020.hasWindow())
+#     time.sleep(2)
+#     note_region = note2020.window()
+#     #note_region.setSize(1000,150).highlight(1)
+#     note_region.setRect(note_region.getX(),note_region.getY(), 90, 150).highlight(1)
+#     note_region.setRect(note_region.getX(), note_region.getY(), 90, 150).saveScreenCapture('shot/', 'dupa')
+#     print(note_region.getW(),note_region.getH(), note_region.getY(), note_region.getX())
+#Region(0,0,100,240).highlight(2)
+
+img = cv2.resize(money.JPG)
