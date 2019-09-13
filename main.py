@@ -1,8 +1,8 @@
 import logging
 import os
 import shutil
-from keyboard import mouse
-
+import mouse
+import pytesseract
 from lackey import *
 
 # ---------------------------------------------- LOGGING HANDLING
@@ -33,7 +33,13 @@ settings_path = os.path.expanduser('~/Documents/KONAMI/eFootball PES 2020/')
 settings_file = settings_path + 'settings.dat'
 settings_backup = settings_path + 'settings.dat.pes-bkp'
 settings_pesbot = 'settings.dat'
-
+pes_frame = []
+spots = {
+    'money' : [952, 66, 132, 30],
+    'player_position' : [],
+    'player_rating' : [],
+    'contract_duration' : [],
+}
 
 def isthere(a):
     if os.path.exists(a):
@@ -186,9 +192,9 @@ def start_game():
         press_A()
         if isok('img/sure-start.JPG', 15):
             press_A()
-    if isok('img/live-update.JPG', 7):
+    if isok('img/live-update.JPG', 17):
         press_A()
-    if isok('img/featured-players.JPG', 8):
+    if isok('img/featured-players.JPG', 17):
         press_A()
     # if isok('img/proceed-btn.JPG', 25):
     #     press_A()
@@ -546,36 +552,49 @@ def initialize_pes():
 #         print('Not found')
 
 ########################################################### CONSTRUCTION AREA
-initialize_pes()
-pes.focus()
-pes_region.saveScreenCapture('./shot','test4')
-# pes_x = pes_region.getX()
-# pes_y = pes_region.getY()
-# pes_w = pes_region.getW()
-# pes_h = pes_region.getH()
-# print(pes_x, pes_y, pes_w, pes_h)
-# print(pes.getPID(), pes.getName(), pes.hasWindow(), pes_region.getX(), pes_region.getY(), pes_region.getH(),pes_region.getW())
-# dupa = pes_region.exists(Pattern('shot/money.JPG').similar(0.8), 5)
-# print('DUpa: ', dupa.getH(), dupa.getW())
+def set_pes_frame():
+    global pes_frame
+    pes_frame = [pes_region.getX(),
+                 pes_region.getY(),
+                 ]
+    return pes_frame
+
+def coordset(pes_xy, object_name):
+    global spots
+    spots[object_name][0] = spots[object_name][0] + pes_xy[0]
+    spots[object_name][1] = spots[object_name][1] + pes_xy[1]
+    logger.info('Object x=%s, y=%s, w=%s, h=%s', *spots[object_name])
+    return spots[object_name]
+
+
+    # GET OBJECT POSITIONS - first set pes window to 0,0 make snapshot and write in eg money.PNG to receive values
+# dupa = pes_region.exists(Pattern('shot/money.PNG').similar(0.8), 5)
+# print('DUpa: ',dupa.getX(), dupa.getY(), dupa.getW(), dupa.getH())
 # dupa.highlight(1)
-#
-# player_position = [1, 2, 3, 4]
-# player_rating = [1, 2, 3, 4]
-# contract_duration = [1, 2, 3, 4]
-#
-# def pictaker(coordinates):
-#     # create pic based on received coordinates
-#     print('Something')
-#
-# def coordset():
-#     # get standard positions and align it to pes window
-#     print('Something')
-#
-# def screen_reader(coordinates, expected_value):
-#     # gets coordinates and expected value there - returns boolean if value match one in area or not
-#     print('Value')
 
 
+def pictaker(object_name):
+    pict = Region(*coordset(pes_frame, object_name))
+    # print('DUpa: ', pict.getX(), pict.getY(), pict.getW(), pict.getH())
+    pict.saveScreenCapture('./shot', 'tmp')
+    pict.highlight(1)
+
+def recognizer(object_name):
+    # gets coordinates and expected value there - returns boolean if value match one in area or not
+    pictaker(object_name)
+    recognized_value = str(pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits'))
+
+
+
+initialize_pes()
+set_pes_frame()
+pes.focus()
+sto = recognizer('money')
+print(sto)
+# if sto > 100:
+#     print('Is more than 100')
+# else:
+#     print('It\'s not :P')
 
 ###########################################################
 
