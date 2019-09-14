@@ -1,7 +1,7 @@
 import logging
 import os
 import shutil
-import mouse
+from keyboard import mouse
 import pytesseract
 from lackey import *
 
@@ -333,18 +333,19 @@ def sign_all(fivestars=0):
                 # If there is scouts - use them
                 #   If there is fivestars - skip them
                 # TODO Think of logick for skipping fivestars if there is
-                if fivestars > 0:
-                    for i in range(fivestars):
-                        if isok('sign/five-star.JPG', 1, 0.96):
-                            logger.info('%s in list is Five star player', i)
-                            turn_down(1)
-                        else:
-                            logger.info('No fivestar players %s', i)
-                    if isok('sign/five-star.JPG', 1, 0.96):
-                        logger.info('More 4-5 stars than provided or all other used. Escaping.')
-                        press_B()
-                        break
+                # if fivestars > 0:
+                #     for i in range(fivestars):
+                #         if isok('sign/five-star.JPG', 1, 0.96):
+                #             logger.info('%s in list is Five star player', i)
+                #             turn_down(1)
+                #         else:
+                #             logger.info('No fivestar players %s', i)
+                #     if isok('sign/five-star.JPG', 1, 0.96):
+                #         logger.info('More 4-5 stars than provided or all other used. Escaping.')
+                #         press_B()
+                #         break
                 # Sign players
+                turn_down(8)
                 if isok('sign/confirm.JPG', 9):
                     press_A()
                 if isok('sign/chosed-trainer.JPG', 9):
@@ -586,11 +587,11 @@ def recognizer(object_name):
 
 
 
-initialize_pes()
-set_pes_frame()
-pes.focus()
-sto = recognizer('money')
-print(sto)
+# initialize_pes()
+# set_pes_frame()
+# pes.focus()
+# sto = recognizer('money')
+# print(sto)
 # if sto > 100:
 #     print('Is more than 100')
 # else:
