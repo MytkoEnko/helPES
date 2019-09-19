@@ -87,7 +87,7 @@ team_nr = 0
 
 def simulate_button(button):
     pes.focus()
-    time.sleep(0.8)
+    time.sleep(0.3)
     keyDown(button)
     time.sleep(0.1)
     keyUp(button)
@@ -150,10 +150,9 @@ def isok(img, seconds, similarity=0.89):
     #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
-        time.sleep(0.7)
+        #time.sleep(0.7)
+        pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
         logger.info('%s match found', img)
-        # DEBUG:
-        pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(2)
         return True
     else:
         logger.warning('%s not found', img)
@@ -345,7 +344,6 @@ def sign_all(fivestars=0):
                 #         press_B()
                 #         break
                 # Sign players
-                turn_down(8)
                 if isok('sign/confirm.JPG', 9):
                     press_A()
                 if isok('sign/chosed-trainer.JPG', 9):
