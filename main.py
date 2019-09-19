@@ -4,6 +4,10 @@ import shutil
 from keyboard import mouse
 import pytesseract
 from lackey import *
+try:
+    from PIL import Image
+except ImportError:
+    import Image
 
 # ---------------------------------------------- LOGGING HANDLING
 
@@ -37,7 +41,7 @@ pes_frame = []
 spots = {
     'money' : [952, 66, 132, 30],
     'player_position' : [],
-    'player_rating' : [],
+    'player_rating' : [961, 252, 48, 36],
     'contract_duration' : [],
 }
 
@@ -551,6 +555,7 @@ def initialize_pes():
 #         print('Not found')
 
 ########################################################### CONSTRUCTION AREA
+# Locates pes window and writes down it's XY to global variable
 def set_pes_frame():
     global pes_frame
     pes_frame = [pes_region.getX(),
@@ -558,6 +563,8 @@ def set_pes_frame():
                  ]
     return pes_frame
 
+# Takes current pes window XY and object name, checks object dictionary by provided name
+# and updates global variable with real object XYWH adjusted to pes window
 def coordset(pes_xy, object_name):
     global spots
     spots[object_name][0] = spots[object_name][0] + pes_xy[0]
@@ -571,24 +578,45 @@ def coordset(pes_xy, object_name):
 # print('DUpa: ',dupa.getX(), dupa.getY(), dupa.getW(), dupa.getH())
 # dupa.highlight(1)
 
+def locate(im_path):
+    dupa = pes_region.exists(Pattern(im_path).similar(0.8), 5)
+    adjust = set_pes_frame()
+    print('DUpa: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
+    dupa.highlight(1)
 
+
+# Takes object name, calls other function that bring back exact location of the object,
+# next it takes picture of that location and saves it in /shot/tmp.PNG
 def pictaker(object_name):
     pict = Region(*coordset(pes_frame, object_name))
     # print('DUpa: ', pict.getX(), pict.getY(), pict.getW(), pict.getH())
     pict.saveScreenCapture('./shot', 'tmp')
     pict.highlight(1)
 
+# Takes saved by pictaker() file and recognizes it's value, returns that value
+# TODO think of how to behave if value can be converted to int or not
 def recognizer(object_name):
     # gets coordinates and expected value there - returns boolean if value match one in area or not
     pictaker(object_name)
     recognized_value = str(pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits'))
+    #recognized_value = int(pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits'))
+    print('recognized value: ', recognized_value)
+    return recognized_value
 
-
-
+def testtt(object_name):
+    pict = Region(*coordset(pes_frame, object_name))
+    dupa = pytesseract.image_to_string(pict.getBitmap())
+    return dupa
 # initialize_pes()
-# set_pes_frame()
-# pes.focus()
-# sto = recognizer('money')
+#
+# locate('conv/pl_rating.PNG')
+
+initialize_pes()
+set_pes_frame()
+pes.focus()
+sto = testtt('player_rating')
+print(sto)
+# sto = recognizer('player_rating')
 # print(sto)
 # if sto > 100:
 #     print('Is more than 100')
