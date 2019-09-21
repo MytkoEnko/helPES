@@ -37,13 +37,6 @@ settings_path = os.path.expanduser('~/Documents/KONAMI/eFootball PES 2020/')
 settings_file = settings_path + 'settings.dat'
 settings_backup = settings_path + 'settings.dat.pes-bkp'
 settings_pesbot = 'settings.dat'
-pes_frame = []
-spots = {
-    'money' : [952, 66, 132, 30],
-    'player_position' : [],
-    'player_rating' : [961, 252, 48, 36],
-    'contract_duration' : [],
-}
 
 def isthere(a):
     if os.path.exists(a):
@@ -86,6 +79,28 @@ pesName = 'eFootball PES 2020'
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
 team_nr = 0
+pes_frame = []
+spots = {
+    'money' : [987, 34, 113, 107],
+    'player_position' : [861, 222, 178, 35], #[949, 223, 69, 33],
+    'player_rating' : [921, 248, 93, 105],
+    'contract_duration' : [1059, 476, 231, 67],
+    'surname' : [904, 95, 363, 86], #[921, 146, 294, 35],
+}
+# Pic, coordinates related to reserves, string reserved for surname
+position = {
+    'gk': ['conv/gk.JPG', [1,1,1,0], '@'],
+    'lb': ['conv/lb.JPG', [1,0,0,0], '@'],
+    'clb': ['conv/cb.JPG', [1,1,0,0], '@'],
+    'crb': ['conv/cb.JPG', [1,2,0,0], '@'],
+    'rb': ['conv/rb.JPG', [1,3,0,0], '@'],
+    'cml': ['conv/cmf.JPG', [2,0,0,0], '@'],
+    'dmf': ['conv/dmf.JPG', [2,1,0,0], '@'],
+    'cmr': ['conv/cmf.JPG', [2,2,0,0], '@'],
+    'lwf': ['conv/lwf.JPG', [3,0,0,0], '@'],
+    'cf': ['conv/cf.JPG', [3,1,0,0], '@'],
+    'rwf': ['conv/rwf.JPG', [3,2,0,0], '@'],
+}
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -574,14 +589,11 @@ def coordset(pes_xy, object_name):
 
 
     # GET OBJECT POSITIONS - first set pes window to 0,0 make snapshot and write in eg money.PNG to receive values
-# dupa = pes_region.exists(Pattern('shot/money.PNG').similar(0.8), 5)
-# print('DUpa: ',dupa.getX(), dupa.getY(), dupa.getW(), dupa.getH())
-# dupa.highlight(1)
 
 def locate(im_path):
     dupa = pes_region.exists(Pattern(im_path).similar(0.8), 5)
     adjust = set_pes_frame()
-    print('DUpa: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
+    print('Coordinates: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
     dupa.highlight(1)
 
 
@@ -598,30 +610,32 @@ def pictaker(object_name):
 def recognizer(object_name):
     # gets coordinates and expected value there - returns boolean if value match one in area or not
     pictaker(object_name)
-    recognized_value = str(pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits'))
+    recognized_value = pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits')
     #recognized_value = int(pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits'))
     print('recognized value: ', recognized_value)
     return recognized_value
 
 def testtt(object_name):
     pict = Region(*coordset(pes_frame, object_name))
-    dupa = pytesseract.image_to_string(pict.getBitmap())
+    dupa = pytesseract.image_to_string(pict.getBitmap(), lang='equ+eng', config='')
     return dupa
-# initialize_pes()
-#
-# locate('conv/pl_rating.PNG')
-
 initialize_pes()
+#
+#locate('shot/contract_duration.JPG')
+
+
 set_pes_frame()
-pes.focus()
-sto = testtt('player_rating')
+# #pes.focus()
+#sto = int(testtt('player_rating'))
+#sto = int(float(testtt('money'))*1000)
+sto = testtt('surname')
 print(sto)
 # sto = recognizer('player_rating')
 # print(sto)
-# if sto > 100:
-#     print('Is more than 100')
+# if sto > 70:
+#      print('Is more than 70')
 # else:
-#     print('It\'s not :P')
+#      print('It\'s not :P')
 
 ###########################################################
 
