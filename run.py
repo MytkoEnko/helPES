@@ -17,3 +17,6 @@ from main import *
 #playing_loop()
 
 #sell_scouts()
+# initialize_pes()
+# print(recognize('player_rating'))
+# print(int(recognize('player_rating')))

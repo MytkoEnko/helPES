@@ -193,6 +193,44 @@ def base_ok(a=5):
         logger.error('Not on home base, can\' proceed')
         return False
 
+########################################################### CONSTRUCTION AREA
+# Find coordinates of img pattern and write it down
+def locate(im_path):
+    dupa = pes_region.exists(Pattern(im_path).similar(0.8), 5)
+    #adjust = set_pes_frame()
+    print('Coordinates: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
+    dupa.highlight(1)
+
+# Playground
+#locate('shot/contract_duration.JPG')
+
+
+# Takes current pes window XY and object name, checks object dictionary by provided name
+# and updates global variable with real object XYWH adjusted to pes window
+# TODO to set global relative coordinates for all objects on initialize (and not move window or set watcher),
+#  or create variable and use coordset every time?
+def coordset(pes_xy, object_name):
+    #global spots
+    obj_coordinates = spots[object_name].copy()
+    # spots[object_name][0] = spots[object_name][0] + pes_xy[0]
+    # spots[object_name][1] = spots[object_name][1] + pes_xy[1]
+    obj_coordinates[0] = obj_coordinates[0] + pes_xy[0]
+    obj_coordinates[1] = obj_coordinates[1] + pes_xy[1]
+    logger.info('Object x=%s, y=%s, w=%s, h=%s', *obj_coordinates)
+    return obj_coordinates
+
+
+# Takes object name, checks it's relevant coordinates and recognizes value
+
+def recognize(object_name, conf_options='outputbase digits'):
+    pict = Region(*coordset(pes_frame, object_name))
+    dupa = pytesseract.image_to_string(pict.getBitmap(), lang='equ+eng', config=conf_options)
+    return dupa
+
+
+###########################################################
+
+#       ------------------------------------ PROCEDURES --------------------------------------
 
 # Start game and go to "Club house" which is base point of the game
 def start_game():
@@ -242,6 +280,7 @@ def team_change(squad):
         press_A()
     global team_nr
     team_nr = squad
+    logger.info('Team number changed to: %s', team_nr)
     return
 
 
@@ -432,26 +471,17 @@ def sell_scouts():
 
 
 # Remove all players others than squad
-
-def players_convert():
-    team_color = ''
-    # if base_ok():
-    #      logger.info('Starting players to EXP trainers convertion')
-    #      # logger.info('Switch to team %s', str(team_nr))
-    #      # # Change to desired team DEBUG
-    #      #team_change(1)
-    # if base_ok():
-    #      press_A()
-    # Define if on reserves
-    def on_reserves():
+# ----------------  PLAYERS CONVERTING ---------------------------
+def on_reserves():
         # Define white or bronze team 0=no, 1=white, 2=bronze
         if isok('conv/reserves.JPG', 8):
             logger.info('On reserves')
             return True
         else:
+            logger.warning('Not on reserves')
             return False
 
-    def which_color():
+def which_color():
         if on_reserves():
             turn_up(1)
             turn_right(1)
@@ -462,14 +492,14 @@ def players_convert():
             team_is = 2
             logger.info('Team of bronze %s',str(team_is))
     # Open reserves
-    def open_reserves():
+def to_reserves():
         while not on_reserves():
-            turn_down(1)
-            turn_left(1)
-        press_A()
+            turn_down(5)
+            turn_left(5)
+        #press_A()
 
     # Ensure on reserves
-    def find_victim():
+def find_victim():
         if isok('conv/reserves-list.JPG', 5):
             # create variable
             ball_path = 'None'
@@ -504,11 +534,11 @@ def players_convert():
             logger.warning('Other than white or bronze ball found, escaping script')
             return False
 
-    def exec_victim():
+def exec_victim(turns_down=2):
         logger.info('Looking for victim')
         press_X()
         if isok('conv/player-menu.JPG', 5):
-            turn_down(2)
+            turn_down(turns_down)
         if isok('conv/convert.JPG', 5):
             press_A()
         if isok('conv/no.JPG', 5):
@@ -517,6 +547,8 @@ def players_convert():
         if isok('conv/converted.JPG', 5):
             press_A()
 
+def players_convert():
+    team_color = ''
     #TODO think on logick of how to execute, how many, when etc
     for i in range(1,3):
         if base_ok():
@@ -525,16 +557,105 @@ def players_convert():
         if base_ok():
             press_A()
         while True:
-            open_reserves()
+            to_reserves()
+            press_A()
             if find_victim():
                 exec_victim()
             else:
                 break
 
+def smart_players_convert(rating=75):
+    def safe_pl_rating():
+        try:
+            players_rating = int(recognize('player_rating'))
+        except ValueError:
+            players_rating = 85
+        return players_rating
+
+
+
+    if base_ok():
+        logger.info('On base, entering team')
+        press_A()
+    global position
+    for key, value in position.items():
+        logger.info('Position %s, name %s', key, value[2])
+        to_reserves()
+        turn_up(value[1][0])
+        turn_right(value[1][1])
+        turn_down(value[1][2])
+        turn_left(value[1][3])
+        #correct_position = isok(value[0],5)
+        correct_rating = safe_pl_rating() < rating
+        if correct_rating:
+            logger.info('Converting player to EXP trainer')
+            #exec_victim(3)
+        else:
+            logger.warning('Player on position %s with rating %s or more is in the team, skipping this one', key, rating)
+            continue
+
+        # Open reserves and go down
+        logger.info('Looking for another player to play on %s position', key)
+        time.sleep(1)
+        press_A()
+        to_reserves()
+        press_A()
+        keyDown(Key.DOWN)
+        time.sleep(3)
+        keyUp(Key.DOWN)
+        while not isok('conv/on_team.JPG',3):
+            time.sleep(0.5)
+            found = False
+            for i in range(6):
+                if isok(value[0],5):
+                    logger.info('Found match for %s', value[0])
+                    if safe_pl_rating() < rating:
+                        logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
+                        if value[2] != recognize('surname',''):
+                            value[2] = recognize('surname','')
+                            logger.info('New player %s set on position %s', value[2], key)
+                            found = True
+                            press_A()
+                            break
+                if not found:
+                    logger.info('Not %s, turning right', key)
+                    turn_right(1)
+            if found:
+                logger.info('Found new player for position %s, job done.', key)
+                break
+            elif safe_pl_rating() >= rating:
+                logger.info('No low leveled players for %s position, picking any.', key)
+                turn_down(15)
+                while not safe_pl_rating() < rating and value[2] != recognize('surname',''):
+                    logger.info('Player not found in the row, going up')
+                    turn_right(1)
+                    turn_up(1)
+                logger.info('Another player found')
+                press_A()
+                break
+            else:
+                logger.info('No suitable players in reserves row, up for 1 row')
+                turn_up(1)
+        time.sleep(2)
+
+        # TODO find_replacement (create function to find correct new player):
+        # rating is ok, name is not same as in value[2], write name to value[2]
+    press_B()
+
+
+
 # TESTS
 #TODO: put it all together
 
 # INITIALIZE GAME (make sure settings are ready, game has started and app instance created).
+# Set PES frame
+def set_pes_frame():
+    global pes_frame
+    pes_frame = [pes_region.getX(),
+                 pes_region.getY(),
+                ]
+    return pes_frame
+
 def initialize_pes():
     global pes
     App.focus(pesName)
@@ -553,6 +674,7 @@ def initialize_pes():
         logger.info('%s already running and initialized, we can proceed with scripts', pes.getName())
     global pes_region
     pes_region= pes.window()
+    set_pes_frame()
     return pes_region
 
 # initialize_pes()
@@ -569,79 +691,11 @@ def initialize_pes():
 #     else:
 #         print('Not found')
 
-########################################################### CONSTRUCTION AREA
-# Locates pes window and writes down it's XY to global variable
-def set_pes_frame():
-    global pes_frame
-    pes_frame = [pes_region.getX(),
-                 pes_region.getY(),
-                 ]
-    return pes_frame
 
-# Takes current pes window XY and object name, checks object dictionary by provided name
-# and updates global variable with real object XYWH adjusted to pes window
-def coordset(pes_xy, object_name):
-    global spots
-    spots[object_name][0] = spots[object_name][0] + pes_xy[0]
-    spots[object_name][1] = spots[object_name][1] + pes_xy[1]
-    logger.info('Object x=%s, y=%s, w=%s, h=%s', *spots[object_name])
-    return spots[object_name]
-
-
-    # GET OBJECT POSITIONS - first set pes window to 0,0 make snapshot and write in eg money.PNG to receive values
-
-def locate(im_path):
-    dupa = pes_region.exists(Pattern(im_path).similar(0.8), 5)
-    adjust = set_pes_frame()
-    print('Coordinates: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
-    dupa.highlight(1)
-
-
-# Takes object name, calls other function that bring back exact location of the object,
-# next it takes picture of that location and saves it in /shot/tmp.PNG
-def pictaker(object_name):
-    pict = Region(*coordset(pes_frame, object_name))
-    # print('DUpa: ', pict.getX(), pict.getY(), pict.getW(), pict.getH())
-    pict.saveScreenCapture('./shot', 'tmp')
-    pict.highlight(1)
-
-# Takes saved by pictaker() file and recognizes it's value, returns that value
-# TODO think of how to behave if value can be converted to int or not
-def recognizer(object_name):
-    # gets coordinates and expected value there - returns boolean if value match one in area or not
-    pictaker(object_name)
-    recognized_value = pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits')
-    #recognized_value = int(pytesseract.image_to_string('./shot/tmp.png', config='outputbase digits'))
-    print('recognized value: ', recognized_value)
-    return recognized_value
-
-def testtt(object_name):
-    pict = Region(*coordset(pes_frame, object_name))
-    dupa = pytesseract.image_to_string(pict.getBitmap(), lang='equ+eng', config='')
-    return dupa
-initialize_pes()
-#
-#locate('shot/contract_duration.JPG')
-
-
-set_pes_frame()
-# #pes.focus()
-#sto = int(testtt('player_rating'))
-#sto = int(float(testtt('money'))*1000)
-sto = testtt('surname')
-print(sto)
-# sto = recognizer('player_rating')
-# print(sto)
-# if sto > 70:
-#      print('Is more than 70')
-# else:
-#      print('It\'s not :P')
-
-###########################################################
 
 # Play one game after another changing squads in between
 #TODO find place for playing loop, find logick for number of games played etc.
-def playing_loop(number=1000):
+def playing_loop(number=1000, smart=False):
     initialize_pes()
     if base_ok():
         logger.info('Game is on, no need to start')
@@ -668,5 +722,42 @@ def playing_loop(number=1000):
         #     playing_loop()
 
     # return
-#playing_loop(10)
+def smart_playing_loop(smart=0, number=1000):
+    initialize_pes()
+    if base_ok():
+        logger.info('Game is on, no need to start')
+    else:
+        start_game()
+    game_number = 0
+    smart_start = smart
+    def shift_change():
+        sign_all()
+        smart_players_convert()
+        logger.info('Team nr: %s recreated', int(team_nr))
+        team_change(1)
+        smart_players_convert()
+        logger.info('Team nr: %s recreated', int(team_nr))
 
+    for i in range(number):
+    #while True:
+        if team_nr == 0 or team_nr == 2:
+            team_change(1)
+        else:
+            team_change(2)
+        play_one()
+        time.sleep(3)
+        game_number += 1
+        logger.info('Number of games played: %s', str(game_number))
+        if smart_start > 0:
+            if game_number % (smart_start * 2) == 0:
+                print('Debug: ',(game_number % (smart_start * 2)))
+                shift_change()
+                smart_start = 0
+        elif game_number % 18 == 0:
+            shift_change()
+
+
+#playing_loop(10)
+# initialize_pes()
+# smart_players_convert()
+smart_playing_loop()
