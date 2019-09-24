@@ -9,7 +9,7 @@ from main import *
 #makebkp()
 #initialize_pes()
 #team_change(2)
-#revertbackup()
+revertbackup()
 #start_game()
 #sign_all()
 #players_convert()

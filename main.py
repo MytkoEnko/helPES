@@ -4,6 +4,7 @@ import shutil
 from keyboard import mouse
 import pytesseract
 from lackey import *
+import json
 try:
     from PIL import Image
 except ImportError:
@@ -88,19 +89,19 @@ spots = {
     'surname' : [904, 95, 363, 86], #[921, 146, 294, 35],
 }
 # Pic, coordinates related to reserves, string reserved for surname
-position = {
-    'gk': ['conv/gk.JPG', [1,1,1,0], '@'],
-    'lb': ['conv/lb.JPG', [1,0,0,0], '@'],
-    'clb': ['conv/cb.JPG', [1,1,0,0], '@'],
-    'crb': ['conv/cb.JPG', [1,2,0,0], '@'],
-    'rb': ['conv/rb.JPG', [1,3,0,0], '@'],
-    'cml': ['conv/cmf.JPG', [2,0,0,0], '@'],
-    'dmf': ['conv/dmf.JPG', [2,1,0,0], '@'],
-    'cmr': ['conv/cmf.JPG', [2,2,0,0], '@'],
-    'lwf': ['conv/lwf.JPG', [3,0,0,0], '@'],
-    'cf': ['conv/cf.JPG', [3,1,0,0], '@'],
-    'rwf': ['conv/rwf.JPG', [3,2,0,0], '@'],
-}
+# position = {
+#     'gk': ['conv/gk.JPG', [1,1,1,0], '@'],
+#     'lb': ['conv/lb.JPG', [1,0,0,0], '@'],
+#     'clb': ['conv/cb.JPG', [1,1,0,0], '@'],
+#     'crb': ['conv/cb.JPG', [1,2,0,0], '@'],
+#     'rb': ['conv/rb.JPG', [1,3,0,0], '@'],
+#     'cml': ['conv/cmf.JPG', [2,0,0,0], '@'],
+#     'dmf': ['conv/dmf.JPG', [2,1,0,0], '@'],
+#     'cmr': ['conv/cmf.JPG', [2,2,0,0], '@'],
+#     'lwf': ['conv/lwf.JPG', [3,0,0,0], '@'],
+#     'cf': ['conv/cf.JPG', [3,1,0,0], '@'],
+#     'rwf': ['conv/rwf.JPG', [3,2,0,0], '@'],
+# }
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -131,6 +132,10 @@ def press_Y():
 
 def press_menu():
     simulate_button(Key.DIVIDE)
+    return
+
+def press_rs():
+    simulate_button(Key.ADD)
     return
 
 # First simulate turn mechanism, than methods for each direction using it
@@ -302,36 +307,46 @@ def play_one():
     if isok('img/skip-graphic.JPG', 120):
         press_Y()
     # Halftime - click ok to start new match
-    if isok('img/halftime.JPG', 650):
+    while not isok('img/halftime.JPG',3):
+        time.sleep(10)
         press_A()
-    if isok('img/second-half.JPG', 120):
+    else:
+        press_A()
+    while not isok('img/second-half.JPG', 3):
+        time.sleep(10)
+    else:
         press_A()
     # Skip highlights
-    if isok('img/highlights.JPG', 820):
+    while not isok('img/highlights.JPG', 3):
+        time.sleep(10)
+    else:
         press_menu()
 
-    # Experience
-    if isok('img/next-finish.JPG', 30):
-        press_A()
-
-    # Experience points (press A twice to proceed)
-    if isok('img/experience.JPG', 30):
-        press_A()
-        time.sleep(0.8)
-        if isok('img/experience.JPG', 2):
-            press_A()
-
-    # Level up
-    if isok('img/levelup.JPG', 20):
-        press_A()
-
-    # Changes rating
-    if isok('img/rating.JPG', 20):
-        press_A()
+    # # Experience
+    # if isok('img/next-finish.JPG', 30):
+    #     press_A()
+    #
+    # # Experience points (press A twice to proceed)
+    # if isok('img/experience.JPG', 30):
+    #     press_A()
+    #     time.sleep(0.8)
+    #     if isok('img/experience.JPG', 2):
+    #         press_A()
+    #
+    # # Level up
+    # if isok('img/levelup.JPG', 20):
+    #     press_A()
+    #
+    # # Changes rating
+    # if isok('img/rating.JPG', 20):
+    #     press_A()
 
     #TODO Find a way to recognize and write down reward (income) and spendings (expenses on contracts)
     # Rewards
-    if isok('img/reward.JPG', 20):
+    while not isok('img/reward.JPG', 2):
+        time.sleep(1)
+        press_A()
+    else:
         press_A()
 
     if isok('img/reward2.JPG', 20):
@@ -494,8 +509,13 @@ def which_color():
     # Open reserves
 def to_reserves():
         while not on_reserves():
-            turn_down(5)
-            turn_left(5)
+            keyDown(Key.DOWN)
+            keyDown(Key.LEFT)
+            time.sleep(3)
+            keyUp(Key.DOWN)
+            keyUp(Key.LEFT)
+            # turn_down(5)
+            # turn_left(5)
         #press_A()
 
     # Ensure on reserves
@@ -572,75 +592,123 @@ def smart_players_convert(rating=75):
             players_rating = 85
         return players_rating
 
-
-
-    if base_ok():
-        logger.info('On base, entering team')
-        press_A()
-    global position
-    for key, value in position.items():
-        logger.info('Position %s, name %s', key, value[2])
-        to_reserves()
-        turn_up(value[1][0])
-        turn_right(value[1][1])
-        turn_down(value[1][2])
-        turn_left(value[1][3])
-        #correct_position = isok(value[0],5)
-        correct_rating = safe_pl_rating() < rating
-        if correct_rating:
-            logger.info('Converting player to EXP trainer')
-            #exec_victim(3)
-        else:
-            logger.warning('Player on position %s with rating %s or more is in the team, skipping this one', key, rating)
-            continue
-
-        # Open reserves and go down
-        logger.info('Looking for another player to play on %s position', key)
-        time.sleep(1)
-        press_A()
-        to_reserves()
-        press_A()
-        keyDown(Key.DOWN)
-        time.sleep(3)
-        keyUp(Key.DOWN)
-        while not isok('conv/on_team.JPG',3):
+    def team_execute():
+        if base_ok():
+            logger.info('On base, entering team')
+            press_A()
+        with open('team.json', 'r') as to_read:
+            position = json.load(to_read)
+        for key, value in position.items():
+            logger.info('Position %s, name %s', key, value[2])
+            to_reserves()
+            turn_up(value[1][0])
+            turn_right(value[1][1])
+            turn_down(value[1][2])
+            turn_left(value[1][3])
             time.sleep(0.5)
-            found = False
-            for i in range(6):
-                if isok(value[0],5):
-                    logger.info('Found match for %s', value[0])
-                    if safe_pl_rating() < rating:
-                        logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
-                        if value[2] != recognize('surname',''):
-                            value[2] = recognize('surname','')
-                            logger.info('New player %s set on position %s', value[2], key)
-                            found = True
-                            press_A()
-                            break
-                if not found:
-                    logger.info('Not %s, turning right', key)
-                    turn_right(1)
-            if found:
-                logger.info('Found new player for position %s, job done.', key)
-                break
-            elif safe_pl_rating() >= rating:
-                logger.info('No low leveled players for %s position, picking any.', key)
-                turn_down(15)
-                while not safe_pl_rating() < rating and value[2] != recognize('surname',''):
-                    logger.info('Player not found in the row, going up')
-                    turn_right(1)
-                    turn_up(1)
-                logger.info('Another player found')
-                press_A()
-                break
+            if safe_pl_rating() < rating:
+                logger.info('Converting player to EXP trainer')
+                exec_victim(3)
             else:
-                logger.info('No suitable players in reserves row, up for 1 row')
-                turn_up(1)
-        time.sleep(2)
+                logger.warning('Player on position %s with rating %s or more is in the team, skipping this one', key,
+                               rating)
+                value[2] = recognize('surname', '')
+                continue
+        with open("team1.json", "w") as to_write:
+            json.dump(position, to_write)
+        del position
+        press_B()
 
-        # TODO find_replacement (create function to find correct new player):
-        # rating is ok, name is not same as in value[2], write name to value[2]
-    press_B()
+    def populate_team():
+        if base_ok():
+            logger.info('On base, entering team')
+            press_A()
+        #global position
+        with open('team.json', 'r') as to_read:
+            position = json.load(to_read)
+
+        for key, value in position.items():
+            logger.info('Position %s, name %s', key, value[2])
+            to_reserves()
+            turn_up(value[1][0])
+            turn_right(value[1][1])
+            turn_down(value[1][2])
+            turn_left(value[1][3])
+            time.sleep(0.5)
+
+            # Open reserves and go down
+            logger.info('Looking for another player to play on %s position', key)
+            time.sleep(1)
+            press_A()
+            to_reserves()
+            press_A()
+            # Use filter
+            time.sleep(0.5)
+            press_rs()
+            turn_down(2)
+            turn_left(1)
+            turn_down(4)
+            press_A()
+            time.sleep(0.5)
+            if isok('conv/filtered.JPG', 2):
+                logger.info('Filter applied')
+            keyDown(Key.DOWN)
+            time.sleep(3)
+            keyUp(Key.DOWN)
+            while not isok('conv/on_team.JPG',3):
+                time.sleep(0.5)
+                found = False
+                for i in range(6):
+                    if isok(value[0],2):
+                        logger.info('Found match for %s', value[0])
+                        if safe_pl_rating() < rating:
+                            logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
+                            if value[2] != recognize('surname',''):
+                                value[2] = recognize('surname','')
+                                logger.info('New player %s set on position %s', value[2], key)
+                                found = True
+                                press_A()
+                                break
+                    if not found:
+                        logger.info('Not %s, turning right', key)
+                        turn_right(1)
+                if found:
+                    logger.info('Found new player for position %s, job done.', key)
+                    break
+                elif safe_pl_rating() >= rating:
+                    logger.info('No low leveled players for %s position, picking any.', key)
+                    turn_down(10)
+    #                while not safe_pl_rating() < rating and value[2] != recognize('surname',''):
+                    while not value[2] != recognize('surname', ''):
+                        logger.info('Player not found in the row, going up')
+                        turn_right(1)
+                        turn_up(1)
+                    logger.info('Another player found')
+                    press_A()
+                    break
+                else:
+                    logger.info('No suitable players in reserves row, up for 1 row')
+                    turn_up(1)
+            time.sleep(2)
+
+            # TODO find_replacement (create function to find correct new player):
+            # rating is ok, name is not same as in value[2], write name to value[2]
+            with open("team1.json", "w") as to_write:
+                json.dump(position, to_write)
+            del position
+            press_B()
+    team_change(1)
+    team_execute()
+    logger.info('Team nr: %s recreated', int(team_nr))
+    team_change(2)
+    team_execute()
+    logger.info('Team nr: %s recreated', int(team_nr))
+    team_change(1)
+    populate_team()
+    logger.info('Team nr: %s recreated', int(team_nr))
+    team_change(1)
+    populate_team()
+    logger.info('Team nr: %s recreated', int(team_nr))
 
 
 
@@ -733,10 +801,6 @@ def smart_playing_loop(smart=0, number=1000):
     def shift_change():
         sign_all()
         smart_players_convert()
-        logger.info('Team nr: %s recreated', int(team_nr))
-        team_change(1)
-        smart_players_convert()
-        logger.info('Team nr: %s recreated', int(team_nr))
 
     for i in range(number):
     #while True:
@@ -744,8 +808,8 @@ def smart_playing_loop(smart=0, number=1000):
             team_change(1)
         else:
             team_change(2)
-        play_one()
-        time.sleep(3)
+        #play_one()
+        time.sleep(1)
         game_number += 1
         logger.info('Number of games played: %s', str(game_number))
         if smart_start > 0:
@@ -760,4 +824,4 @@ def smart_playing_loop(smart=0, number=1000):
 #playing_loop(10)
 # initialize_pes()
 # smart_players_convert()
-smart_playing_loop()
+smart_playing_loop(2)
