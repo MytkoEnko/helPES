@@ -10,7 +10,7 @@ try:
     from PIL import Image
 except ImportError:
     import Image
-
+import cv2
 # ---------------------------------------------- LOGGING HANDLING
 
 logger = logging.getLogger(__name__)
@@ -233,8 +233,8 @@ def coordset(pes_xy, object_name):
 
 def recognize(object_name, conf_options='outputbase digits'):
     pict = Region(*coordset(pes_frame, object_name))
-    pict_size = (pict.getW(),pict.getH())
-    dupa = pytesseract.image_to_string(pict.getBitmap(), lang='equ+eng', config=conf_options)
+    pict_size = (pict.getW()*3,pict.getH()*3)
+    dupa = pytesseract.image_to_string(cv2.resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
     pict.highlight(1)
     return dupa
 
