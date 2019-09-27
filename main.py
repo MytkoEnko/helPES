@@ -5,6 +5,7 @@ from keyboard import mouse
 import pytesseract
 from lackey import *
 import json
+import matplotlib
 try:
     from PIL import Image
 except ImportError:
@@ -75,6 +76,7 @@ def revertbackup():
 
 # ------------------------------------------ DEFINE GAME VARIABLES
 
+matplotlib.use('agg')
 pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"')
 pesName = 'eFootball PES 2020'
 pes = App() # Global variable to be used for app reference after initialization
@@ -90,20 +92,20 @@ spots = {
 }
 # Pic, coordinates related to reserves, string reserved for surname
 position = {
-    'gk': ['conv/gk.JPG', [1,1,1,0], '@', 'gk_f.JPG', 1],
-    'lb': ['conv/lb.JPG', [1,0,0,0], '@', 'lb_f.JPG', 3],
-    'clb': ['conv/cb.JPG', [1,1,0,0], '@', 'cb_f.JPG', 2],
-    'crb': ['conv/cb.JPG', [1,2,0,0], '@', 'cb_f.JPG', 2],
-    'rb': ['conv/rb.JPG', [1,3,0,0], '@', 'rb_f.JPG', 4],
-    'cml': ['conv/cmf.JPG', [2,0,0,0], '@', 'cm_f.JPG', 6],
-    'dmf': ['conv/dmf.JPG', [2,1,0,0], '@', 'dmf_f.JPG', 5],
-    'cmr': ['conv/cmf.JPG', [2,2,0,0], '@', 'cm_f.JPG', 6],
-    'lwf': ['conv/lwf.JPG', [3,0,0,0], '@', 'lwf_f.JPG', 10],
-    'cf': ['conv/cf.JPG', [3,1,0,0], '@', 'cf_f.JPG', 13],
-    'rwf': ['conv/rwf.JPG', [3,2,0,0], '@', 'rwf_f.JPG', 11],
+    'gk': ['conv/gk.JPG', [1,1,1,0], '@', 'conv/gk_f.JPG', 1],
+    'lb': ['conv/lb.JPG', [1,0,0,0], '@', 'conv/lb_f.JPG', 3],
+    'clb': ['conv/cb.JPG', [1,1,0,0], '@', 'conv/cb_f.JPG', 2],
+    'crb': ['conv/cb.JPG', [1,2,0,0], '@', 'conv/cb_f.JPG', 2],
+    'rb': ['conv/rb.JPG', [1,3,0,0], '@', 'conv/rb_f.JPG', 4],
+    'cml': ['conv/cmf.JPG', [2,0,0,0], '@', 'conv/cm_f.JPG', 6],
+    'dmf': ['conv/dmf.JPG', [2,1,0,0], '@', 'conv/dmf_f.JPG', 5],
+    'cmr': ['conv/cmf.JPG', [2,2,0,0], '@', 'conv/cm_f.JPG', 6],
+    'lwf': ['conv/lwf.JPG', [3,0,0,0], '@', 'conv/lwf_f.JPG', 10],
+    'cf': ['conv/cf.JPG', [3,1,0,0], '@', 'conv/cf_f.JPG', 13],
+    'rwf': ['conv/rwf.JPG', [3,2,0,0], '@', 'conv/rwf_f.JPG', 11],
 }
-with open('team2.json', "w") as to_write:
-    json.dump(position, to_write)
+# with open('team2.json', "w") as to_write:
+#     json.dump(position, to_write)
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -231,7 +233,9 @@ def coordset(pes_xy, object_name):
 
 def recognize(object_name, conf_options='outputbase digits'):
     pict = Region(*coordset(pes_frame, object_name))
+    pict_size = (pict.getW(),pict.getH())
     dupa = pytesseract.image_to_string(pict.getBitmap(), lang='equ+eng', config=conf_options)
+    pict.highlight(1)
     return dupa
 
 
@@ -578,7 +582,7 @@ def players_convert():
             else:
                 break
 
-def smart_players_convert(rating=80):
+def smart_players_convert():
     def safe_pl_rating():
         try:
             players_rating = int(recognize('player_rating'))
@@ -657,16 +661,18 @@ def smart_players_convert(rating=80):
             # Use filter
             time.sleep(0.5)
             press_rs()
-            turn_left(value[5])
-            if isok(value[4],1.5):
+            turn_left(value[4])
+            if isok(value[3],1.5):
                 logger.info('Position %s filter applied', key)
             else:
-                while not isok(value[4],1):
+                while not isok(value[3],1):
                     turn_left(1)
             turn_down(2)
-            turn_left(2)
-            if isok('conv/value_f.JPG',2):
+            if isok('conv/value_f.JPG',2,0.95):
                 logger.info('Value filter applied')
+            else:
+                while not isok('conv/value_f.JPG',1.5,0.98):
+                    turn_left(1)
             turn_down(4)
             press_A()
             time.sleep(0.5)
@@ -679,8 +685,8 @@ def smart_players_convert(rating=80):
                 time.sleep(0.5)
                 found = False
                 for i in range(6):
-                    if isok(value[0],2):
-                        logger.info('Found match for %s', value[0])
+                    #if isok(value[0],2):
+                     #   logger.info('Found match for %s', value[0])
                         # if safe_pl_rating() < rating:
                         #     logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
                         #     if value[2] != recognize('surname',''):
@@ -688,21 +694,26 @@ def smart_players_convert(rating=80):
                         #         logger.info('New player %s set on position %s', value[2], key)
                         #         with open("team1.json", "w") as to_write:
                         #             json.dump(position, to_write)
+                        #found = True
+                        #press_A()
+                        #break
+                    surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
+                    print(surname)
+                    if surname != '' and surname not in position1.values() and surname not in position2.values():
+                        value[2] = surname
+                        logger.info('New player found: %s', surname)
                         found = True
-                        #         press_A()
-                        #         break
-                        surname = recognize('surname','')
-                        if surname not in position1.values() and surname not in position2.values():
-                            value[2] = surname
-                            logger.info('New player found')
-                            with open(team_file1, "w") as to_write:
-                                json.dump(position1, to_write)
+                        with open(team_file1, "w") as to_write:
+                            json.dump(position1, to_write)
                     if not found:
                         logger.info('Not %s, turning right', key)
                         turn_right(1)
-                if found:
-                    logger.info('Found new player for position %s, job done.', key)
-                    break
+                    if found == True:
+                        logger.info('Found new player for position %s, job done.', key)
+                        found = False
+                        while not isok('conv/on_team.JPG',3):
+                            press_A()
+                        break
     #             elif safe_pl_rating() >= rating:
     #                 logger.info('No low leveled players for %s position, picking any.', key)
     #                 turn_down(10)
@@ -726,12 +737,12 @@ def smart_players_convert(rating=80):
         while not base_ok():
             press_B()
 
-    team_change(1)
-    team_execute()
-    logger.info('Team nr: %s recreated', int(team_nr))
-    team_change(2)
-    team_execute()
-    logger.info('Team nr: %s recreated', int(team_nr))
+    # team_change(1)
+    # team_execute()
+    # logger.info('Team nr: %s recreated', int(team_nr))
+    # team_change(2)
+    # team_execute()
+    # logger.info('Team nr: %s recreated', int(team_nr))
     team_change(1)
     populate_team(1)
     logger.info('Team nr: %s recreated', int(team_nr))
@@ -829,10 +840,10 @@ def smart_playing_loop(file=False, smart=0, number=1000):
     if file == False:
         game_number = 0
     else:
-        if fplayed.read() == 0:
+        if int(fplayed.read()) == 0:
             game_number = 0
         else:
-            game_number = fplayed.read()
+            game_number = int(fplayed.read())
     fplayed.close()
     smart_start = smart
     def shift_change():
@@ -849,7 +860,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         time.sleep(1)
         game_number += 1
         write_to_file = open('games_played.txt', 'w+')
-        write_to_file.write(game_number)
+        write_to_file.write(str(game_number))
         write_to_file.close()
         logger.info('Number of games played: %s', str(game_number))
         if smart_start > 0:
@@ -864,6 +875,9 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 
 
 #playing_loop(10)
-# initialize_pes()
+initialize_pes()
 # smart_players_convert()
-#smart_playing_loop(2)
+#ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
+ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
+print(ddd)
+#smart_playing_loop(False,2)
