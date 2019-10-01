@@ -5,7 +5,6 @@ idna==2.8
 keyboard==0.13.3
 kiwisolver==1.1.0
 Lackey==0.7.3
-matplotlib==3.1.1
 mouse==0.7.0
 numpy==1.16.4
 opencv-python==4.1.0.25

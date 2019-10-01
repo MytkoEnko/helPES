@@ -1,4 +1,4 @@
-from main import *
+from main import revertbackup
 
 # Elements you can run separately or creating loops
 #start_game()

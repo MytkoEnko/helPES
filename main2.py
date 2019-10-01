@@ -2,14 +2,13 @@ import logging
 import os
 import shutil
 from keyboard import mouse
+import pytesseract
 from lackey import *
 import json
-import pytesseract
 try:
     from PIL import Image
 except ImportError:
     import Image
-import cv2
 
 # ---------------------------------------------- LOGGING HANDLING
 
@@ -20,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(levelname)s:%(asctime)s:%(funcName)20s() ]: %(message)s')
 
 # File handler - file name, format, level
-file_handler = logging.FileHandler('pes-f.log')
+file_handler = logging.FileHandler('test.log')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 
@@ -90,21 +89,19 @@ spots = {
     'surname' : [904, 95, 363, 86], #[921, 146, 294, 35],
 }
 # Pic, coordinates related to reserves, string reserved for surname
-position = {
-    'gk': ['conv/gk.JPG', [1,1,1,0], '@', 'conv/gk_f.JPG', 1],
-    'lb': ['conv/lb.JPG', [1,0,0,0], '@', 'conv/lb_f.JPG', 3],
-    'clb': ['conv/cb.JPG', [1,1,0,0], '@', 'conv/cb_f.JPG', 2],
-    'crb': ['conv/cb.JPG', [1,2,0,0], '@', 'conv/cb_f.JPG', 2],
-    'rb': ['conv/rb.JPG', [1,3,0,0], '@', 'conv/rb_f.JPG', 4],
-    'cml': ['conv/cmf.JPG', [2,0,0,0], '@', 'conv/cm_f.JPG', 6],
-    'dmf': ['conv/dmf.JPG', [2,1,0,0], '@', 'conv/dmf_f.JPG', 5],
-    'cmr': ['conv/cmf.JPG', [2,2,0,0], '@', 'conv/cm_f.JPG', 6],
-    'lwf': ['conv/lwf.JPG', [3,0,0,0], '@', 'conv/lwf_f.JPG', 10],
-    'cf': ['conv/cf.JPG', [3,1,0,0], '@', 'conv/cf_f.JPG', 13],
-    'rwf': ['conv/rwf.JPG', [3,2,0,0], '@', 'conv/rwf_f.JPG', 11],
-}
-# with open('team2.json', "w") as to_write:
-#     json.dump(position, to_write)
+# position = {
+#     'gk': ['conv/gk.JPG', [1,1,1,0], '@'],
+#     'lb': ['conv/lb.JPG', [1,0,0,0], '@'],
+#     'clb': ['conv/cb.JPG', [1,1,0,0], '@'],
+#     'crb': ['conv/cb.JPG', [1,2,0,0], '@'],
+#     'rb': ['conv/rb.JPG', [1,3,0,0], '@'],
+#     'cml': ['conv/cmf.JPG', [2,0,0,0], '@'],
+#     'dmf': ['conv/dmf.JPG', [2,1,0,0], '@'],
+#     'cmr': ['conv/cmf.JPG', [2,2,0,0], '@'],
+#     'lwf': ['conv/lwf.JPG', [3,0,0,0], '@'],
+#     'cf': ['conv/cf.JPG', [3,1,0,0], '@'],
+#     'rwf': ['conv/rwf.JPG', [3,2,0,0], '@'],
+# }
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 
@@ -178,7 +175,7 @@ def isok(img, seconds, similarity=0.89):
 
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
-        #pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
+        pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
         logger.info('%s match found', img)
         return True
     else:
@@ -203,11 +200,20 @@ def base_ok(a=5):
 
 ########################################################### CONSTRUCTION AREA
 # Find coordinates of img pattern and write it down
-def locate(im_path):
-    dupa = pes_region.exists(Pattern(im_path).similar(0.8), 5)
+def locate(im_path, time=5):
+    dupa = pes_region.exists(Pattern(im_path).similar(0.8), time)
     #adjust = set_pes_frame()
+    pic_coor = [
+        dupa.getX() - pes_frame[0],
+        dupa.getY() - pes_frame[1],
+        dupa.getW(),
+        dupa.getH()
+        ]
+
     print('Coordinates: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
     dupa.highlight(1)
+    return pic_coor
+
 
 # Playground
 #locate('shot/contract_duration.JPG')
@@ -232,11 +238,8 @@ def coordset(pes_xy, object_name):
 
 def recognize(object_name, conf_options='outputbase digits'):
     pict = Region(*coordset(pes_frame, object_name))
-    pict_size = (pict.getW()*3,pict.getH()*3)
-    image_value = pytesseract.image_to_string(cv2.resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
-    time.sleep(1)
-    #pict.highlight(1)
-    return image_value
+    dupa = pytesseract.image_to_string(pict.getBitmap(), lang='equ+eng', config=conf_options)
+    return dupa
 
 
 ###########################################################
@@ -312,37 +315,38 @@ def play_one():
         #pes_region.saveScreenCapture('./shot', 'test1')
     if isok('img/skip-graphic.JPG', 120):
         press_Y()
-        #if isok('img/skip-graphic.JPG', 10):
-        #   press_Y()
     # Halftime - click ok to start new match
-    if isok('img/halftime.JPG', 650):
+    time.sleep(300)
+    if isok('img/halftime.JPG',300):
+    #    time.sleep(10)
         press_A()
+    #else:
+    #    press_A()
     if isok('img/second-half.JPG', 120):
+    #    time.sleep(10)
+    #else:
         press_A()
     # Skip highlights
-    if isok('img/highlights.JPG', 820):
+    time.sleep(300)
+    if isok('img/highlights.JPG', 400):
+    #    time.sleep(10)
+    #else:
         press_menu()
-        #if isok('img/fulltime.JPG',10):
-        #    press_A()
-        #else:
-        #    press_menu()
 
     # Experience
     if isok('img/next-finish.JPG', 30):
         press_A()
-    
-
-    # Experience points (press A twice to proceed)
+        # # Experience points (press A twice to proceed)
     if isok('img/experience.JPG', 30):
         press_A()
         time.sleep(0.8)
         if isok('img/experience.JPG', 2):
             press_A()
-
+    
     # Level up
     if isok('img/levelup.JPG', 20):
         press_A()
-
+    
     # Changes rating
     if isok('img/rating.JPG', 20):
         press_A()
@@ -350,7 +354,10 @@ def play_one():
     #TODO Find a way to recognize and write down reward (income) and spendings (expenses on contracts)
     # Rewards
     if isok('img/reward.JPG', 20):
+    #    time.sleep(1)
         press_A()
+    #else:
+    #    press_A()
 
     if isok('img/reward2.JPG', 20):
         press_A()
@@ -379,8 +386,6 @@ def play_one():
         logger.info('1 more game')
 
     return
-
-
 
 # TODO prepare scripts that simultaneously handle interrupters:
 #  lost connection, screen freeze, auction update, confirmation only screens etc. Help:
@@ -589,7 +594,7 @@ def players_convert():
             else:
                 break
 
-def smart_players_convert():
+def smart_players_convert(rating=80):
     def safe_pl_rating():
         try:
             players_rating = int(recognize('player_rating'))
@@ -598,7 +603,7 @@ def smart_players_convert():
         return players_rating
 
     def team_execute():
-        if base_ok(9):
+        if base_ok():
             logger.info('On base, entering team')
             press_A()
         with open('team1.json', 'r') as to_read:
@@ -611,45 +616,28 @@ def smart_players_convert():
             turn_down(value[1][2])
             turn_left(value[1][3])
             time.sleep(0.5)
-            if isok('conv/no_player.JPG',1):
-                logger.info('No player, skipping %s', key)
-                continue
-            else:
+            if safe_pl_rating() < rating:
+                logger.info('Converting player to EXP trainer')
                 exec_victim(3)
-            # if safe_pl_rating() < rating:
-            #     logger.info('Converting player to EXP trainer')
-            #     exec_victim(3)
-            # else:
-            #     logger.warning('Player on position %s with rating %s or more is in the team, skipping this one', key,
-            #                    rating)
-            #     value[2] = recognize('surname', '')
-            #     continue
+            else:
+                logger.warning('Player on position %s with rating %s or more is in the team, skipping this one', key,
+                               rating)
+                value[2] = recognize('surname', '')
+                continue
         with open("team1.json", "w") as to_write:
             json.dump(position, to_write)
         del position
-        while not base_ok(3):
-            press_B()
+        press_B()
 
-    def populate_team(which_team=1):
-        if base_ok(9):
+    def populate_team():
+        if base_ok():
             logger.info('On base, entering team')
             press_A()
         #global position
-        if isok('conv/on_team.JPG', 5):
-            logger.info('Entered team')
-        if which_team == 1:
-            team_file1 = 'team1.json'
-            team_file2 = 'team2.json'
-        else:
-            team_file1 = 'team2.json'
-            team_file2 = 'team1.json'
+        with open('team1.json', 'r') as to_read:
+            position = json.load(to_read)
 
-        with open(team_file1, 'r') as to_read:
-            position1 = json.load(to_read)
-        with open(team_file2, 'r') as to_read2:
-            position2 = json.load(to_read2)
-
-        for key, value in position1.items():
+        for key, value in position.items():
             logger.info('Position %s, name %s', key, value[2])
             to_reserves()
             turn_up(value[1][0])
@@ -662,85 +650,52 @@ def smart_players_convert():
             logger.info('Looking for another player to play on %s position', key)
             time.sleep(1)
             press_A()
-            time.sleep(0.5)
             to_reserves()
             press_A()
             # Use filter
             time.sleep(0.5)
             press_rs()
-            turn_left(value[4])
-            if isok(value[3],1.5):
-                logger.info('Position %s filter applied', key)
-            else:
-                while not isok(value[3],1):
-                    turn_left(1)
             turn_down(2)
-            if isok('conv/value_f.JPG',2,0.95):
-                logger.info('Value filter applied')
-            else:
-                while not isok('conv/value_f.JPG',1.5,0.98):
-                    turn_left(1)
+            turn_left(1)
             turn_down(4)
             press_A()
             time.sleep(0.5)
             if isok('conv/filtered.JPG', 2):
-                logger.info('Filters applied')
+                logger.info('Filter applied')
             keyDown(Key.DOWN)
-            time.sleep(2)
+            time.sleep(3)
             keyUp(Key.DOWN)
             while not isok('conv/on_team.JPG',3):
                 time.sleep(0.5)
                 found = False
                 for i in range(6):
-                    #if isok(value[0],2):
-                     #   logger.info('Found match for %s', value[0])
-                        # if safe_pl_rating() < rating:
-                        #     logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
-                        #     if value[2] != recognize('surname',''):
-                        #         value[2] = recognize('surname','')
-                        #         logger.info('New player %s set on position %s', value[2], key)
-                        #         with open("team1.json", "w") as to_write:
-                        #             json.dump(position, to_write)
-                        #found = True
-                        #press_A()
-                        #break
-                    try:
-                        surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
-                    except 'Tcl_AsyncDelete':
-                        logger.warning('Tcl_AsyncDelete occured, trying again')
-                        time.sleep(2)
-                        surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
-
-                    print(surname)
-                    team1_names = [value[2] for (key,value) in position1.items()]
-                    team2_names = [value[2] for (key,value) in position2.items()]
-                    known_names = team1_names + team2_names
-                    if surname != '' and surname not in known_names:
-                        value[2] = surname
-                        logger.info('New player found: %s', surname)
-                        found = True
-                        with open(team_file1, "w") as to_write:
-                            json.dump(position1, to_write)
+                    if isok(value[0],2):
+                        logger.info('Found match for %s', value[0])
+                        if safe_pl_rating() < rating:
+                            logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
+                            if value[2] != recognize('surname',''):
+                                value[2] = recognize('surname','')
+                                logger.info('New player %s set on position %s', value[2], key)
+                                found = True
+                                press_A()
+                                break
                     if not found:
                         logger.info('Not %s, turning right', key)
                         turn_right(1)
-                    if found == True:
-                        logger.info('Found new player for position %s, job done.', key)
-                        found = False
-                        while not isok('conv/on_team.JPG',3):
-                            press_A()
-                        break
-    #             elif safe_pl_rating() >= rating:
-    #                 logger.info('No low leveled players for %s position, picking any.', key)
-    #                 turn_down(10)
-    # #                while not safe_pl_rating() < rating and value[2] != recognize('surname',''):
-    #                 while not value[2] != recognize('surname', ''):
-    #                     logger.info('Player not found in the row, going up')
-    #                     turn_right(1)
-    #                     turn_up(1)
-    #                 logger.info('Another player found')
-    #                 press_A()
-    #                 break
+                if found:
+                    logger.info('Found new player for position %s, job done.', key)
+                    break
+                elif safe_pl_rating() >= rating:
+                    logger.info('No low leveled players for %s position, picking any.', key)
+                    turn_down(10)
+    #                while not safe_pl_rating() < rating and value[2] != recognize('surname',''):
+                    while not value[2] != recognize('surname', ''):
+                        logger.info('Player not found in the row, going up')
+                        turn_right(1)
+                        turn_up(1)
+                    logger.info('Another player found')
+                    press_A()
+                    break
                 else:
                     logger.info('No suitable players in reserves row, up for 1 row')
                     turn_up(1)
@@ -748,11 +703,10 @@ def smart_players_convert():
 
             # TODO find_replacement (create function to find correct new player):
             # rating is ok, name is not same as in value[2], write name to value[2]
-        del position1
-        time.sleep(1)
-        while not base_ok():
-            press_B()
-
+        with open("team1.json", "w") as to_write:
+            json.dump(position, to_write)
+        del position
+        press_B()
     team_change(1)
     team_execute()
     logger.info('Team nr: %s recreated', int(team_nr))
@@ -760,10 +714,10 @@ def smart_players_convert():
     team_execute()
     logger.info('Team nr: %s recreated', int(team_nr))
     team_change(1)
-    populate_team(1)
+    populate_team()
     logger.info('Team nr: %s recreated', int(team_nr))
-    team_change(2)
-    populate_team(2)
+    team_change(1)
+    populate_team()
     logger.info('Team nr: %s recreated', int(team_nr))
 
 
@@ -846,22 +800,13 @@ def playing_loop(number=1000, smart=False):
         #     playing_loop()
 
     # return
-def smart_playing_loop(file=False, smart=0, number=1000):
+def smart_playing_loop(smart=0, number=1000):
     initialize_pes()
     if base_ok():
         logger.info('Game is on, no need to start')
     else:
         start_game()
-    fplayed = open('games_played.txt', 'r')
-    fplayed_value = int(fplayed.read())
-    if file == False:
-        game_number = 0
-    else:
-        if fplayed_value == 0:
-            game_number = 0
-        else:
-            game_number = fplayed_value
-    fplayed.close()
+    game_number = 0
     smart_start = smart
     def shift_change():
         sign_all()
@@ -876,29 +821,143 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         play_one()
         time.sleep(1)
         game_number += 1
-        write_to_file = open('games_played.txt', 'w+')
-        write_to_file.write(str(game_number))
-        write_to_file.close()
         logger.info('Number of games played: %s', str(game_number))
         if smart_start > 0:
             if game_number % (smart_start * 2) == 0:
                 print('Debug: ',(game_number % (smart_start * 2)))
                 shift_change()
                 smart_start = 0
-                game_number = 0
+        elif game_number % 18 == 0:
+            shift_change()
+
+
+# pic_path = [
+#     'img/press-button.jpg',
+#     'img/club-house.JPG',
+#     'img/online-confirm.jpg',
+#     'img/this-week-pick-up.JPG',
+#     'img/game-screen.JPG',
+#     'img/myclub-enter.JPG',
+#     'img/sure-start.JPG',
+#     'img/live-update.JPG',
+#     'img/featured-players.JPG',
+#     'img/proceed-btn.JPG',
+#     'img/no-new-updates.JPG',
+#     'img/proceed-small.JPG',
+#     'img/big-ok.JPG',
+#     'img/squad-list.JPG',
+#     'img/sim-game.JPG',
+#     'img/kickoff.JPG',
+#     'img/match-started.JPG',
+#     'img/skip-graphic.JPG',
+#     'img/halftime.JPG',
+#     'img/second-half.JPG',
+#     'img/highlights.JPG',
+#     'img/next-finish.JPG',
+#     'img/experience.JPG',
+#     'img/experience.JPG',
+#     'img/levelup.JPG',
+#     'img/rating.JPG',
+#     'img/reward.JPG',
+#     'img/reward2.JPG',
+#     'img/contract-manager-upd.JPG',
+#     'img/contract-confirm1.JPG',
+#     'img/pay-gp.JPG',
+#     'img/sure-pay.JPG',
+#     'img/contracts-renewed.JPG',
+#     'sign/scout.JPG',
+#     'sign/sign-enter.JPG',
+#     'sign/choose-slot.JPG',
+#     'sign/no-scouts.JPG',
+#     'sign/five-star.JPG',
+#     'sign/confirm.JPG',
+#     'sign/chosed-trainer.JPG',
+#     'sign/sure.JPG',
+#     'sign/skip.JPG',
+#     'sign/confirm-player.JPG',
+#     'sign/next.JPG',
+#     'sign/added.JPG',
+#     'sign/choose-slot.JPG',
+#     'sign/sign-enter.JPG',
+#     'sign/scout.JPG',
+#     'img/club-house.JPG',
+#     'sign/scout.JPG',
+#     'sign/sign-enter.JPG',
+#     'sign/sell-enter.JPG',
+#     'sign/no-scouts-left.JPG',
+#     'sign/unchecked.JPG',
+#     'sign/last-checked.JPG',
+#     'sign/confirm-sell.JPG',
+#     'sign/reward-received.JPG',
+#     'sign/no-scouts-left.JPG',
+#     'sign/scout.JPG',
+#     'conv/reserves.JPG',
+#     'conv/white-ball.JPG',
+#     'conv/bronze-ball.JPG',
+#     'conv/reserves-list.JPG',
+#     'conv/white-ball.JPG',
+#     'conv/bronze-ball.JPG',
+#     'conv/black-ball.JPG',
+#     'conv/gold-ball.JPG',
+#     'conv/black-ball.JPG',
+#     'conv/player-menu.JPG',
+#     'conv/convert.JPG',
+#     'conv/no.JPG',
+#     'conv/converted.JPG',
+#     'sign/sign-enter.JPG',
+# ]
+# Tesseract for output base digits
+# tesseract money100.PNG stdout outputbase digits
+position = {
+    'gk': ['conv/gk.JPG', [1,1,1,0], '@'],
+    'lb': ['conv/lb.JPG', [1,0,0,0], '@'],
+    'clb': ['conv/cb.JPG', [1,1,0,0], '@'],
+    'crb': ['conv/cb.JPG', [1,2,0,0], '@'],
+    'rb': ['conv/rb.JPG', [1,3,0,0], '@'],
+    'cml': ['conv/cmf.JPG', [2,0,0,0], '@'],
+    'dmf': ['conv/dmf.JPG', [2,1,0,0], '@'],
+    'cmr': ['conv/cmf.JPG', [2,2,0,0], '@'],
+    'lwf': ['conv/lwf.JPG', [3,0,0,0], '@'],
+    'cf': ['conv/cf.JPG', [3,1,0,0], '@'],
+    'rwf': ['conv/rwf.JPG', [3,2,0,0], '@'],
+}
+
+
+# dictionary = {
+#     'key' : [1, 2, 3, 4],
+#
+# }
+
+# for i in mydict:
+#     print(i, pytesseract.image_to_string(mydict[i],config='outputbase digits'))
+#image_to_data(image, lang=None, config='', nice=0, output_type=Output.STRING, timeout=0)
+# print(pytesseract.image_to_string(mydict[6], config='outputbase digits'))
+# print(int(pytesseract.image_to_string(mydict[6], config='outputbase digits')))
+initialize_pes()
+
+with open('pic_path.json', 'r') as f:
+    pic_path = json.load(f)
+
+for path in pic_path:
+    if isok(path, 1, 0.90):
+        coordinates = locate(path,1)
+        with open('position.json', 'r') as f:
+            dictionary = json.load(f)
+
+        if path in dictionary.keys():
+            pic_path.remove(path)
+            with open('pic_path.json', 'w') as f:
+                json.dump(pic_path, f)
+            continue
         else:
-            if game_number % 18 == 0:
-                shift_change()
+            dictionary[path] = coordinates
+        with open('position.json','w') as f:
+            json.dump(dictionary, f)
+        break
 
+# with open('pic_path.json', 'w') as f:
+#     json.dump(pic_path, f)
 
-playing_loop()
-#initialize_pes()
+#playing_loop(10)
 # smart_players_convert()
-# #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
-# ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
-# print(ddd)
-#smart_playing_loop(False,8,1000)
-# for i in range(1000):
-#     surname = ''.join(
-#         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
-#     print(surname, i)
+#smart_playing_loop(6)
