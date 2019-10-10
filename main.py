@@ -92,18 +92,18 @@ spots = {
 # Pic, coordinates related to reserves, string reserved for surname
 position = {
     'gk': ['conv/gk.JPG', [1,1,1,0], '@', 'conv/gk_f.JPG', 1],
-    'lb': ['conv/lb.JPG', [1,0,0,0], '@', 'conv/lb_f.JPG', 3],
     'clb': ['conv/cb.JPG', [1,1,0,0], '@', 'conv/cb_f.JPG', 2],
     'crb': ['conv/cb.JPG', [1,2,0,0], '@', 'conv/cb_f.JPG', 2],
+    'lb': ['conv/lb.JPG', [1,0,0,0], '@', 'conv/lb_f.JPG', 3],
     'rb': ['conv/rb.JPG', [1,3,0,0], '@', 'conv/rb_f.JPG', 4],
-    'cml': ['conv/cmf.JPG', [2,0,0,0], '@', 'conv/cm_f.JPG', 6],
     'dmf': ['conv/dmf.JPG', [2,1,0,0], '@', 'conv/dmf_f.JPG', 5],
+    'cml': ['conv/cmf.JPG', [2,0,0,0], '@', 'conv/cm_f.JPG', 6],
     'cmr': ['conv/cmf.JPG', [2,2,0,0], '@', 'conv/cm_f.JPG', 6],
     'lwf': ['conv/lwf.JPG', [3,0,0,0], '@', 'conv/lwf_f.JPG', 10],
-    'cf': ['conv/cf.JPG', [3,1,0,0], '@', 'conv/cf_f.JPG', 13],
     'rwf': ['conv/rwf.JPG', [3,2,0,0], '@', 'conv/rwf_f.JPG', 11],
+    'cf': ['conv/cf.JPG', [3,1,0,0], '@', 'conv/cf_f.JPG', 13],
 }
-# with open('team2.json', "w") as to_write:
+# with open('team1.json', "w") as to_write:
 #     json.dump(position, to_write)
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
@@ -114,7 +114,7 @@ def simulate_button(button):
     keyDown(button)
     time.sleep(0.1)
     keyUp(button)
-    logger.info('Button %s pressed', button)
+    logger.debug('Button %s pressed', button)
     return
 
 def press_A():
@@ -148,7 +148,7 @@ def simulate_turn(direction,times):
         count += 1
         simulate_button(direction)
         time.sleep(0.3)
-    logger.info('Turned %s %s times', str(direction), count)
+    logger.debug('Turned %s %s times', str(direction), count)
     del count
 
 def turn_right(n):
@@ -319,7 +319,7 @@ def play_one():
         press_A()
     if isok('img/second-half.JPG', 120):
         press_A()
-    # Skip highlights
+    # Skip highlights 6' 6"
     if isok('img/highlights.JPG', 820):
         press_menu()
         #if isok('img/fulltime.JPG',10):
@@ -328,7 +328,7 @@ def play_one():
         #    press_menu()
 
     # Experience
-    if isok('img/next-finish.JPG', 30):
+    if isok('img/next-finish.JPG', 230):
         press_A()
     
 
@@ -501,16 +501,6 @@ def on_reserves():
             logger.warning('Not on reserves')
             return False
 
-def which_color():
-        if on_reserves():
-            turn_up(1)
-            turn_right(1)
-        if isok('conv/white-ball.JPG', 5):
-            team_is = 1
-            logger.info('Team of whites %s', str(team_is))
-        if isok('conv/bronze-ball.JPG', 5):
-            team_is = 2
-            logger.info('Team of bronze %s',str(team_is))
     # Open reserves
 def to_reserves():
         while not on_reserves():
@@ -668,7 +658,7 @@ def smart_players_convert():
             # Use filter
             time.sleep(0.5)
             press_rs()
-            turn_left(value[4])
+            #turn_left(value[4])
             if isok(value[3],1.5):
                 logger.info('Position %s filter applied', key)
             else:
@@ -889,15 +879,23 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         else:
             if game_number % 18 == 0:
                 shift_change()
+    # TODO Communication error handling
+    #  During match - "Lost pres ok", right after match:
+    #  1.Connection lost
+    #  2. Communication error
+    #  3. Experience Points
+    #  If out of match  - drops to main menu - new login to MyClub required
 
 
-playing_loop()
+
+
+#playing_loop()
 #initialize_pes()
-# smart_players_convert()
+#smart_players_convert()
 # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
 # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 # print(ddd)
-#smart_playing_loop(False,8,1000)
+smart_playing_loop(False, 7, 1000)
 # for i in range(1000):
 #     surname = ''.join(
 #         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
