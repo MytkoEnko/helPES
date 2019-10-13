@@ -27,7 +27,7 @@ file_handler.setFormatter(formatter)
 # Stream handler
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
-stream_handler.setLevel(logging.DEBUG)
+stream_handler.setLevel(logging.INFO)
 
 # Add handlers to logger
 logger.addHandler(file_handler)
@@ -148,7 +148,7 @@ def simulate_turn(direction,times):
         count += 1
         simulate_button(direction)
         time.sleep(0.3)
-    logger.debug('Turned %s %s times', str(direction), count)
+    logger.info('Turned %s %s times', str(direction), count)
     del count
 
 def turn_right(n):
@@ -179,7 +179,7 @@ def isok(img, seconds, similarity=0.89):
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
         #pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
-        logger.info('%s match found', img)
+        logger.debug('%s match found', img)
         return True
     else:
         logger.warning('%s not found', img)
@@ -863,7 +863,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
             team_change(1)
         else:
             team_change(2)
-        play_one()
+        #play_one()
         time.sleep(1)
         game_number += 1
         write_to_file = open('games_played.txt', 'w+')
@@ -895,7 +895,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
 # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 # print(ddd)
-smart_playing_loop(False, 7, 1000)
+#smart_playing_loop(False, 2)
 # for i in range(1000):
 #     surname = ''.join(
 #         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
