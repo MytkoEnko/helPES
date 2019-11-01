@@ -176,7 +176,7 @@ def isok(img, seconds, similarity=0.89):
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
         pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
-        logger.info('%s match found', img)
+        logger.info('%s MATCH FOUND +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++', img)
         return True
     else:
         logger.warning('%s not found', img)
@@ -939,7 +939,7 @@ with open('pic_path.json', 'r') as f:
     pic_path = json.load(f)
 
 for path in pic_path:
-    if isok(path, 1, 0.90):
+    if isok(path, 0.6, 0.90):
         coordinates = locate(path,1)
         with open('position.json', 'r') as f:
             dictionary = json.load(f)

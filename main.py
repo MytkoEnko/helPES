@@ -863,7 +863,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
             team_change(1)
         else:
             team_change(2)
-        #play_one()
+        play_one()
         time.sleep(1)
         game_number += 1
         write_to_file = open('games_played.txt', 'w+')
@@ -895,8 +895,12 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
 # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 # print(ddd)
-#smart_playing_loop(False, 2)
+smart_playing_loop()
 # for i in range(1000):
 #     surname = ''.join(
 #         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 #     print(surname, i)
+#TODO post tasks:
+#daily-bonus.JPG
+#
+#
