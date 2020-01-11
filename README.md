@@ -8,7 +8,7 @@ To successfully use pes-farmer you will need:
 - [Python3 installed](https://www.python.org/downloads/) (this was tested on version 3.8.1)
 - tesseract ocr installed (v [3.05.1](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.01.exe) from [this source](https://digi.bib.uni-mannheim.de/tesseract/) was used. instalation path should be added to PATH so `tesseract` should be callable from terminal)
 
-###Install:
+### Install
 1. Make sure all required applications were installed
 2. Clone repository (you'll need to configure git) or download and unpack the archive:
     ```
