@@ -363,18 +363,18 @@ def play_one():
     # If contract expires players only (for now)
     #TODO choose to prolongue players contracts or not, use that signal to start shift_change()
     if isok('img/contract-confirm1.JPG', 10):
-        #turn_right(1)
+        turn_right(1)
         press_A()
 
-        # if isok('img/pay-gp.JPG', 10):
-        #     press_A()
-        #
-        # if isok('img/sure-pay.JPG', 10):
-        #     turn_right(1)
-        #     press_A()
-        #
-        # if isok('img/contracts-renewed.JPG', 10):
-        #     press_A()
+        if isok('img/pay-gp.JPG', 10):
+            press_A()
+
+        if isok('img/sure-pay.JPG', 10):
+            turn_right(1)
+            press_A()
+
+        if isok('img/contracts-renewed.JPG', 10):
+            press_A()
 
     # Confirm got back to club house
     if base_ok(30):
