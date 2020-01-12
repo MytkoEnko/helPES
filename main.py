@@ -27,7 +27,7 @@ file_handler.setFormatter(formatter)
 # Stream handler
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
-stream_handler.setLevel(logging.INFO)
+stream_handler.setLevel(logging.DEBUG)
 
 # Add handlers to logger
 logger.addHandler(file_handler)
@@ -89,7 +89,8 @@ spots = {
     'contract_duration' : [1059, 476, 231, 67],
     'surname' : [904, 95, 363, 86], #[921, 146, 294, 35],
 }
-# Pic, coordinates related to reserves, string reserved for surname
+# Team template
+# Pic, coordinates related to reserves, string reserved for surname, pic for filter, filter turns left:
 position = {
     'gk': ['conv/gk.JPG', [1,1,1,0], '@', 'conv/gk_f.JPG', 1],
     'clb': ['conv/cb.JPG', [1,1,0,0], '@', 'conv/cb_f.JPG', 2],
@@ -107,7 +108,7 @@ position = {
 #     json.dump(position, to_write)
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
-
+# Buttons
 def simulate_button(button):
     pes.focus()
     time.sleep(0.3)
@@ -134,7 +135,7 @@ def press_Y():
     return
 
 def press_menu():
-    simulate_button(Key.DIVIDE)
+    simulate_button(Key.MINUS)
     return
 
 def press_rs():
@@ -360,19 +361,20 @@ def play_one():
         press_A()
 
     # If contract expires players only (for now)
+    #TODO choose to prolongue players contracts or not, use that signal to start shift_change()
     if isok('img/contract-confirm1.JPG', 10):
-        turn_right(1)
+        #turn_right(1)
         press_A()
 
-        if isok('img/pay-gp.JPG', 10):
-            press_A()
-
-        if isok('img/sure-pay.JPG', 10):
-            turn_right(1)
-            press_A()
-
-        if isok('img/contracts-renewed.JPG', 10):
-            press_A()
+        # if isok('img/pay-gp.JPG', 10):
+        #     press_A()
+        #
+        # if isok('img/sure-pay.JPG', 10):
+        #     turn_right(1)
+        #     press_A()
+        #
+        # if isok('img/contracts-renewed.JPG', 10):
+        #     press_A()
 
     # Confirm got back to club house
     if base_ok(30):
@@ -493,7 +495,6 @@ def sell_scouts():
 # Remove all players others than squad
 # ----------------  PLAYERS CONVERTING ---------------------------
 def on_reserves():
-        # Define white or bronze team 0=no, 1=white, 2=bronze
         if isok('conv/reserves.JPG', 8):
             logger.info('On reserves')
             return True
@@ -509,11 +510,8 @@ def to_reserves():
             time.sleep(3)
             keyUp(Key.DOWN)
             keyUp(Key.LEFT)
-            # turn_down(5)
-            # turn_left(5)
-        #press_A()
 
-    # Ensure on reserves
+# NOT USED
 def find_victim():
         if isok('conv/reserves-list.JPG', 5):
             # create variable
@@ -548,7 +546,7 @@ def find_victim():
             time.sleep(1)
             logger.warning('Other than white or bronze ball found, escaping script')
             return False
-
+# Convert player into EXP trainer
 def exec_victim(turns_down=2):
         logger.info('Looking for victim')
         press_X()
@@ -561,10 +559,9 @@ def exec_victim(turns_down=2):
             press_A()
         if isok('conv/converted.JPG', 5):
             press_A()
-
+# TODO convert all low level players - recognize level and decide of converting:
 def players_convert():
     team_color = ''
-    #TODO think on logick of how to execute, how many, when etc
     for i in range(1,3):
         if base_ok():
             logger.info('Starting players to EXP trainers convertion')
@@ -579,6 +576,7 @@ def players_convert():
             else:
                 break
 
+# Converts and populates squads of playing teams:
 def smart_players_convert():
     def safe_pl_rating():
         try:
@@ -589,7 +587,7 @@ def smart_players_convert():
 
     def team_execute():
         if base_ok(9):
-            logger.info('On base, entering team')
+            logger.info('On base, entering team for execution')
             press_A()
         with open('team1.json', 'r') as to_read:
             position = json.load(to_read)
@@ -622,7 +620,7 @@ def smart_players_convert():
 
     def populate_team(which_team=1):
         if base_ok(9):
-            logger.info('On base, entering team')
+            logger.info('On base, entering team for population')
             press_A()
         #global position
         if isok('conv/on_team.JPG', 5):
@@ -863,7 +861,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
             team_change(1)
         else:
             team_change(2)
-        play_one()
+        #play_one()
         time.sleep(1)
         game_number += 1
         write_to_file = open('games_played.txt', 'w+')
@@ -895,7 +893,9 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
 # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 # print(ddd)
-smart_playing_loop()
+#smart_playing_loop(True)
+#smart_playing_loop(False, 2, 1000)
+#smart_playing_loop(False,4,10)
 # for i in range(1000):
 #     surname = ''.join(
 #         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
