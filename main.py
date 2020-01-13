@@ -109,11 +109,11 @@ position = {
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 # Buttons
-def simulate_button(button):
+def simulate_button(button,long=0.1):
     pes.focus()
     time.sleep(0.3)
     keyDown(button)
-    time.sleep(0.1)
+    time.sleep(long)
     keyUp(button)
     logger.debug('Button %s pressed', button)
     return
@@ -135,7 +135,7 @@ def press_Y():
     return
 
 def press_menu():
-    simulate_button(Key.MINUS)
+    simulate_button(Key.SHIFT, 0.6)
     return
 
 def press_rs():
@@ -888,7 +888,8 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 
 
 #playing_loop()
-#initialize_pes()
+initialize_pes()
+sign_all()
 #smart_players_convert()
 # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
 # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
