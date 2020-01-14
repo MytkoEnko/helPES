@@ -373,19 +373,25 @@ def play_one():
 
     # If contract expires players only (for now)
     #TODO choose to prolongue players contracts or not, use that signal to start shift_change()
-    if isok('img/contract-confirm1.JPG', 10):
-        #turn_right(1)
+    if isok('img/contract-confirm1.JPG', 10) and not isok('img/contract-renewal-manager.JPG',5):
+
         press_A()
 
-        # if isok('img/pay-gp.JPG', 10):
-        #     press_A()
-        #
-        # if isok('img/sure-pay.JPG', 10):
-        #     turn_right(1)
-        #     press_A()
-        #
-        # if isok('img/contracts-renewed.JPG', 10):
-        #     press_A()
+    elif isok('img/contract-renewal-manager.JPG',5):
+        turn_right(1)
+        press_A()
+
+        if isok('img/pay-gp.JPG', 10):
+            press_A()
+
+        if isok('img/sure-pay.JPG', 10):
+            turn_right(1)
+            press_A()
+
+        if isok('img/contracts-renewed.JPG', 10):
+            press_A()
+            time.sleep(3)
+            press_A()
 
     # Confirm got back to club house
     if base_ok(30):
@@ -897,7 +903,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
                 smart_start = 0
                 game_number = 0
         else:
-            if game_number % 18 == 0:
+            if game_number % 20 == 0:
                 shift_change()
 
     # TODO Communication error handling
