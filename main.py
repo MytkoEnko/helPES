@@ -10,7 +10,7 @@ try:
 except ImportError:
     import Image
 import cv2
-
+from azure_vm import *
 # ---------------------------------------------- LOGGING HANDLING
 
 logger = logging.getLogger(__name__)
@@ -89,6 +89,7 @@ spots = {
     'contract_duration' : [1059, 476, 231, 67],
     'surname' : [904, 95, 363, 86], #[921, 146, 294, 35],
 }
+error_count = 0
 # Team template
 # Pic, coordinates related to reserves, string reserved for surname, pic for filter, filter turns left:
 position = {
@@ -184,9 +185,19 @@ def isok(img, seconds, similarity=0.89):
         return True
     else:
         logger.warning('%s not found', img)
+        global error_count
+        error_count +=1
+        error_check()
         return False
 
-
+# Errors number checking
+def error_check(allowed):
+    global error_count
+    if error_count > allowed:
+        logger.info('Global error count is higher than %s, switching off in 60 seconds',allowed)
+        time.sleep(60)
+        stop_vm(compute_client)
+    error_count = 0
 # press_A when matched photo (a) within timeout (b)
 def proceed(a, b):
     isok(a, b)
@@ -409,6 +420,9 @@ def sign_all(fivestars=0):
                     logger.warning('No scouts left, all signed')
                     press_A()
                     break
+                else:
+                    global error_count
+                    error_count -= 1
                 # If there is scouts - use them
                 #   If there is fivestars - skip them
                 # TODO Think of logick for skipping fivestars if there is
@@ -499,6 +513,8 @@ def on_reserves():
             logger.info('On reserves')
             return True
         else:
+            global error_count
+            error_count -= 1
             logger.warning('Not on reserves')
             return False
 
@@ -603,6 +619,8 @@ def smart_players_convert():
                 logger.info('No player, skipping %s', key)
                 continue
             else:
+                global error_count
+                error_count -= 1
                 exec_victim(3)
             # if safe_pl_rating() < rating:
             #     logger.info('Converting player to EXP trainer')
@@ -677,6 +695,8 @@ def smart_players_convert():
             time.sleep(2)
             keyUp(Key.DOWN)
             while not isok('conv/on_team.JPG',3):
+                global error_count
+                error_count -= 1
                 time.sleep(0.5)
                 found = False
                 for i in range(6):
@@ -861,13 +881,15 @@ def smart_playing_loop(file=False, smart=0, number=1000):
             team_change(1)
         else:
             team_change(2)
-        #play_one()
+        play_one()
         time.sleep(1)
         game_number += 1
         write_to_file = open('games_played.txt', 'w+')
         write_to_file.write(str(game_number))
         write_to_file.close()
         logger.info('Number of games played: %s', str(game_number))
+        logger.info('Number of errors occured: %s', str(error_count))
+        error_check()
         if smart_start > 0:
             if game_number % (smart_start * 2) == 0:
                 print('Debug: ',(game_number % (smart_start * 2)))
@@ -877,6 +899,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         else:
             if game_number % 18 == 0:
                 shift_change()
+
     # TODO Communication error handling
     #  During match - "Lost pres ok", right after match:
     #  1.Connection lost
@@ -888,8 +911,8 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 
 
 #playing_loop()
-initialize_pes()
-sign_all()
+#initialize_pes()
+#sign_all()
 #smart_players_convert()
 # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
 # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
