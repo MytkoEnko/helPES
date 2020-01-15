@@ -191,13 +191,12 @@ def isok(img, seconds, similarity=0.89):
         return False
 
 # Errors number checking
-def error_check(allowed):
+def error_check(allowed=30):
     global error_count
     if error_count > allowed:
         logger.info('Global error count is higher than %s, switching off in 60 seconds',allowed)
         time.sleep(60)
         stop_vm(compute_client)
-    error_count = 0
 # press_A when matched photo (a) within timeout (b)
 def proceed(a, b):
     isok(a, b)
@@ -882,6 +881,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         smart_players_convert()
 
     for i in range(number):
+        global error_count
     #while True:
         if team_nr == 0 or team_nr == 2:
             team_change(1)
@@ -895,7 +895,6 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         write_to_file.close()
         logger.info('Number of games played: %s', str(game_number))
         logger.info('Number of errors occured: %s', str(error_count))
-        error_check()
         if smart_start > 0:
             if game_number % (smart_start * 2) == 0:
                 print('Debug: ',(game_number % (smart_start * 2)))
@@ -905,6 +904,8 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         else:
             if game_number % 20 == 0:
                 shift_change()
+        if error_count < 30:
+            error_count = 0
 
     # TODO Communication error handling
     #  During match - "Lost pres ok", right after match:
