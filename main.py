@@ -191,7 +191,7 @@ def isok(img, seconds, similarity=0.89):
         return False
 
 # Errors number checking
-def error_check(allowed=30):
+def error_check(allowed=40):
     global error_count
     if error_count > allowed:
         logger.info('Global error count is higher than %s, switching off in 60 seconds',allowed)
@@ -696,6 +696,8 @@ def smart_players_convert():
             time.sleep(0.5)
             if isok('conv/filtered.JPG', 2):
                 logger.info('Filters applied')
+                if error_count < 15:
+                    error_count = 0
             keyDown(Key.DOWN)
             time.sleep(2)
             keyUp(Key.DOWN)
@@ -904,7 +906,7 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         else:
             if game_number % 20 == 0:
                 shift_change()
-        if error_count < 30:
+        if error_count < 40:
             error_count = 0
 
     # TODO Communication error handling
