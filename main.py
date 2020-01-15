@@ -642,6 +642,7 @@ def smart_players_convert():
             press_B()
 
     def populate_team(which_team=1):
+        global error_count
         if base_ok(9):
             logger.info('On base, entering team for population')
             press_A()
@@ -696,14 +697,12 @@ def smart_players_convert():
             time.sleep(0.5)
             if isok('conv/filtered.JPG', 2):
                 logger.info('Filters applied')
-                global error_count
                 if error_count < 15:
                     error_count = 0
             keyDown(Key.DOWN)
             time.sleep(2)
             keyUp(Key.DOWN)
             while not isok('conv/on_team.JPG',3):
-                global error_count
                 error_count -= 1
                 time.sleep(0.5)
                 found = False
