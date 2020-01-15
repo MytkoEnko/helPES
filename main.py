@@ -696,6 +696,7 @@ def smart_players_convert():
             time.sleep(0.5)
             if isok('conv/filtered.JPG', 2):
                 logger.info('Filters applied')
+                global error_count
                 if error_count < 15:
                     error_count = 0
             keyDown(Key.DOWN)
