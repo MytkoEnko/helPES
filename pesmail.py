@@ -5,6 +5,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
 
 def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png'):
+
     message = Mail(
         from_email='pes-python@dmytro.pl',
         to_emails='deass@ukr.net',

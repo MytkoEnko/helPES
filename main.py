@@ -11,6 +11,7 @@ except ImportError:
     import Image
 import cv2
 from azure_vm import *
+from pesmail import send_mail
 # ---------------------------------------------- LOGGING HANDLING
 
 logger = logging.getLogger(__name__)
@@ -191,11 +192,15 @@ def isok(img, seconds, similarity=0.89):
         return False
 
 # Errors number checking
-def error_check(allowed=40):
+def error_check(allowed=30):
     global error_count
     if error_count > allowed:
-        logger.info('Global error count is higher than %s, switching off in 60 seconds',allowed)
-        time.sleep(60)
+        logger.info('Global error count is higher than %s, switching off in 5 minutes',allowed)
+        global pes_region
+        pes_region.saveScreenCapture('./shot', 'screen_to_mail')
+        time.sleep(5)
+        send_mail()
+        time.sleep(300)
         stop_vm(compute_client)
 # press_A when matched photo (a) within timeout (b)
 def proceed(a, b):
@@ -205,11 +210,14 @@ def proceed(a, b):
 
 
 def base_ok(a=5):
+    global error_count
     if isok('img/club-house.JPG', a):
         logger.info('On home menu')
+        error_count = 0
         return True
     else:
         logger.error('Not on home base, can\' proceed')
+        error_count +=13
         return False
 
 ########################################################### CONSTRUCTION AREA
@@ -407,6 +415,7 @@ def play_one():
 
 # Sign players using all available trainers one by one, skip 5stars (argument as nr of fivestars)
 def sign_all(fivestars=0):
+    global error_count
     # Initialize starting from home screen
     if base_ok(10):
         logger.info('sign_all script started')
@@ -426,7 +435,6 @@ def sign_all(fivestars=0):
                     press_A()
                     break
                 else:
-                    global error_count
                     error_count -= 1
                 # If there is scouts - use them
                 #   If there is fivestars - skip them
@@ -467,8 +475,11 @@ def sign_all(fivestars=0):
             press_B()
         if isok('sign/scout.JPG', 5):
             turn_left(4)
+
         if isok('img/club-house.JPG', 10):
             logger.info('sign_all script finished')
+        else:
+            error_count += 15
         return
 
 def sell_scouts():
@@ -906,8 +917,6 @@ def smart_playing_loop(file=False, smart=0, number=1000):
         else:
             if game_number % 20 == 0:
                 shift_change()
-        if error_count < 40:
-            error_count = 0
 
     # TODO Communication error handling
     #  During match - "Lost pres ok", right after match:
@@ -937,3 +946,4 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 #daily-bonus.JPG
 #
 #
+#pes_region.saveScreenCapture('./shot', 'screen_to_mail')
