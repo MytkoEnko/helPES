@@ -400,6 +400,9 @@ def play_one():
             time.sleep(3)
             press_A()
 
+        if isok('img/contract-manager-upd.JPG', 10):
+            press_A()
+
     # Confirm got back to club house
     if base_ok(30):
         logger.info('1 more game')
