@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
+from secrets import sendgrid_api_key
 
 def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png'):
 
@@ -24,7 +25,7 @@ def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png'):
     )
     message.attachment = attachment
     try:
-        sendgrid_client = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        sendgrid_client = SendGridAPIClient(sendgrid_api_key)
         response = sendgrid_client.send(message)
         print(response.status_code,response.body,response.headers)
     except Exception as e:
