@@ -5,6 +5,7 @@ from keyboard import mouse
 from lackey import *
 import json
 import pytesseract
+import argparse
 try:
     from PIL import Image
 except ImportError:
@@ -12,6 +13,17 @@ except ImportError:
 import cv2
 from azure_vm import *
 from pesmail import send_mail
+
+# ---------------------------------------------- ARGUMENTS PARSING
+
+parser = argparse.ArgumentParser(description="PES-farming script. Use to automate sim matches.")
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-r", "--restore", help="Restores PES original settings file to let you play normally", action="store_true")
+group.add_argument("-p", "--prepare", help="Copies prepared PES settings file to let script navigate in game", action="store_true")
+group.add_argument("-go", "--run", help="Run the script", action="store_true")
+parser.add_argument("--hello", help="Say hello too", action="store_true")
+args = parser.parse_args()
+
 # ---------------------------------------------- LOGGING HANDLING
 
 logger = logging.getLogger(__name__)
@@ -398,6 +410,8 @@ def play_one():
         if isok('img/contracts-renewed.JPG', 10):
             press_A()
             time.sleep(3)
+
+        if isok('img/contracts-renewed.JPG', 10):
             press_A()
 
         if isok('img/contract-manager-upd.JPG', 10):
@@ -950,3 +964,4 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 #
 #
 #pes_region.saveScreenCapture('./shot', 'screen_to_mail')
+# -------------------------------------------- RUN SCRIPT (WITH ARGUMENTS)
