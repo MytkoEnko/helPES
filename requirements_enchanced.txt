@@ -1,0 +1,2 @@
+sendgrid
+azure-mgmt
