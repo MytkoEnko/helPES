@@ -10,7 +10,6 @@ group.add_argument("-p", "--prepare", help="Copies prepared PES settings file to
 group.add_argument("-go", "--run", help="Run the script", action="store_true")
 parser.add_argument("--hello", help="Say hello too", action="store_true")
 args = parser.parse_args()
-parser.
 
 if args.restore :
     print("Hehehe")
