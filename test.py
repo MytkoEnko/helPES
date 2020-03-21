@@ -1,4 +1,5 @@
 from main import *
+import threading
 import json
 try:
     from PIL import Image
@@ -136,12 +137,33 @@ mydict = {
 #image_to_data(image, lang=None, config='', nice=0, output_type=Output.STRING, timeout=0)
 # print(pytesseract.image_to_string(mydict[6], config='outputbase digits'))
 # print(int(pytesseract.image_to_string(mydict[6], config='outputbase digits')))
-with open('position.json', 'r') as f:
-    dupa = json.load(f)
 
-for a,b in dupa.items():
-    b[2] = 'Dupa'
+# TODO UNCOMENT BELOW
+# with open('position.json', 'r') as f:
+#     dupa = json.load(f)
+#
+# for a,b in dupa.items():
+#     b[2] = 'Dupa'
+#
+# with open('position.json','w') as f:
+#     json.dump(dupa, f)
 
-with open('position.json','w') as f:
-    json.dump(dupa, f)
+def print_hello():
+    for i in range(4):
+        time.sleep(2.5)
+        print("Hello")
+
+
+def print_hi():
+    for i in range(4):
+        time.sleep(7.5)
+        print("Hi")
+
+
+t1 = threading.Thread(target=print_hello)
+t2 = threading.Thread(target=print_hi)
+t1.start()
+t2.start()
+time.sleep(2)
+print('Script done')
 
