@@ -20,8 +20,8 @@ parser = argparse.ArgumentParser(description="PES-farming script. Use to automat
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-r", "--restore", help="Restores PES original settings file to let you play normally", action="store_true")
 group.add_argument("-p", "--prepare", help="Copies prepared PES settings file to let script navigate in game", action="store_true")
-group.add_argument("-go", "--run", help="Run the script", action="store_true")
-parser.add_argument("--hello", help="Say hello too", action="store_true")
+group.add_argument("-go", "--run", help="Run the script with defaults", action="store_true")
+group.add_argument("-c", "--custom", help="Run script with function calls inside the #custom of main.py", action="store_true")
 args = parser.parse_args()
 
 # ---------------------------------------------- LOGGING HANDLING
@@ -945,23 +945,32 @@ def smart_playing_loop(file=False, smart=0, number=1000):
 
 
 
-#playing_loop()
-#initialize_pes()
-#sign_all()
-#smart_players_convert()
-# #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
-# ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
-# print(ddd)
-#smart_playing_loop(True)
-#smart_playing_loop(False, 2, 1000)
-#smart_playing_loop(False,4,10)
-# for i in range(1000):
-#     surname = ''.join(
-#         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
-#     print(surname, i)
-#TODO post tasks:
-#daily-bonus.JPG
-#
-#
-#pes_region.saveScreenCapture('./shot', 'screen_to_mail')
 # -------------------------------------------- RUN SCRIPT (WITH ARGUMENTS)
+if args.run:
+    smart_playing_loop()
+if args.restore:
+    revertbackup()
+if args.prepare:
+    makebkp()
+
+# Custom goes here:
+if args.custom:
+    # playing_loop()
+    # initialize_pes()
+    # sign_all()
+    # smart_players_convert()
+    # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
+    # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
+    # print(ddd)
+    # smart_playing_loop(True)
+    # smart_playing_loop(False, 2, 1000)
+    # smart_playing_loop(False,4,10)
+    # for i in range(1000):
+    #     surname = ''.join(
+    #         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
+    #     print(surname, i)
+    # TODO post tasks:
+    # daily-bonus.JPG
+    #
+    #
+    # pes_region.saveScreenCapture('./shot', 'screen_to_mail')
