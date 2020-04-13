@@ -983,6 +983,7 @@ if args.prepare:
 
 # Custom goes here:
 if args.custom:
+    print('Runing with custom')
     # playing_loop()
     # initialize_pes()
     # sign_all()
