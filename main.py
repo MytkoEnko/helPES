@@ -4,6 +4,7 @@ import shutil
 from keyboard import mouse
 from lackey import *
 import json
+import vdf
 import pytesseract
 import argparse
 try:
@@ -87,9 +88,36 @@ def revertbackup():
         logger.warning("No backup or something is wrong with file structure. Skipping")
 
 
+def get_pes_exe():
+    prgm_path = ""
+    if os.environ.get("PROGRAMFILES(X86)") is None:  # this case is 32bit
+        prgm_path = os.environ.get("PROGRAMFILES")
+    else:
+        prgm_path = os.environ.get("PROGRAMFILES(X86)")
+
+    default_pes_path = prgm_path + '\Steam\steamapps\common\eFootball PES 2020\PES2020.exe'
+    if isthere(default_pes_path):
+        print('Pes installed in default location:' + default_pes_path)
+        return repr(default_pes_path).replace("'",'"')
+    else:
+        lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
+        with open(lib_path, "r") as read_steam:
+            steam_lib = vdf.load(read_steam)
+
+        steam_library = {number: location for number, location in steam_lib['LibraryFolders'].items() if number.isdigit()}
+        alternative_pes_path = ''
+
+        for loc in steam_library.values():
+            new_path = loc + '\steamapps\common\eFootball PES 2020\PES2020.exe'
+            if isthere(new_path):
+                alternative_pes_path = new_path
+        print('Pes installed in alternative location:' + alternative_pes_path)
+        return repr(alternative_pes_path).replace("'",'"')
+
+
 # ------------------------------------------ DEFINE GAME VARIABLES
 
-pes_launcher = App(r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"')
+pes_launcher = App(r'{}'.format(get_pes_exe()))
 pesName = 'eFootball PES 2020'
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
@@ -974,3 +1002,5 @@ if args.custom:
     #
     #
     # pes_region.saveScreenCapture('./shot', 'screen_to_mail')
+    #print(r'"' + '{}"'.format(get_pes_exe()))
+    #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
