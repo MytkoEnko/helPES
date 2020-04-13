@@ -111,7 +111,7 @@ def get_pes_exe():
             new_path = loc + '\steamapps\common\eFootball PES 2020\PES2020.exe'
             if isthere(new_path):
                 alternative_pes_path = new_path
-        print('Pes installed in alternative location:' + alternative_pes_path)
+        logger.info("Pes installed in alternative location: %s", alternative_pes_path)
         return repr(alternative_pes_path).replace("'",'"')
 
 
