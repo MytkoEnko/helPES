@@ -4,9 +4,45 @@ import main
 from tkinter import filedialog
 from PIL import ImageTk, Image
 import os
+import json
+
+def load_configurations():
+    if os.path.exists('configuration.json'):
+        with open('configuration.json', 'r') as to_read:
+            global pes_config
+            pes_config = json.load(to_read)
+
+def write_configurations():
+    global  pes_config
+    with open('configuration.json', "w") as to_write:
+        json.dump(pes_config, to_write)
+
+load_configurations()
 
 class PesGui:
     def __init__(self, master):
+        global pes_config
+
+        # ================== Top section =====================
+
+        self.top_section = Frame(master)
+        topsection = self.top_section
+
+        # ----------- LOGO ----------------
+        self.img = PhotoImage(file="logo.png")
+        self.logo = Label(topsection, image=self.img)
+
+        # ----------- Description ----------
+        self.description_frame = LabelFrame(topsection, text="About")
+        self.description = Label(self.description_frame,wraplength=500, text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
+
+        # ------------ Layout ---------------
+        topsection.pack(side=TOP, fill=X)
+        self.logo.pack(side=LEFT)
+        self.description_frame.pack(side=LEFT, fill=BOTH, expand=YES)
+        self.description.pack(side=TOP)
+
+        # =================  FRAME 1 =========================
         self.frame = Frame(master)
         self.frame.pack(fill=BOTH, padx=4, pady=1)
 
@@ -29,25 +65,6 @@ class PesGui:
         self.menu.add_cascade(label="Support", menu=support)
         support.add_command(label="Donate", command=self.print_message)
 
-        # ================== Top section =====================
-
-        self.top_section = Frame(self.frame)
-        topsection = self.top_section
-
-        # ----------- LOGO ----------------
-        self.img = PhotoImage(file="logo.png")
-        self.logo = Label(topsection, image=self.img)
-
-        # ----------- Description ----------
-        self.description_frame = LabelFrame(topsection, text="About")
-        self.description = Label(self.description_frame,wraplength=500, text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-
-        # ------------ Layout ---------------
-        topsection.pack(side=TOP, fill=X)
-        self.logo.pack(side=LEFT)
-        self.description_frame.pack(side=LEFT, fill=BOTH, expand=YES)
-        self.description.pack(side=TOP)
-
 
         # =============== Middle section ===============
         # --------- Layout ------------
@@ -62,6 +79,20 @@ class PesGui:
         self.actions.pack(side=TOP, fill=X)
 
         # ----------- Stats ------------
+
+        #set variables and trace them
+        stats_variables = (
+            "games_played_var",
+            "games_total_var",
+            "players_runtime_var",
+            "players_total_var",
+            "exp_left_var"
+        )
+
+        for variable in stats_variables:
+            setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            getattr(self, variable).trace_variable("w", self.save_configs)
+
         stats_labels = dict(sticky=W, pady=3, padx=4)
         self.games_runtime = Label(self.stats, text="Games played").grid(row=0, column=2, **stats_labels)
         self.games_total = Label(self.stats, text="Games total").grid(row=0, column=4, **stats_labels)
@@ -70,11 +101,11 @@ class PesGui:
         self.exp_left = Label(self.stats, text="EXP trainers slots left").grid(row=2, column=2, **stats_labels)
 
         stats_entry = dict(width=4, state=DISABLED)
-        self.games_r = Entry(self.stats, **stats_entry)
-        self.games_t = Entry(self.stats, **stats_entry)
-        self.players_r = Entry(self.stats, **stats_entry)
-        self.players_t = Entry(self.stats, **stats_entry)
-        self.exp = Entry(self.stats, **stats_entry)
+        self.games_r = Entry(self.stats, **stats_entry, textvariable=self.games_played_var)
+        self.games_t = Entry(self.stats, **stats_entry, textvariable=self.games_total_var)
+        self.players_r = Entry(self.stats, **stats_entry, textvariable=self.players_runtime_var)
+        self.players_t = Entry(self.stats, **stats_entry, textvariable=self.players_total_var)
+        self.exp = Entry(self.stats, **stats_entry, textvariable=self.exp_left_var)
 
         self.games_r.grid(row=0, column=1)
         self.games_t.grid(row=0, column=3)
@@ -87,15 +118,21 @@ class PesGui:
         actions_label_args = dict(sticky=W, pady=3, padx=4)
         self.team1_name = Label(self.actions, text="Team 1").grid(row=0, column=1, **actions_label_args)
         self.team2_name = Label(self.actions, text="Team 2").grid(row=1, column=1, **actions_label_args)
-
-        self.team1_convert = BooleanVar(value=True)
-        self.team2_convert = BooleanVar(value=True)
-        self.team1_populate = BooleanVar(value=True)
-        self.team2_populate = BooleanVar(value=True)
-        self.sign_all = BooleanVar(value=True)
+        #variables
+        self.team1_convert = BooleanVar(value=pes_config['gui']['team1_convert'])
+        self.team2_convert = BooleanVar(value=pes_config['gui']['team2_convert'])
+        self.team1_populate = BooleanVar(value=pes_config['gui']['team1_populate'])
+        self.team2_populate = BooleanVar(value=pes_config['gui']['team2_populate'])
+        self.sign_all = BooleanVar(value=pes_config['gui']['sign_all'])
+        #add callback
+        self.team1_convert.trace_variable("w", self.save_configs)
+        self.team2_convert.trace_variable("w", self.save_configs)
+        self.team1_populate.trace_variable("w", self.save_configs)
+        self.team2_populate.trace_variable("w", self.save_configs)
+        self.sign_all.trace_variable("w", self.save_configs)
 
         self.t1_con = Checkbutton(self.actions, text="convert all players", variable=self.team1_convert)
-        self.t1_pop = Checkbutton(self.actions, text="populate team", variable=self.team1_populate)
+        self.t1_pop = Checkbutton(self.actions, text="pospulate team", variable=self.team1_populate)
         self.t2_con = Checkbutton(self.actions, text="convert all players", variable=self.team2_convert)
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
         self.sign_a = Checkbutton(self.actions, text="sign all scouts", variable=self.sign_all)
@@ -111,10 +148,40 @@ class PesGui:
 
 
         # ------------ Settings  ----------
-        self.mail_send_var = BooleanVar(value=False)
-        self.azure_vm_var = BooleanVar(value=False)
-        self.shutdown_var = BooleanVar(value=False)
-        self.players_cost_var = IntVar(value=15)
+        #variables
+        self.mail_send_var = BooleanVar(value=pes_config['gui']['mail_send_var'])
+        self.azure_vm_var = BooleanVar(value=pes_config['gui']['azure_vm_var'])
+        self.shutdown_var = BooleanVar(value=pes_config['gui']['shutdown_var'])
+        self.players_cost_var = IntVar(value=pes_config['gui']['players_cost_var'])
+        self.delay_var = IntVar(value=pes_config['gui']['delay_var'])
+        self.sendgrid_api_key = StringVar(value=pes_config['secrets']['sendgrid_api_key'])
+        self.email_address = StringVar(value=pes_config['general']['email_address'])
+        self.az_client_id = StringVar(value=pes_config['secrets']['az_client_id'])
+        self.az_secret = StringVar(value=pes_config['secrets']['az_secret'])
+        self.az_tenant = StringVar(value=pes_config['secrets']['az_tenant'])
+        self.az_subscription_id = StringVar(value=pes_config['secrets']['az_subscription_id'])
+        self.az_group_name = StringVar(value=pes_config['general']['az_group_name'])
+        self.az_vm_name = StringVar(value=pes_config['general']['az_vm_name'])
+
+        #add callback
+        settings_callbacks = (
+            "mail_send_var",
+            "azure_vm_var",
+            "shutdown_var",
+            "players_cost_var",
+            "delay_var",
+            "sendgrid_api_key",
+            "email_address",
+            "az_client_id",
+            "az_secret",
+            "az_tenant",
+            "az_subscription_id",
+            "az_group_name",
+            "az_vm_name",
+        )
+
+        for variable in settings_callbacks:
+            getattr(self, variable).trace_variable("w", self.save_configs)
 
         self.mail_send = Checkbutton(self.pes_settings, text="Send email when script crashes or completes", variable=self.mail_send_var, command=self.use_mail)
         self.azure_vm = Checkbutton(self.pes_settings, text="Run on azure vm (see documentation)", variable=self.azure_vm_var, command=self.use_azure)
@@ -127,6 +194,7 @@ class PesGui:
         self.label_client_id = Label(self.pes_settings, text="azure client ID")
         self.label_secret = Label(self.pes_settings, text="azure secret")
         self.label_tenant = Label(self.pes_settings, text="azure tenant")
+        self.label_subscription = Label(self.pes_settings, text="azure subscription id")
         self.label_resource_group = Label(self.pes_settings, text="service group name")
         self.label_vm_name = Label(self.pes_settings, text="virtual machine name")
 
@@ -134,19 +202,20 @@ class PesGui:
 
         settings_entry = dict(width=35, state=DISABLED)
 
-        self.sendgrid_token = Entry(self.pes_settings, **settings_entry)
-        self.email_address = Entry(self.pes_settings, **settings_entry)
+        self.sendgrid_token = Entry(self.pes_settings, **settings_entry, textvariable=self.sendgrid_api_key)
+        self.email_addr = Entry(self.pes_settings, **settings_entry, textvariable=self.email_address)
 
-        self.az_client_id = Entry(self.pes_settings, **settings_entry)
-        self.az_secret = Entry(self.pes_settings, **settings_entry)
-        self.az_tenant = Entry(self.pes_settings, **settings_entry)
-        self.az_resource_name = Entry(self.pes_settings, **settings_entry)
-        self.az_vm = Entry(self.pes_settings, **settings_entry)
+        self.az_cl_id = Entry(self.pes_settings, **settings_entry, textvariable=self.az_client_id)
+        self.az_sec = Entry(self.pes_settings, **settings_entry, textvariable=self.az_secret)
+        self.az_ten = Entry(self.pes_settings, **settings_entry, textvariable=self.az_tenant)
+        self.az_subs = Entry(self.pes_settings, **settings_entry, textvariable=self.az_subscription_id)
+        self.az_resource_name = Entry(self.pes_settings, **settings_entry, textvariable=self.az_group_name)
+        self.az_vm = Entry(self.pes_settings, **settings_entry, textvariable=self.az_vm_name)
 
         player_cost_choices = [15,20,25,30]
         self.players_cost_select = Combobox(self.pes_settings, textvariable=self.players_cost_var, values=player_cost_choices, state='readonly')
 
-        self.shutdown_delay = Entry(self.pes_settings, width=6, state=DISABLED)
+        self.shutdown_delay = Entry(self.pes_settings, width=6, state=DISABLED, textvariable=self.delay_var)
 
         # Grid layout
         settings_lables = dict(sticky=E, pady=1, padx=4)
@@ -155,27 +224,27 @@ class PesGui:
         self.label_sendgrid.grid(column=2, row=2, **settings_lables)
         self.label_mail.grid(column=2, row=3, **settings_lables)
         self.sendgrid_token.grid(column=3, row=2, columnspan=2)
-        self.email_address.grid(column=3, row=3, columnspan=2)
+        self.email_addr.grid(column=3, row=3, columnspan=2)
 
         self.azure_vm.grid(column=1,row=4, columnspan=5, stick=W)
         self.label_client_id.grid(column=2, row=5, **settings_lables)
         self.label_secret.grid(column=2, row=6, **settings_lables)
         self.label_tenant.grid(column=2, row=7, **settings_lables)
-        self.label_resource_group.grid(column=2, row=8, **settings_lables)
-        self.label_vm_name.grid(column=2, row=9, **settings_lables)
-        self.az_client_id.grid(column=3, row=5, columnspan=2)
-        self.az_secret.grid(column=3, row=6, columnspan=2)
-        self.az_tenant.grid(column=3, row=7, columnspan=2)
-        self.az_resource_name.grid(column=3, row=8, columnspan=2)
-        self.az_vm.grid(column=3, row=9, columnspan=2)
+        self.label_subscription.grid(column=2, row=8, **settings_lables)
+        self.label_resource_group.grid(column=2, row=9, **settings_lables)
+        self.label_vm_name.grid(column=2, row=10, **settings_lables)
+        self.az_cl_id.grid(column=3, row=5, columnspan=2)
+        self.az_sec.grid(column=3, row=6, columnspan=2)
+        self.az_ten.grid(column=3, row=7, columnspan=2)
+        self.az_subs.grid(column=3, row=8, columnspan=2)
+        self.az_resource_name.grid(column=3, row=9, columnspan=2)
+        self.az_vm.grid(column=3, row=10, columnspan=2)
 
-        self.label_players_cost.grid(column=1, row=10, columnspan=2, stick=W)
-        self.players_cost_select.grid(column=4, row=10)
+        self.label_players_cost.grid(column=1, row=11, columnspan=2, stick=W)
+        self.players_cost_select.grid(column=4, row=11)
 
-        self.shutdown.grid(column=1,row=11, columnspan=4, stick=W)
-        self.shutdown_delay.grid(column=5, row=11)
-
-
+        self.shutdown.grid(column=1,row=12, columnspan=4, stick=W)
+        self.shutdown_delay.grid(column=5, row=12)
 
 
 
@@ -190,18 +259,24 @@ class PesGui:
         self.checks.pack(side=TOP, fill=X)
 
         # --------- Modes -------------
-        self.which_mode = StringVar(value='standard')
-        self.continue_serie = BooleanVar(value=True)
-        self.games_numbar = IntVar(None,1000)
-
+        #variables
+        self.which_mode = StringVar(value=pes_config['gui']['which_mode'])
+        self.continue_serie = BooleanVar(value=pes_config['gui']['continue_serie'])
+        self.games_number = IntVar(None,pes_config['gui']['games_number'])
+        #callback
+        self.which_mode.trace_variable("w", self.save_configs)
+        self.continue_serie.trace_variable("w", self.save_configs)
+        self.games_number.trace_variable("w", self.save_configs)
 
         self.mode_standard = Radiobutton(self.modes, text="Standard (Continue playing previous serie until exp trainers slot empty)", value='standard', variable=self.which_mode, command=self.toggle_mode)
         self.mode_custom = Radiobutton(self.modes, text='Custom mode: ', value='custom', variable=self.which_mode, command=self.toggle_mode)
         self.mode_limited = Radiobutton(self.modes, text="Limited (Do not convert/sign players, play same squads and renew contracts)", value='limited', variable=self.which_mode, command=self.toggle_mode)
 
         self.cont_s = Checkbutton(self.modes, text="Continue/start over", variable=self.continue_serie, state=DISABLED)
-        self.to_play_val = Entry(self.modes, width=5, justify=RIGHT, textvariable=self.games_numbar, state=DISABLED)
+        self.to_play_val = Entry(self.modes, width=5, justify=RIGHT, textvariable=self.games_number, state=DISABLED)
         self.to_play = Label(self.modes, text="games to play")
+        # Enable if custom is default
+        self.toggle_mode()
 
         modes_grid = dict(sticky=W, pady=3, padx=4)
         self.mode_standard.grid(row=0, column=1, columnspan=4, **modes_grid)
@@ -226,9 +301,9 @@ class PesGui:
         self.settings_toggle.grid(row=1, column=2)
 
         #Game path
-        self.game_path = eval(main.get_pes_exe())
+        self.game_path = StringVar(value=eval(main.get_pes_exe()))
         self.path_found_label = Label(self.checks, text="Game path: ", font='bold')
-        self.path_found_label['text'] += 'detected' if len(self.game_path) > 3 else 'unknown'
+        self.path_found_label['text'] += 'detected' if len(self.game_path.get()) > 3 else 'unknown'
         self.path_found_label['foreground'] = 'green' if self.path_found_label['text'] == "Game path: detected" else 'red'
         self.path_button = Button(
             self.checks,
@@ -241,18 +316,181 @@ class PesGui:
 
 
         # -------- Run / quit buttons
-        self.insert_button = Button(self.botwrap, text="Start", command=self.start)
-        self.insert_button.pack(side=LEFT, padx=2, pady=2)
-        self.insert_button = Button(self.botwrap, text="Quit", command=self.frame.quit)
-        self.insert_button.pack(side=LEFT, padx=2, pady=2)
+        self.start_button = Button(self.botwrap, text="Start", command=self.start)
+        self.start_button.pack(side=LEFT, padx=2, pady=2)
+        self.quit_button = Button(self.botwrap, text="Quit", command=self.frame.quit)
+        self.quit_button.pack(side=LEFT, padx=2, pady=2)
 
 
 
         # ----------- Status bar -------------
         self.status = Label(master, text="Path: ", borderwidth=1, relief=SUNKEN, anchor=W)
-        self.status['text'] += self.game_path
+        self.status['text'] += self.game_path.get()
         self.status.pack(side=BOTTOM, fill=X)
 
+        # ================== FRAME 2 ==================#
+        self.frame2 = Frame(master)
+        self.frame2.pack_forget()
+
+        # --------- Layout ------------
+        self.runwrap = Frame(self.frame2)
+        self.runstats = LabelFrame(self.runwrap, text="Live stats")
+        self.logs = LabelFrame(self.runwrap, text="Logs")
+        self.controls = LabelFrame(self.runwrap, text="Controls")
+
+
+        self.runwrap.pack(side=TOP, fill=X)
+        self.runstats.pack(side=TOP, fill=X)
+        self.logs.pack(side=TOP, fill=X)
+        self.controls.pack(side=TOP, fill=X)
+
+        # ---------- PLay stats ----------
+
+        #variables
+        play_variables = (
+            "team1_contract_var",
+            "team2_contract_var",
+            "manager_contract_var",
+            "gp_balance_var"
+        )
+        for variable in play_variables:
+            setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            getattr(self, variable).trace_variable("w", self.save_configs)
+
+        # not standard variables:
+        self.current_team_var = IntVar(value=pes_config['gui']['current_team_var'])
+        self.errors_var = IntVar(value=0)
+
+        self.current_team_var.trace_variable("w", self.mark_team)
+
+        self.label_games_stats = Label(self.runstats, text="Games played/planned")
+        self.label_current_team = Label(self.runstats, text="Team playing now")
+        self.label_manager_stat = Label(self.runstats, text="Manager contract left")
+        self.label_error = Label(self.runstats, text="Errors occured")
+        self.label_team_contract = Label(self.runstats, text="Teams contracts left")
+        self.label_gp_balance = Label(self.runstats, text="GP balance")
+        self.label_script_status = Label(self.runstats, text="Script is running", foreground="green", font='bold')
+
+        pl_stats_entry = dict(width=5, justify=RIGHT, state=DISABLED)
+        self.games_played = Entry(self.runstats, **pl_stats_entry, textvariable=self.games_played_var)
+        self.games_planned = Entry(self.runstats, **pl_stats_entry, textvariable=self.games_number)
+        self.current_team1 = Label(self.runstats, font='bold', text='1', **pl_stats_entry, anchor=CENTER)
+        self.current_team2 = Label(self.runstats, font='bold', text='2', **pl_stats_entry, anchor=CENTER)
+        self.current_team = Entry(self.runstats, **pl_stats_entry, textvariable=self.current_team_var)
+        self.manager_stats = Entry(self.runstats, **pl_stats_entry, textvariable=self.manager_contract_var)
+        self.error = Entry(self.runstats, **pl_stats_entry, textvariable=self.errors_var)
+        self.team1_contract = Entry(self.runstats, **pl_stats_entry, textvariable=self.team1_contract_var)
+        self.team2_contract = Entry(self.runstats, **pl_stats_entry, textvariable=self.team2_contract_var)
+        self.gp_balance = Entry(self.runstats, width=12, justify=RIGHT, state=DISABLED, textvariable=self.gp_balance_var)
+
+        # Grid layout
+        pl_stats_labels = dict(sticky=E, pady=2, padx=4)
+
+        self.label_games_stats.grid(row=1, column=1, **pl_stats_labels)
+        self.label_error.grid(row=2, column=1, **pl_stats_labels)
+        self.label_current_team.grid(row=1, column=4, **pl_stats_labels)
+        self.label_team_contract.grid(row=2, column=4, **pl_stats_labels)
+        self.label_manager_stat.grid(row=1, column=7, **pl_stats_labels)
+        self.label_gp_balance.grid(row=2, column=7, **pl_stats_labels)
+        self.label_script_status.grid(row=1, rowspan=2, column=10)
+
+        self.games_played.grid(row=1, column=2)
+        self.games_planned.grid(row=1, column=3)
+        self.error.grid(row=2, column=2, columnspan=2)
+        self.current_team1.grid(row=1, column=5)
+        self.current_team2.grid(row=1, column=6)
+        self.team1_contract.grid(row=2, column=5)
+        self.team2_contract.grid(row=2,column=6)
+        self.manager_stats.grid(row=1, column=8)
+        self.gp_balance.grid(row=2, column=8)
+
+
+        # ----------- LOGS -------------
+        self.logs = Text(self.logs, background="black", foreground='white', height=18)
+        self.logs.insert(END,'''
+[INFO:2020-04-19 23:41:27,429:         get_pes_exe() ]: Pes installed in alternative location: E:\Steam\steamapps\common\eFootball PES 2020\PES2020.exe
+[INFO:2020-04-19 23:41:32,468:             makebkp() ]: Creating backup and importing pes settings file
+[INFO:2020-04-19 23:41:32,469:             makebkp() ]: Backup created: ['76561198156308153', 'mount', 'settings.dat.orig', 'settings.dat.pes-bkp', 'WEPES']
+[INFO:2020-04-19 23:41:32,470:             makebkp() ]: Settings copied, folder contents: ['76561198156308153', 'mount', 'settings.dat', 'settings.dat.orig', 'settings.dat.pes-bkp', 'WEPES']
+[INFO:2020-04-19 23:41:47,981:         get_pes_exe() ]: Pes installed in alternative location: E:\Steam\steamapps\common\eFootball PES 2020\PES2020.exe
+[INFO:2020-04-19 23:41:48,058:         get_pes_exe() ]: Pes installed in alternative location: E:\Steam\steamapps\common\eFootball PES 2020\PES2020.exe
+[INFO:2020-04-19 23:41:53,743:        revertbackup() ]: Backup is there, reverting:
+[INFO:2020-04-19 23:41:53,744:        revertbackup() ]: settings.dat removed, starting revert from settings.dat.pes-bkp
+[INFO:2020-04-19 23:41:53,744:        revertbackup() ]: Backup reverted to settings.dat\n
+        ''')
+        self.logs.pack(fill=X, expand=1)
+
+        # ----------- Controls ----------
+        self.abort = Button(self.controls, text="Abort", command=self.test)
+        self.gracefull_stop = Button(self.controls, text="Gracefull stop")
+        self.poweroff = Checkbutton(self.controls, text="Poweroff after finish, delay m: ", variable=self.shutdown_var, command=self.use_shutdown)
+        self.delay = Entry(self.controls, width=6, state=DISABLED, textvariable=self.delay_var)
+        self.go_back = Button(self.controls, text="Go back", command=self.back)
+
+        self.abort.grid(row=1, column=1)
+        self.gracefull_stop.grid(row=1, column=2)
+        self.poweroff.grid(row=1, column=3)
+        self.delay.grid(row=1, column=4)
+        self.go_back.grid(row=1, column=5)
+
+
+        #Refresh once loading
+        self.use_azure()
+        self.use_mail()
+        self.use_shutdown()
+
+
+
+        #================= END of the class ==================
+
+
+    def test(self, *args):
+        print('Abort pressed -> test result:')
+        if self.current_team_var.get() == 1:
+            self.current_team_var.set(2)
+        else:
+            self.current_team_var.set(1)
+
+    def mark_team(self, *args):
+        self.current_team1['state'] = '!disabled'
+        self.current_team2['state'] = '!disabled'
+        if self.current_team_var.get() < 2:
+            self.current_team1.config(borderwidth=2, relief="groove")
+            self.current_team2.config(borderwidth=0, relief="")
+        else:
+            self.current_team2.config(borderwidth=2, relief="groove")
+            self.current_team1.config(borderwidth=0, relief="")
+        self.current_team1['state'] = 'disabled'
+        self.current_team2['state'] = 'disabled'
+        self.save_configs()
+
+    def start_toggle(self):
+        # disable if mail wrong
+        if self.mail_send_var.get() and '' in [self.sendgrid_api_key.get(), self.email_address.get()]:
+            self.start_button['state'] = 'disabled'
+        # disable if azure wrong
+        elif self.azure_vm_var.get() and '' in [
+            self.az_client_id.get(),
+            self.az_secret.get(),
+            self.az_tenant.get(),
+            self.az_subscription_id.get(),
+            self.az_group_name.get(),
+            self.az_vm_name.get()
+        ]:
+            self.start_button['state'] = 'disabled'
+        # disable if shutdown is wrong
+        elif self.shutdown_var.get() and self.delay_var.get() < 1:
+            self.start_button['state'] = 'disabled'
+        else:
+            self.start_button['state'] = '!disabled'
+
+    def save_configs(self, *args):
+        global pes_config
+        for section in pes_config.keys():
+            for key,value in pes_config[section].items():
+                pes_config[section][key] = getattr(self, key).get()
+        write_configurations()
+        self.start_toggle()
 
     def settings_switch(self):
         if self.settings_toggle["text"] == "Copy settings":
@@ -271,6 +509,7 @@ class PesGui:
         print("Wow, this actually worked!")
 
 
+
     def toggle_mode(self):
         if self.which_mode.get() == 'custom':
             self.cont_s['state'] = "!disabled"
@@ -282,45 +521,56 @@ class PesGui:
     def use_mail(self):
         if self.mail_send_var.get():
             self.sendgrid_token['state'] = '!disabled'
-            self.email_address['state'] = '!disabled'
+            self.email_addr['state'] = '!disabled'
         else:
             self.sendgrid_token['state'] = 'disabled'
-            self.email_address['state'] = 'disabled'
+            self.email_addr['state'] = 'disabled'
 
 
     def use_azure(self):
         if self.azure_vm_var.get():
-            self.az_client_id['state'] = '!disabled'
-            self.az_secret['state'] = '!disabled'
-            self.az_tenant['state'] = '!disabled'
+            self.az_cl_id['state'] = '!disabled'
+            self.az_sec['state'] = '!disabled'
+            self.az_ten['state'] = '!disabled'
+            self.az_subs['state'] = '!disabled'
             self.az_resource_name['state'] = '!disabled'
             self.az_vm['state'] = '!disabled'
         else:
-            self.az_client_id['state'] = 'disabled'
-            self.az_secret['state'] = 'disabled'
-            self.az_tenant['state'] = 'disabled'
+            self.az_cl_id['state'] = 'disabled'
+            self.az_sec['state'] = 'disabled'
+            self.az_ten['state'] = 'disabled'
+            self.az_subs['state'] = 'disabled'
             self.az_resource_name['state'] = 'disabled'
             self.az_vm['state'] = 'disabled'
 
     def use_shutdown(self):
         if self.shutdown_var.get():
+            self.delay['state'] = '!disabled'
             self.shutdown_delay['state'] = '!disabled'
         else:
+            self.delay['state'] = 'disabled'
             self.shutdown_delay['state'] = 'disabled'
 
     def select_path(self):
         self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES2020.exe','PES2020.exe')])
-        self.game_path = self.filename
-        if len(self.game_path) > 3:
+        self.game_path.set(self.filename)
+        if len(self.game_path.get()) > 3:
             self.path_found_label['text'] += 'Game path: detected'
             self.path_found_label['foreground'] = 'green'
+            global pes_config
+            pes_config['general']['game_path'] = self.game_path.get()
+            self.save_configs()
 
     def new_window(self):
         self.window=Toplevel(gui)
 
     def start(self):
         self.frame.pack_forget()
-        self.frame2 = Frame(self.master)
+        self.frame2.pack(fill=BOTH, padx=4, pady=1)
+
+    def back(self):
+        self.frame2.pack_forget()
+        self.frame.pack(fill=BOTH, padx=4, pady=1)
 
 
 
