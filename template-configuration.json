@@ -1,0 +1,40 @@
+{
+  "secrets": {
+    "az_client_id": "USE_NO_SPACES" ,
+    "az_secret": "az_secret" ,
+    "az_tenant": "az_tenant" ,
+    "az_subscription_id": "az_subscription_id" ,
+    "sendgrid_api_key": "paste_sendgrid_token_here"
+  } ,
+  "gui": {
+    "team1_convert": true ,
+    "team2_convert": true ,
+    "team1_populate": true ,
+    "team2_populate": true ,
+    "sign_all": true ,
+    "mail_send_var": false ,
+    "azure_vm_var": false ,
+    "shutdown_var": false ,
+    "players_cost_var": 15 ,
+    "delay_var": 4 ,
+    "which_mode": "standard" ,
+    "continue_serie": true ,
+    "games_number": 1000 ,
+    "games_played_var": 1 ,
+    "games_total_var": 2 ,
+    "players_runtime_var": 3 ,
+    "players_total_var": 4 ,
+    "exp_left_var": 5 ,
+    "current_team_var": 2 ,
+    "team1_contract_var": 25 ,
+    "team2_contract_var": 24 ,
+    "manager_contract_var": 22 ,
+    "gp_balance_var": 37000
+  } ,
+  "general": {
+    "email_address": "email@example.com" ,
+    "az_group_name": "az_group_name" ,
+    "az_vm_name": "az_vm_name" ,
+    "game_path": ""
+  }
+}

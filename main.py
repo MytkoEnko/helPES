@@ -98,6 +98,8 @@ def get_pes_exe():
     default_pes_path = prgm_path + '\Steam\steamapps\common\eFootball PES 2020\PES2020.exe'
     if isthere(default_pes_path):
         print('Pes installed in default location:' + default_pes_path)
+        pes_config['general']['game_path'] = repr(default_pes_path).replace("'",'"')
+        write_configurations()
         return repr(default_pes_path).replace("'",'"')
     else:
         lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
@@ -112,12 +114,33 @@ def get_pes_exe():
             if isthere(new_path):
                 alternative_pes_path = new_path
         logger.info("Pes installed in alternative location: %s", alternative_pes_path)
+        pes_config['general']['game_path'] = repr(alternative_pes_path).replace("'",'"')
+        write_configurations()
         return repr(alternative_pes_path).replace("'",'"')
 
 
 # ------------------------------------------ DEFINE GAME VARIABLES
+# Variable for settings:
+pes_config = {}
 
-pes_launcher = App(r'{}'.format(get_pes_exe()))
+# Load/prepare and load configuration.json
+def load_configurations():
+    if not isthere('configuration.json'):
+        shutil.copy('template-configuration.json', 'configuration.json')
+
+    if isthere('configuration.json'):
+        with open('configuration.json', 'r') as to_read:
+            global pes_config
+            pes_config = json.load(to_read)
+
+def write_configurations():
+    global  pes_config
+    with open('configuration.json', "w") as to_write:
+        json.dump(pes_config, to_write)
+
+load_configurations()
+
+pes_launcher = App(r'{}'.format(pes_config['general']['game_path'])) if len(pes_config['general']['game_path']) > 3 else App(r'{}'.format(get_pes_exe()))
 pesName = 'eFootball PES 2020'
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
@@ -985,8 +1008,8 @@ if args.prepare:
 if args.custom:
     print('Runing with custom')
     # playing_loop()
-    # initialize_pes()
-    # sign_all()
+    initialize_pes()
+    sign_all()
     # smart_players_convert()
     # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
     # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
