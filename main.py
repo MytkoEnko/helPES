@@ -114,7 +114,7 @@ def get_pes_exe():
             if isthere(new_path):
                 alternative_pes_path = new_path
         logger.info("Pes installed in alternative location: %s", alternative_pes_path)
-        pes_config['general']['game_path'] = repr(alternative_pes_path).replace("'",'"')
+        pes_config['general']['game_path'] = alternative_pes_path
         write_configurations()
         return repr(alternative_pes_path).replace("'",'"')
 
@@ -1028,3 +1028,8 @@ if args.custom:
     # pes_region.saveScreenCapture('./shot', 'screen_to_mail')
     #print(r'"' + '{}"'.format(get_pes_exe()))
     #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
+
+def dummy_playing_loop():
+    for i in range(10):
+        time.sleep(2)
+        logger.info(f'Numbers of dummy games played: {i}')
