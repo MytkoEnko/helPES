@@ -5,19 +5,12 @@ from tkinter import filedialog
 from PIL import ImageTk, Image
 import os
 import json
+import threading
+import logging
 
-def load_configurations():
-    if os.path.exists('configuration.json'):
-        with open('configuration.json', 'r') as to_read:
-            global pes_config
-            pes_config = json.load(to_read)
+pes_config = main.pes_config
 
-def write_configurations():
-    global  pes_config
-    with open('configuration.json', "w") as to_write:
-        json.dump(pes_config, to_write)
 
-load_configurations()
 
 class PesGui:
     def __init__(self, master):
@@ -360,6 +353,8 @@ class PesGui:
         # not standard variables:
         self.current_team_var = IntVar(value=pes_config['gui']['current_team_var'])
         self.errors_var = IntVar(value=0)
+        self.run_status = StringVar(value='Starting')
+        self.run_status.trace_variable('w', self.run_status_changes)
 
         self.current_team_var.trace_variable("w", self.mark_team)
 
@@ -369,7 +364,7 @@ class PesGui:
         self.label_error = Label(self.runstats, text="Errors occured")
         self.label_team_contract = Label(self.runstats, text="Teams contracts left")
         self.label_gp_balance = Label(self.runstats, text="GP balance")
-        self.label_script_status = Label(self.runstats, text="Script is running", foreground="green", font='bold')
+        self.label_script_status = Label(self.runstats, textvar=self.run_status, foreground="light steel blue", font='bold')
 
         pl_stats_entry = dict(width=5, justify=RIGHT, state=DISABLED)
         self.games_played = Entry(self.runstats, **pl_stats_entry, textvariable=self.games_played_var)
@@ -408,24 +403,34 @@ class PesGui:
         # ----------- LOGS -------------
         self.logs = Text(self.logs, background="black", foreground='white', height=18)
         self.logs.insert(END,'''
-[INFO:2020-04-19 23:41:27,429:         get_pes_exe() ]: Pes installed in alternative location: E:\Steam\steamapps\common\eFootball PES 2020\PES2020.exe
-[INFO:2020-04-19 23:41:32,468:             makebkp() ]: Creating backup and importing pes settings file
-[INFO:2020-04-19 23:41:32,469:             makebkp() ]: Backup created: ['76561198156308153', 'mount', 'settings.dat.orig', 'settings.dat.pes-bkp', 'WEPES']
-[INFO:2020-04-19 23:41:32,470:             makebkp() ]: Settings copied, folder contents: ['76561198156308153', 'mount', 'settings.dat', 'settings.dat.orig', 'settings.dat.pes-bkp', 'WEPES']
-[INFO:2020-04-19 23:41:47,981:         get_pes_exe() ]: Pes installed in alternative location: E:\Steam\steamapps\common\eFootball PES 2020\PES2020.exe
-[INFO:2020-04-19 23:41:48,058:         get_pes_exe() ]: Pes installed in alternative location: E:\Steam\steamapps\common\eFootball PES 2020\PES2020.exe
-[INFO:2020-04-19 23:41:53,743:        revertbackup() ]: Backup is there, reverting:
-[INFO:2020-04-19 23:41:53,744:        revertbackup() ]: settings.dat removed, starting revert from settings.dat.pes-bkp
-[INFO:2020-04-19 23:41:53,744:        revertbackup() ]: Backup reverted to settings.dat\n
-        ''')
+  _ \  ____|  ___|        ____| \     _ \   \  | ____|  _ \  
+ |   | __|  \___ \        |    _ \   |   | |\/ | __|   |   | 
+ ___/  |          |_____| __| ___ \  __ <  |   | |     __ <  
+_|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\ 
+\n''')
         self.logs.pack(fill=X, expand=1)
 
+        #  actual logging section
+        from main import logger as logger
+
+        # Set format for logs
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s:]: %(message)s', datefmt='%H:%M:%S')
+
+        # Gui handler
+        text_handler = self.TextHandler(self.logs)
+        text_handler.setFormatter(formatter)
+        text_handler.setLevel(logging.DEBUG)
+
+        # Add handlers to logger
+        logger.addHandler(text_handler)
+
+
         # ----------- Controls ----------
-        self.abort = Button(self.controls, text="Abort", command=self.test)
+        self.abort = Button(self.controls, text="Abort", command=self.abort_pressed)
         self.gracefull_stop = Button(self.controls, text="Gracefull stop")
         self.poweroff = Checkbutton(self.controls, text="Poweroff after finish, delay m: ", variable=self.shutdown_var, command=self.use_shutdown)
         self.delay = Entry(self.controls, width=6, state=DISABLED, textvariable=self.delay_var)
-        self.go_back = Button(self.controls, text="Go back", command=self.back)
+        self.go_back = Button(self.controls, text="Go back", command=self.back, state=DISABLED)
 
         self.abort.grid(row=1, column=1)
         self.gracefull_stop.grid(row=1, column=2)
@@ -489,7 +494,7 @@ class PesGui:
         for section in pes_config.keys():
             for key,value in pes_config[section].items():
                 pes_config[section][key] = getattr(self, key).get()
-        write_configurations()
+        main.write_configurations()
         self.start_toggle()
 
     def settings_switch(self):
@@ -567,11 +572,95 @@ class PesGui:
     def start(self):
         self.frame.pack_forget()
         self.frame2.pack(fill=BOTH, padx=4, pady=1)
+        main.time.sleep(1)
+
+        self.script = threading.Thread(name='pes_run', target=self.play)
+        self.status_watcher_job = threading.Thread(name='watcher', target=self.status_watcher)
+
+        # Update status and buttons
+        self.run_status.set('Starting')
+        self.abort.config(state='normal')
+        self.go_back.config(state='disabled')
+        # Run threads
+        self.script.start()
+        self.status_watcher_job.start()
+
+        #self.play()
 
     def back(self):
         self.frame2.pack_forget()
         self.frame.pack(fill=BOTH, padx=4, pady=1)
 
+    ###################### RUN GAME #######################
+
+    def play(self):
+        main.aborted = False
+        main.time.sleep(2)
+        main.dummy_playing_loop()
+
+    def abort_pressed(self):
+        main.aborted = True
+        self.run_status.set('Aborting')
+        self.abort.config(state='disabled')
+
+
+    def status_watcher(self):
+        while self.script.is_alive() and self.run_status.get() != 'Aborting':
+            self.run_status.set('Script is running')
+            main.time.sleep(2)
+            print('status watcher is good')
+        else:
+            print('status watcher else cond')
+            main.time.sleep(1)
+            if self.run_status.get() == 'Aborting':
+                print('status watcher detected aborted')
+                self.run_status.set('Aborted')
+                self.go_back.config(state='normal')
+            elif self.run_status.get() not in ('Done', 'Aborted', 'Aborting'):
+                self.run_status.set('Failed')
+                self.go_back.config(state='normal')
+                print('status watcher detected failure')
+
+
+    def run_status_changes(self, *args):
+        status_color = {
+            "Script is running" : 'green',
+            'Aborting' : 'coral',
+            'Aborted' : 'red',
+            'Done' : 'blue',
+            'Failed' : 'red',
+            'Starting' : 'light steel blue'
+        }
+
+        status = self.run_status.get()
+        for status_name,color in status_color.items():
+            if status == status_name:
+                self.label_script_status.config(foreground=color)
+
+    #self.label_script_status = Label(self.runstats, textvar=self.run_status, foreground="light steel blue", font='bold')
+
+    #################### Logging class ######################
+    class TextHandler(logging.Handler):
+        """This class allows you to log to a Tkinter Text or ScrolledText widget"""
+
+        def __init__(self, text):
+            # run the regular Handler __init__
+            logging.Handler.__init__(self)
+            # Store a reference to the Text it will log to
+            self.text = text
+
+        def emit(self, record):
+            msg = self.format(record)
+
+            def append():
+                self.text.configure(state='normal')
+                self.text.insert(END, msg + '\n')
+                self.text.configure(state='disabled')
+                # Autoscroll to the bottom
+                self.text.yview(END)
+
+            # This is necessary because we can't modify the Text from other threads
+            self.text.after(0, append)
 
 
 gui = Tk(className=" PES2020 Farmer") #create instance

@@ -1028,8 +1028,11 @@ if args.custom:
     # pes_region.saveScreenCapture('./shot', 'screen_to_mail')
     #print(r'"' + '{}"'.format(get_pes_exe()))
     #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
-
+aborted = False
+import  sys
 def dummy_playing_loop():
     for i in range(10):
         time.sleep(2)
         logger.info(f'Numbers of dummy games played: {i}')
+        if aborted:
+            sys.exit()
