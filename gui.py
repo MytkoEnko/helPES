@@ -191,7 +191,7 @@ class PesGui:
         self.label_resource_group = Label(self.pes_settings, text="service group name")
         self.label_vm_name = Label(self.pes_settings, text="virtual machine name")
 
-        self.label_players_cost = Label(self.pes_settings, text="Use players of cost (and less):")
+        self.label_players_cost = Label(self.pes_settings, text="Use players of max cost:")
 
         settings_entry = dict(width=35, state=DISABLED)
 
@@ -427,16 +427,18 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
 
         # ----------- Controls ----------
         self.abort = Button(self.controls, text="Abort", command=self.abort_pressed)
-        self.gracefull_stop = Button(self.controls, text="Gracefull stop")
+        self.gracefull_stop = Button(self.controls, text="Gracefull stop", command=self.do_gracefull_stop)
         self.poweroff = Checkbutton(self.controls, text="Poweroff after finish, delay m: ", variable=self.shutdown_var, command=self.use_shutdown)
-        self.delay = Entry(self.controls, width=6, state=DISABLED, textvariable=self.delay_var)
+        self.delay = Entry(self.controls, width=6, state=DISABLED, justify=RIGHT, textvariable=self.delay_var)
+        self.countdown = Label(self.controls, text="Waiting.." )
         self.go_back = Button(self.controls, text="Go back", command=self.back, state=DISABLED)
 
         self.abort.grid(row=1, column=1)
         self.gracefull_stop.grid(row=1, column=2)
         self.poweroff.grid(row=1, column=3)
-        self.delay.grid(row=1, column=4)
-        self.go_back.grid(row=1, column=5)
+        self.delay.grid(row=1, column=4, sticky=E, pady=2, padx=4)
+        self.countdown.grid(row=1, column=5, sticky=E, pady=2, padx=4)
+        self.go_back.grid(row=1, column=6)
 
 
         #Refresh once loading
@@ -520,6 +522,7 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
             self.cont_s['state'] = "!disabled"
             self.to_play_val['state'] = "!disabled"
         else:
+            self.games_number.set(1000)
             self.cont_s['state'] = "disabled"
             self.to_play_val['state'] = "disabled"
 
@@ -552,9 +555,13 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         if self.shutdown_var.get():
             self.delay['state'] = '!disabled'
             self.shutdown_delay['state'] = '!disabled'
+            main.shutdown = True
+            self.countdown.config(text='Waiting..')
         else:
+            main.shutdown = False
             self.delay['state'] = 'disabled'
             self.shutdown_delay['state'] = 'disabled'
+            self.countdown.config(text='Waiting..')
 
     def select_path(self):
         self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES2020.exe','PES2020.exe')])
@@ -580,6 +587,7 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         # Update status and buttons
         self.run_status.set('Starting')
         self.abort.config(state='normal')
+        self.gracefull_stop.config(state='normal')
         self.go_back.config(state='disabled')
         # Run threads
         self.script.start()
@@ -595,24 +603,26 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
 
     def play(self):
         main.aborted = False
+        main.gracefull_stop = False
         main.time.sleep(2)
         main.dummy_playing_loop()
 
     def abort_pressed(self):
         main.aborted = True
         self.run_status.set('Aborting')
-        self.abort.config(state='disabled')
 
 
     def status_watcher(self):
-        while self.script.is_alive() and self.run_status.get() != 'Aborting':
+        while self.script.is_alive() and self.run_status.get() not in ('Aborting', 'Stopping'):
             self.run_status.set('Script is running')
             main.time.sleep(2)
             print('status watcher is good')
         else:
             print('status watcher else cond')
+            self.abort.config(state='disabled')
+            self.gracefull_stop.config(state='disabled')
             main.time.sleep(1)
-            if self.run_status.get() == 'Aborting':
+            if self.run_status.get() in ('Aborting', "Stopping"):
                 print('status watcher detected aborted')
                 self.run_status.set('Aborted')
                 self.go_back.config(state='normal')
@@ -620,12 +630,14 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
                 print('status watcher detected failure')
+                self.do_shutdown() #TODO: find good place for that one.
 
 
     def run_status_changes(self, *args):
         status_color = {
             "Script is running" : 'green',
             'Aborting' : 'coral',
+            'Stopping' : 'coral',
             'Aborted' : 'red',
             'Done' : 'blue',
             'Failed' : 'red',
@@ -637,7 +649,25 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
             if status == status_name:
                 self.label_script_status.config(foreground=color)
 
-    #self.label_script_status = Label(self.runstats, textvar=self.run_status, foreground="light steel blue", font='bold')
+    def do_shutdown(self):
+        sec_delay = int(self.delay_var.get() * 60)
+        logging.info(f'Shutting down after {self.delay_var.get()} minutes')
+        while self.shutdown_var.get():
+            if sec_delay == 0:
+                os.system('shutdown -s')
+            else:
+                mins, secs = divmod(sec_delay,60)
+                hours, remain = divmod(mins, 60)
+                timeformat = "{:02d}:{:02d}:{:02d}".format(hours, mins, secs)
+                self.countdown.config(text=timeformat)
+                sec_delay -= 1
+                main.time.sleep(1)
+
+    def do_gracefull_stop(self):
+        main.gracefull_stop = True
+        self.run_status.set('Stopping')
+
+
 
     #################### Logging class ######################
     class TextHandler(logging.Handler):
