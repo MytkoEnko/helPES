@@ -3,9 +3,9 @@ import base64
 from datetime import datetime
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
-from secrets import sendgrid_api_key
 
-def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png'):
+
+def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png', sendgrid_api_key='',to_email='', alt_content=''):
 
     with open("pes-f.log", 'r') as f:
         data = f.readlines()
@@ -16,9 +16,9 @@ def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png'):
 
     message = Mail(
         from_email='pes-python@dmytro.pl',
-        to_emails='dmytro.aleksieiev@gmail.com',
+        to_emails=to_email,
         subject='PES script hang mail ' + str(date),
-        html_content=f'<strong>Last 30 lines of pes-f.log</strong> <br> {body} <br> <img src="cid:my_content_id"></img>')
+        html_content=alt_content if alt_content else f'<strong>Last 30 lines of pes-f.log</strong> <br> {body} <br> <img src="cid:my_content_id"></img>')
 
     with open(file_path, 'rb') as f:
         data = f.read()
@@ -35,5 +35,6 @@ def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png'):
         sendgrid_client = SendGridAPIClient(sendgrid_api_key)
         response = sendgrid_client.send(message)
         print(response.status_code,response.body,response.headers)
+        return response.status_code
     except Exception as e:
-        print(e.message)
+        return 500

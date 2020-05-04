@@ -262,7 +262,7 @@ def error_check(allowed=30):
         global pes_region
         pes_region.saveScreenCapture('./shot', 'screen_to_mail')
         time.sleep(5)
-        send_mail()
+        send_mail(sendgrid_api_key=pes_config['secrets']['sendgrid_api_key'], to_email=pes_config['general']['email_address'])
         time.sleep(300)
         stop_vm(compute_client)
 # press_A when matched photo (a) within timeout (b)
@@ -1028,7 +1028,9 @@ if args.custom:
     # pes_region.saveScreenCapture('./shot', 'screen_to_mail')
     #print(r'"' + '{}"'.format(get_pes_exe()))
     #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
+gracefull_stop = False
 aborted = False
+shutdown = False
 import  sys
 def dummy_playing_loop():
     for i in range(10):
@@ -1036,3 +1038,6 @@ def dummy_playing_loop():
         logger.info(f'Numbers of dummy games played: {i}')
         if aborted:
             sys.exit()
+        if gracefull_stop:
+            break
+    logger.info(f'Dummy playig loop finished')

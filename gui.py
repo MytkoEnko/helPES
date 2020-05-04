@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 import main
 from tkinter import filedialog
+from tkinter import messagebox
 from PIL import ImageTk, Image
 import os
 import json
@@ -184,6 +185,9 @@ class PesGui:
         self.label_sendgrid = Label(self.pes_settings, text="sendgrid_token")
         self.label_mail = Label(self.pes_settings, text="email")
 
+        self.email_test = Button(self.pes_settings, text="test email", command=self.test_email, state=DISABLED)
+        self.azure_test = Button(self.pes_settings, text="test azure", command=self.test_azure, state=DISABLED)
+
         self.label_client_id = Label(self.pes_settings, text="azure client ID")
         self.label_secret = Label(self.pes_settings, text="azure secret")
         self.label_tenant = Label(self.pes_settings, text="azure tenant")
@@ -214,12 +218,14 @@ class PesGui:
         settings_lables = dict(sticky=E, pady=1, padx=4)
 
         self.mail_send.grid(column=1,row=1, columnspan=5, stick=W)
+        self.email_test.grid(column=4, row=1, stick=E)
         self.label_sendgrid.grid(column=2, row=2, **settings_lables)
         self.label_mail.grid(column=2, row=3, **settings_lables)
         self.sendgrid_token.grid(column=3, row=2, columnspan=2)
         self.email_addr.grid(column=3, row=3, columnspan=2)
 
         self.azure_vm.grid(column=1,row=4, columnspan=5, stick=W)
+        self.azure_test.grid(column=4, row=4, stick=E)
         self.label_client_id.grid(column=2, row=5, **settings_lables)
         self.label_secret.grid(column=2, row=6, **settings_lables)
         self.label_tenant.grid(column=2, row=7, **settings_lables)
@@ -450,6 +456,24 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
 
         #================= END of the class ==================
 
+    def test_azure(self):
+        print("Azure test")
+
+    def test_email(self):
+        print("Email test")
+        response = main.send_mail(
+            sendgrid_api_key=pes_config['secrets']['sendgrid_api_key'],
+            to_email=pes_config['general']['email_address'],
+            alt_content="helPES test mail confirmation"
+        )
+
+        if response == 202:
+            message = "202 Accepted \n Check your email to verify"
+        else:
+            message = "Could not send message, please check token, email address and sendgrid settings"
+        messagebox.showinfo('Email test response', message=message)
+
+
 
     def test(self, *args):
         print('Abort pressed -> test result:')
@@ -530,26 +554,29 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         if self.mail_send_var.get():
             self.sendgrid_token['state'] = '!disabled'
             self.email_addr['state'] = '!disabled'
+            self.email_test['state'] = '!disabled'
         else:
             self.sendgrid_token['state'] = 'disabled'
             self.email_addr['state'] = 'disabled'
+            self.email_test['state'] = 'disabled'
 
 
     def use_azure(self):
+        fields_list = (
+            'az_cl_id',
+            'az_sec',
+            'az_ten',
+            'az_subs',
+            'az_resource_name',
+            'az_vm',
+            'azure_test'
+        )
         if self.azure_vm_var.get():
-            self.az_cl_id['state'] = '!disabled'
-            self.az_sec['state'] = '!disabled'
-            self.az_ten['state'] = '!disabled'
-            self.az_subs['state'] = '!disabled'
-            self.az_resource_name['state'] = '!disabled'
-            self.az_vm['state'] = '!disabled'
+            for field in fields_list:
+                getattr(self, field)['state'] = '!disabled'
         else:
-            self.az_cl_id['state'] = 'disabled'
-            self.az_sec['state'] = 'disabled'
-            self.az_ten['state'] = 'disabled'
-            self.az_subs['state'] = 'disabled'
-            self.az_resource_name['state'] = 'disabled'
-            self.az_vm['state'] = 'disabled'
+            for field in fields_list:
+                getattr(self, field)['state'] = 'disabled'
 
     def use_shutdown(self):
         if self.shutdown_var.get():
