@@ -130,7 +130,7 @@ class PesGui:
         self.t2_con = Checkbutton(self.actions, text="convert all players", variable=self.team2_convert)
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
         self.sign_a = Checkbutton(self.actions, text="sign all scouts", variable=self.sign_all)
-        self.perform = Button(self.actions, text="Perform", command=self.print_message)
+        self.perform = Button(self.actions, text="Perform", command= lambda: self.start(perform=True))
 
         self.t1_con.grid(row=0, column=2, **actions_label_args)
         self.t1_pop.grid(row=0, column=3, **actions_label_args)
@@ -603,12 +603,17 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
     def new_window(self):
         self.window=Toplevel(gui)
 
-    def start(self):
+    def start(self, perform=False):
         self.frame.pack_forget()
         self.frame2.pack(fill=BOTH, padx=4, pady=1)
         main.time.sleep(1)
 
-        self.script = threading.Thread(name='pes_run', target=self.play)
+        #Prepare threads
+        if perform:
+            self.script = threading.Thread(name='pes_run', target=self.perform_actions)
+        else:
+            self.script = threading.Thread(name='pes_run', target=self.play)
+
         self.status_watcher_job = threading.Thread(name='watcher', target=self.status_watcher)
 
         # Update status and buttons
@@ -627,6 +632,11 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         self.frame.pack(fill=BOTH, padx=4, pady=1)
 
     ###################### RUN GAME #######################
+    def perform_actions(self):
+        main.aborted = False
+        main.gracefull_stop = False
+        main.time.sleep(2)
+        self.gui_actions_loop()
 
     def play(self):
         main.aborted = False
@@ -634,6 +644,37 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         main.time.sleep(2)
         main.dummy_playing_loop()
 
+    # --------- Playing loop -----------
+    def gui_playing_loop(self):
+        logging.info('helPES playing loop started')
+        self.gui_start_pes()
+
+
+    # --------- Actions playing loop -------
+    def gui_actions_loop(self):
+        logging.info('helPES actions loop started')
+        self.gui_start_pes()
+        if self.sign_all.get():
+            main.sign_all()
+        main.smart_players_convert(1, self.team1_populate.get(),self.team1_convert.get())
+        main.smart_players_convert(2, self.team2_populate.get(), self.team2_convert.get())
+        self.run_status.set('Done')
+        if self.shutdown_var.get():
+            self.do_shutdown()
+
+    def gui_start_pes(self):
+        main.initialize_pes()
+        if main.base_ok():
+            logging.info('Game is on, no need to start')
+        else:
+            main.start_game()
+
+    def gui_shift_change(self, team=12):
+        main.sign_all()
+        main.smart_players_convert(team)
+
+
+    ####################### END RUN GAME #####################
     def abort_pressed(self):
         main.aborted = True
         self.run_status.set('Aborting')

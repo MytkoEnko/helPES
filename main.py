@@ -1,4 +1,5 @@
 import logging
+import  sys
 import os
 import shutil
 from keyboard import mouse
@@ -120,9 +121,13 @@ def get_pes_exe():
 
 
 # ------------------------------------------ DEFINE GAME VARIABLES
-# Variable for settings:
+# Runtime variables:
 pes_config = {}
+gracefull_stop = False
+aborted = False
+shutdown = False
 
+# Saved settings (variables)
 # Load/prepare and load configuration.json
 def load_configurations():
     if not isthere('configuration.json'):
@@ -140,7 +145,12 @@ def write_configurations():
 
 load_configurations()
 
-pes_launcher = App(r'{}'.format(pes_config['general']['game_path'])) if len(pes_config['general']['game_path']) > 3 else App(r'{}'.format(get_pes_exe()))
+if len(pes_config['general']['game_path']) > 3:
+    pes_path = r'{}'.format(repr(pes_config['general']['game_path']).replace("'",'"'))
+else:
+    pes_path = r'{}'.format(get_pes_exe())
+
+pes_launcher = App(f'{pes_path}')
 pesName = 'eFootball PES 2020'
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
@@ -235,11 +245,13 @@ def turn_down(n):
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(img, seconds, similarity=0.89):
+    if aborted:
+        sys.exit()
     pes.focus()
     # Update PES window
     global pes_region
     pes_region = pes.window()
-    #pes_region.highlight(1)
+    pes_region.highlight(1)
     #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
@@ -677,7 +689,7 @@ def players_convert():
                 break
 
 # Converts and populates squads of playing teams:
-def smart_players_convert():
+def smart_players_convert(which_teams=12, populate=True, execute=True):
     def safe_pl_rating():
         try:
             players_rating = int(recognize('player_rating'))
@@ -847,18 +859,28 @@ def smart_players_convert():
         while not base_ok():
             press_B()
 
-    team_change(1)
-    team_execute()
-    logger.info('Team nr: %s recreated', int(team_nr))
-    team_change(2)
-    team_execute()
-    logger.info('Team nr: %s recreated', int(team_nr))
-    team_change(1)
-    populate_team(1)
-    logger.info('Team nr: %s recreated', int(team_nr))
-    team_change(2)
-    populate_team(2)
-    logger.info('Team nr: %s recreated', int(team_nr))
+    if which_teams == 12:
+        team_change(1)
+        team_execute()
+        logger.info('Team nr: %s recreated', int(team_nr))
+        team_change(2)
+        team_execute()
+        logger.info('Team nr: %s recreated', int(team_nr))
+        team_change(1)
+        populate_team(1)
+        logger.info('Team nr: %s recreated', int(team_nr))
+        team_change(2)
+        populate_team(2)
+        logger.info('Team nr: %s recreated', int(team_nr))
+    else:
+        if True in (execute, populate):
+            team_change(which_teams)
+            if execute:
+                team_execute()
+                logger.info('Team nr: %s recreated', int(team_nr))
+            if populate:
+                populate_team(which_teams)
+                logger.info('Team nr: %s recreated', int(team_nr))
 
 
 
@@ -885,7 +907,7 @@ def initialize_pes():
         # TODO: create logic for error if app not starting
         while True:
             pes = App(pesName)
-            if pes.isRunning(5) and pes.getName()!='Steam.exe':
+            if pes.isRunning(5) and pes.getName().lower()!='steam.exe':
                 logger.info('Global app is initialized and %s under PID %s can be used for reference', pes.getName(), pes.getPID())
                 break
     else:
@@ -1008,8 +1030,8 @@ if args.prepare:
 if args.custom:
     print('Runing with custom')
     # playing_loop()
-    initialize_pes()
-    sign_all()
+    # initialize_pes()
+    # sign_all()
     # smart_players_convert()
     # #ddd = ''.join([char for char in recognize('surname','') if not char.isdigit() and not char == ' '] and not ord(char) < 128)
     # ddd = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
@@ -1025,13 +1047,9 @@ if args.custom:
     # daily-bonus.JPG
     #
     #
-    # pes_region.saveScreenCapture('./shot', 'screen_to_mail')
-    #print(r'"' + '{}"'.format(get_pes_exe()))
+    #pes_region.saveScreenCapture('./shot', 'screen_to_mail')
     #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
-gracefull_stop = False
-aborted = False
-shutdown = False
-import  sys
+
 def dummy_playing_loop():
     for i in range(10):
         time.sleep(2)
