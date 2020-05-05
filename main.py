@@ -157,11 +157,12 @@ pes_region = None
 team_nr = 0
 pes_frame = []
 spots = {
-    'money' : [987, 34, 113, 107],
-    'player_position' : [861, 222, 178, 35], #[949, 223, 69, 33],
-    'player_rating' : [921, 248, 93, 105],
-    'contract_duration' : [1059, 476, 231, 67],
-    'surname' : [904, 95, 363, 86], #[921, 146, 294, 35],
+    'money' : ([987, 67, 79, 29], '-psm 13'),
+    'player_position' : ([957, 228, 51, 27], '-c tessedit_char_whitelist=BCDFMGKLRSW -psm 13'), #[949, 223, 69, 33],
+    'player_rating' : ([921, 248, 93, 105], '-c tessedit_char_whitelist=0123456789 -psm 13'),
+    'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 -psm 13'),
+    'surname' : ([904, 95, 363, 86],'@'), #[921, 146, 294, 35],
+    'scouts' : ([553, 652, 83,26], '-psm 13'),
 }
 error_count = 0
 # Team template
@@ -251,7 +252,7 @@ def isok(img, seconds, similarity=0.89):
     # Update PES window
     global pes_region
     pes_region = pes.window()
-    pes_region.highlight(1)
+    #pes_region.highlight(1)
     #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
     if pes_region.exists(Pattern(img).similar(similarity), seconds):
@@ -313,7 +314,7 @@ def locate(im_path):
 #  or create variable and use coordset every time?
 def coordset(pes_xy, object_name):
     #global spots
-    obj_coordinates = spots[object_name].copy()
+    obj_coordinates = spots[object_name][0].copy()
     # spots[object_name][0] = spots[object_name][0] + pes_xy[0]
     # spots[object_name][1] = spots[object_name][1] + pes_xy[1]
     obj_coordinates[0] = obj_coordinates[0] + pes_xy[0]
@@ -325,6 +326,10 @@ def coordset(pes_xy, object_name):
 # Takes object name, checks it's relevant coordinates and recognizes value
 
 def recognize(object_name, conf_options='outputbase digits'):
+    if conf_options != 'outputbase digits':
+        conf_options = conf_options
+    elif spots[object_name][1] != '@':
+        conf_options = spots[object_name][1]
     pict = Region(*coordset(pes_frame, object_name))
     pict_size = (pict.getW()*3,pict.getH()*3)
     image_value = pytesseract.image_to_string(cv2.resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
