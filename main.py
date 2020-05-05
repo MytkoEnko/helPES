@@ -157,6 +157,7 @@ pes_region = None
 team_nr = 0
 pes_frame = []
 spots = {
+    # use '@' to use default
     'money' : ([987, 67, 79, 29], '-psm 13'),
     'player_position' : ([957, 228, 51, 27], '-c tessedit_char_whitelist=BCDFMGKLRSW -psm 13'), #[949, 223, 69, 33],
     'player_rating' : ([921, 248, 93, 105], '-c tessedit_char_whitelist=0123456789 -psm 13'),
