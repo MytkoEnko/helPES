@@ -515,45 +515,36 @@ def sign_all(fivestars=0):
         while True:
             if isok('sign/choose-slot.JPG', 9):
                 press_A()
-                # If no scouts - break
-                if isok('sign/no-scouts.JPG', 3):
-                    logger.warning('No scouts left, all signed')
-                    press_A()
-                    break
-                else:
-                    error_count -= 1
-                # If there is scouts - use them
-                #   If there is fivestars - skip them
-                # TODO Think of logick for skipping fivestars if there is
-                # if fivestars > 0:
-                #     for i in range(fivestars):
-                #         if isok('sign/five-star.JPG', 1, 0.96):
-                #             logger.info('%s in list is Five star player', i)
-                #             turn_down(1)
-                #         else:
-                #             logger.info('No fivestar players %s', i)
-                #     if isok('sign/five-star.JPG', 1, 0.96):
-                #         logger.info('More 4-5 stars than provided or all other used. Escaping.')
-                #         press_B()
-                #         break
-                # Sign players
+                time.sleep(0.5)
+                if fivestars:
+                    turn_down(fivestars)
+                    if int(recognize('scouts').split('/')[0]) == int(fivestars):
+                        press_B()
+                        logger.info('No scouts left or only skipped left. Sign all script finished, going back')
+                        break
                 if isok('sign/confirm.JPG', 9):
                     press_A()
-                if isok('sign/chosed-trainer.JPG', 9):
-                    turn_down(3)
+                    if isok('sign/chosed-trainer.JPG', 9):
+                        turn_down(3)
+                        press_A()
+                    if isok('sign/sure.JPG', 9):
+                        turn_right(1)
+                        press_A()
+                    if isok('sign/skip.JPG', 10):
+                        press_menu()
+                    if isok('sign/confirm-player.JPG', 9):
+                        time.sleep(1.5)
+                        press_A()
+                    if isok('sign/next.JPG', 9):
+                        press_A()
+                    if isok('sign/added.JPG', 9):
+                        press_A()
+                # If no scouts - break
+                elif isok('sign/no-scouts.JPG', 3):
+                    logger.warning('No scouts left, all signed')
                     press_A()
-                if isok('sign/sure.JPG', 9):
-                    turn_right(1)
-                    press_A()
-                if isok('sign/skip.JPG', 10):
-                    press_menu()
-                if isok('sign/confirm-player.JPG', 9):
-                    time.sleep(1.5)
-                    press_A()
-                if isok('sign/next.JPG', 9):
-                    press_A()
-                if isok('sign/added.JPG', 9):
-                    press_A()
+                    error_count -= 1
+                    break
         # Get back to home once all sold
         if isok('sign/choose-slot.JPG', 5):
             press_B()

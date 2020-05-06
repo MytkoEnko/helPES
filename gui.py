@@ -118,18 +118,28 @@ class PesGui:
         self.team1_populate = BooleanVar(value=pes_config['gui']['team1_populate'])
         self.team2_populate = BooleanVar(value=pes_config['gui']['team2_populate'])
         self.sign_all = BooleanVar(value=pes_config['gui']['sign_all'])
+        self.sign_skip = IntVar(value=pes_config['gui']['sign_skip'])
         #add callback
-        self.team1_convert.trace_variable("w", self.save_configs)
-        self.team2_convert.trace_variable("w", self.save_configs)
-        self.team1_populate.trace_variable("w", self.save_configs)
-        self.team2_populate.trace_variable("w", self.save_configs)
-        self.sign_all.trace_variable("w", self.save_configs)
+        actions_variables = (
+            "team1_convert",
+            "team2_convert",
+            "team1_populate",
+            "team2_populate",
+            "sign_all",
+            "sign_skip"
+        )
+
+        for variable in actions_variables:
+            #setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            getattr(self, variable).trace_variable("w", self.save_configs)
+        # non standard callback
 
         self.t1_con = Checkbutton(self.actions, text="convert all players", variable=self.team1_convert)
         self.t1_pop = Checkbutton(self.actions, text="pospulate team", variable=self.team1_populate)
         self.t2_con = Checkbutton(self.actions, text="convert all players", variable=self.team2_convert)
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
-        self.sign_a = Checkbutton(self.actions, text="sign all scouts", variable=self.sign_all)
+        self.sign_a = Checkbutton(self.actions, text="sign scouts, skip: ", variable=self.sign_all, command=self.use_sign_all)
+        self.sign_a_skip = Entry(self.actions, textvariable=self.sign_skip, justify=RIGHT, width=4, state=DISABLED)
         self.perform = Button(self.actions, text="Perform", command= lambda: self.start(perform=True))
 
         self.t1_con.grid(row=0, column=2, **actions_label_args)
@@ -138,7 +148,8 @@ class PesGui:
         self.t2_pop.grid(row=1, column=3, **actions_label_args)
         Separator(self.actions, orient=HORIZONTAL).grid(row=2,sticky="ew",columnspan=4)
         self.sign_a.grid(row=3, column=2, **actions_label_args)
-        self.perform.grid(row=3, column=3, **actions_label_args)
+        self.sign_a_skip.grid(row=3, column=3, sticky=W)
+        self.perform.grid(row=3, column=4, **actions_label_args)
 
 
         # ------------ Settings  ----------
@@ -451,6 +462,8 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         self.use_azure()
         self.use_mail()
         self.use_shutdown()
+        self.use_sign_all()
+        self.mark_team()
 
 
 
@@ -590,6 +603,14 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
             self.shutdown_delay['state'] = 'disabled'
             self.countdown.config(text='Waiting..')
 
+    def use_sign_all(self):
+        if self.sign_all.get():
+            self.sign_a_skip['state'] = '!disabled'
+            self.save_configs()
+        else:
+            self.sign_a_skip['state'] = 'disabled'
+            self.save_configs()
+
     def select_path(self):
         self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES2020.exe','PES2020.exe')])
         self.game_path.set(self.filename)
@@ -655,12 +676,14 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         logging.info('helPES actions loop started')
         self.gui_start_pes()
         if self.sign_all.get():
-            main.sign_all()
+            main.sign_all(self.sign_skip.get())
         main.smart_players_convert(1, self.team1_populate.get(),self.team1_convert.get())
         main.smart_players_convert(2, self.team2_populate.get(), self.team2_convert.get())
         self.run_status.set('Done')
         if self.shutdown_var.get():
             self.do_shutdown()
+
+    # --- Reusable ----
 
     def gui_start_pes(self):
         main.initialize_pes()
@@ -698,7 +721,10 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
                 print('status watcher detected failure')
-                self.do_shutdown() #TODO: find good place for that one.
+                self.do_shutdown()
+            else:
+                self.go_back.config(state='normal')
+            #TODO: find good place for that one.
 
 
     def run_status_changes(self, *args):
