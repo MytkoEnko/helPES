@@ -12,6 +12,7 @@
     "team1_populate": true ,
     "team2_populate": true ,
     "sign_all": true ,
+    "sign_skip": 0 ,
     "mail_send_var": false ,
     "azure_vm_var": false ,
     "shutdown_var": false ,
