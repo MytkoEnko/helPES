@@ -123,6 +123,9 @@ def get_pes_exe():
 # ------------------------------------------ DEFINE GAME VARIABLES
 # Runtime variables:
 pes_config = {}
+pes_gui = False
+converted_nr = 0
+game_number = 0
 gracefull_stop = False
 aborted = False
 shutdown = False
@@ -164,6 +167,7 @@ spots = {
     'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 -psm 13'),
     'surname' : ([904, 95, 363, 86],'@'), #[921, 146, 294, 35],
     'scouts' : ([553, 652, 83,26], '-psm 13'),
+    'exp_trainers' : ([1111, 448, 42, 28], "-c tessedit_char_whitelist=0123456789 -psm 13")
 }
 error_count = 0
 # Team template
@@ -247,9 +251,10 @@ def turn_down(n):
 
 # Set check photo (a) and set timeout for check (b). It will focus on window.
 def isok(img, seconds, similarity=0.89):
-    if aborted:
-        sys.exit()
-    pes.focus()
+    if pes_gui:
+        if aborted:
+            sys.exit()
+        pes.focus()
     # Update PES window
     global pes_region
     pes_region = pes.window()
@@ -715,6 +720,9 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                 global error_count
                 error_count -= 1
                 exec_victim(3)
+            if pes_gui:
+                global converted_nr
+                converted_nr += 1
             # if safe_pl_rating() < rating:
             #     logger.info('Converting player to EXP trainer')
             #     exec_victim(3)
@@ -1047,10 +1055,17 @@ if args.custom:
     #pes_region.saveScreenCapture('./shot', 'screen_to_mail')
     #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
 
+
 def dummy_playing_loop():
     for i in range(10):
         time.sleep(2)
         logger.info(f'Numbers of dummy games played: {i}')
+        global game_number
+        game_number +=1
+        global error_count
+        error_count += 2
+        global team_nr
+        team_nr = 1 if team_nr > 1 else 2
         if aborted:
             sys.exit()
         if gracefull_stop:

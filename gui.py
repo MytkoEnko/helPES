@@ -16,6 +16,7 @@ pes_config = main.pes_config
 class PesGui:
     def __init__(self, master):
         global pes_config
+        main.pes_gui = True
 
         # ================== Top section =====================
 
@@ -48,7 +49,7 @@ class PesGui:
         self.sub_menu = Menu(menu) # declare submenu (also menu
         submenu = self.sub_menu
         self.menu.add_cascade(label="Edit", menu=submenu) # Make menu expandable, it's objects are sub_menu
-        submenu.add_command(label="Settings", command=self.print_message)
+        submenu.add_command(label="Settings", command=self.home_stats_collect)
         submenu.add_command(label="About", command=self.print_message)
         submenu.add_separator()
         submenu.add_command(label="Exit", command=self.frame.quit)
@@ -92,7 +93,11 @@ class PesGui:
         self.games_total = Label(self.stats, text="Games total").grid(row=0, column=4, **stats_labels)
         self.players_runtime = Label(self.stats, text="Players converted").grid(row=1, column=2, **stats_labels)
         self.players_total = Label(self.stats, text="Total converted").grid(row=1, column=4, **stats_labels)
-        self.exp_left = Label(self.stats, text="EXP trainers slots left").grid(row=2, column=2, **stats_labels)
+        self.exp_left = Label(self.stats, text="EXP trainers (of 150)").grid(row=2, column=2, **stats_labels)
+
+        #Reset runtime to 0
+        self.games_played_var.set(0)
+        self.players_runtime_var.set(0)
 
         stats_entry = dict(width=4, state=DISABLED)
         self.games_r = Entry(self.stats, **stats_entry, textvariable=self.games_played_var)
@@ -307,8 +312,10 @@ class PesGui:
         self.settings_toggle["text"] = "Copy settings" if self.settings_ready["text"] == "Settings are ready: No" else "Revert"
         self.settings_ready.config(foreground='red' if self.settings_ready["text"] == "Settings are ready: No" else "green")
 
+
         self.settings_ready.grid(row=1, column=1)
         self.settings_toggle.grid(row=1, column=2)
+
 
         #Game path
         self.game_path = StringVar(value=eval(main.get_pes_exe()))
@@ -323,6 +330,14 @@ class PesGui:
 
         self.path_found_label.grid(row=2, column=1)
         self.path_button.grid(row=2, column=2)
+
+        # Tesseract check
+        self.tesseract_label = Label(self.checks, text="Tesseract version:", font='bold')
+        self.tesseract_version = Label(self.checks, text="Checking..")
+        self.tesseract_check()
+
+        self.tesseract_label.grid(row=3, column=1)
+        self.tesseract_version.grid(row=3, column=2)
 
 
         # -------- Run / quit buttons
@@ -463,7 +478,6 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         self.use_mail()
         self.use_shutdown()
         self.use_sign_all()
-        self.mark_team()
 
 
 
@@ -547,6 +561,15 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
             self.settings_ready["text"] = "Settings are ready: No"
             self.settings_toggle["text"] = "Copy settings"
             self.settings_ready['foreground'] = "red"
+
+    def tesseract_check(self):
+        try:
+            tess_version = main.pytesseract.get_tesseract_version()
+            self.tesseract_version.config(foreground='green', text=tess_version)
+            self.tesseract_label.config(foreground='green')
+        except:
+            self.tesseract_label.config(foreground='red')
+            self.tesseract_version.config(foreground='red', text="Not installed or not in PATH")
 
 
     def print_message(self):
@@ -696,6 +719,21 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         main.sign_all()
         main.smart_players_convert(team)
 
+    def home_stats_collect(self):
+        main.initialize_pes()
+        main.base_ok()
+        print('MONEY')
+        #GP
+        self.gp_balance['state'] = '!disabled'
+        self.gp_balance_var.set(int(float(main.recognize('money'))*1000))
+        self.gp_balance['state'] = 'disabled'
+        # EXP trainers
+        self.exp['state'] ='!disabled'
+        self.exp_left_var.set(int(main.recognize('exp_trainers')))
+        self.exp['state'] = 'disabled'
+
+
+
 
     ####################### END RUN GAME #####################
     def abort_pressed(self):
@@ -704,10 +742,24 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
 
 
     def status_watcher(self):
+        watched_vars = {
+            # variable in main, (runtime or single var, total or placeholder var)
+            'game_number' : ('games_played_var', 'games_total_var'),
+            'converted_nr' : ('players_runtime_var', 'players_total_var'),
+            'error_count' : ('errors_var', '@'),
+            'team_nr' : ('current_team_var', '@')
+        }
         while self.script.is_alive() and self.run_status.get() not in ('Aborting', 'Stopping'):
             self.run_status.set('Script is running')
             main.time.sleep(2)
             print('status watcher is good')
+            ## Here goes runtime variables updates
+            for main_vars, gui_vars in watched_vars.items():
+                if getattr(main, main_vars) != getattr(self, gui_vars[0]).get():
+                    getattr(self, gui_vars[0]).set(getattr(main, main_vars))
+                    if gui_vars[1] != '@':
+                        getattr(self, gui_vars[1]).set( 1 + getattr(self, gui_vars[1]).get())
+
         else:
             print('status watcher else cond')
             self.abort.config(state='disabled')
