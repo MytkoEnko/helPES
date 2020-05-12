@@ -50,7 +50,7 @@ class PesGui:
         submenu = self.sub_menu
         self.menu.add_cascade(label="Edit", menu=submenu) # Make menu expandable, it's objects are sub_menu
         submenu.add_command(label="Settings", command=self.home_stats_collect)
-        submenu.add_command(label="About", command=self.print_message)
+        submenu.add_command(label="About", command=self.initial_stats_collect)
         submenu.add_separator()
         submenu.add_command(label="Exit", command=self.frame.quit)
 
@@ -435,10 +435,15 @@ class PesGui:
         # ----------- LOGS -------------
         self.logs = Text(self.logs, background="black", foreground='white', height=18)
         self.logs.insert(END,'''
-  _ \  ____|  ___|        ____| \     _ \   \  | ____|  _ \  
- |   | __|  \___ \        |    _ \   |   | |\/ | __|   |   | 
- ___/  |          |_____| __| ___ \  __ <  |   | |     __ <  
-_|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\ 
+ /$$                 /$$ /$$$$$$$  /$$$$$$$$  /$$$$$$ 
+| $$                | $$| $$__  $$| $$_____/ /$$__  $$
+| $$$$$$$   /$$$$$$ | $$| $$  \ $$| $$      | $$  \__/
+| $$__  $$ /$$__  $$| $$| $$$$$$$/| $$$$$   |  $$$$$$ 
+| $$  \ $$| $$$$$$$$| $$| $$____/ | $$__/    \____  $$
+| $$  | $$| $$_____/| $$| $$      | $$       /$$  \ $$
+| $$  | $$|  $$$$$$$| $$| $$      | $$$$$$$$|  $$$$$$/
+|__/  |__/ \_______/|__/|__/      |________/ \______/ 
+                                                      
 \n''')
         self.logs.pack(fill=X, expand=1)
 
@@ -731,6 +736,50 @@ _|    _____|_____/       _| _/    _\_| \_\_|  _|_____|_| \_\
         self.exp['state'] ='!disabled'
         self.exp_left_var.set(int(main.recognize('exp_trainers')))
         self.exp['state'] = 'disabled'
+
+    def initial_stats_collect(self):
+        main.initialize_pes()
+        main.base_ok()
+        logging.info('Checking teams and manager contracts duration')
+        formations = ''
+        for i in range(2):
+            main.base_ok()
+            main.press_X()
+            if formations == '':
+                # Recognize and check formations
+                message, first, second = '', True, True
+                if main.recognize('formation1') != '4-3-3':
+                    message += "First team doesn't have 4-3-3 formation. "
+                    first = False
+                else:
+                    formations = '4-3-3'
+                if main.recognize('formation2') != '4-3-3':
+                    message += "Second team doesn't have 4-3-3 formation. "
+                    second = False
+                else:
+                    formations = '4-3-3'
+                if not first and second:
+                    message += "Please, select same coach with 4-3-3 for both teams and try again"
+                    logging.error(f'{message}')
+                    break
+            if main.isok('img/squad-list.JPG', 60):
+                main.turn_down(i+1)
+                main.time.sleep(0.5)
+                main.press_A()
+            if main.base_ok():
+                main.press_A()
+                main.to_reserves()
+                main.turn_up(1)
+                if i+1 == 1:
+                    self.team1_contract_var.set(int(main.recognize('contract_duration')))
+                elif i+1 == 2:
+                    self.team2_contract_var.set(int(main.recognize('contract_duration')))
+                main.turn_up(2)
+                main.turn_left(1)
+                self.manager_contract_var.set(int(main.recognize('coach_contract')))
+            while not main.base_ok():
+                main.press_B()
+
 
 
 

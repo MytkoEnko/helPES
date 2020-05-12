@@ -167,7 +167,10 @@ spots = {
     'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 -psm 13'),
     'surname' : ([904, 95, 363, 86],'@'), #[921, 146, 294, 35],
     'scouts' : ([553, 652, 83,26], '-psm 13'),
-    'exp_trainers' : ([1111, 448, 42, 28], "-c tessedit_char_whitelist=0123456789 -psm 13")
+    'exp_trainers' : ([1111, 448, 42, 28], "-c tessedit_char_whitelist=0123456789 -psm 13"),
+    'coach_contract' : ([1092, 442, 103, 45], "-c tessedit_char_whitelist=0123456789 -psm 13"),
+    'formation1' : ([827, 377, 111, 37], "@"),
+    'formation2' : ([821, 526, 123, 38], "@")
 }
 error_count = 0
 # Team template
