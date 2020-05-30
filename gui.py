@@ -140,7 +140,7 @@ class PesGui:
         # non standard callback
 
         self.t1_con = Checkbutton(self.actions, text="convert all players", variable=self.team1_convert)
-        self.t1_pop = Checkbutton(self.actions, text="pospulate team", variable=self.team1_populate)
+        self.t1_pop = Checkbutton(self.actions, text="populate team", variable=self.team1_populate)
         self.t2_con = Checkbutton(self.actions, text="convert all players", variable=self.team2_convert)
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
         self.sign_a = Checkbutton(self.actions, text="sign scouts, skip: ", variable=self.sign_all, command=self.use_sign_all)
@@ -748,6 +748,7 @@ class PesGui:
             if formations == '':
                 # Recognize and check formations
                 message, first, second = '', True, True
+                main.time.sleep(1) #Wait until team list opens
                 if main.recognize('formation1') != '4-3-3':
                     message += "First team doesn't have 4-3-3 formation. "
                     first = False
