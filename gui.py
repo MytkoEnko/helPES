@@ -122,6 +122,7 @@ class PesGui:
         self.team2_convert = BooleanVar(value=pes_config['gui']['team2_convert'])
         self.team1_populate = BooleanVar(value=pes_config['gui']['team1_populate'])
         self.team2_populate = BooleanVar(value=pes_config['gui']['team2_populate'])
+        self.convert_all = BooleanVar(value=pes_config['gui']['convert_all'])
         self.sign_all = BooleanVar(value=pes_config['gui']['sign_all'])
         self.sign_skip = IntVar(value=pes_config['gui']['sign_skip'])
         #add callback
@@ -130,6 +131,7 @@ class PesGui:
             "team2_convert",
             "team1_populate",
             "team2_populate",
+            "convert_all",
             "sign_all",
             "sign_skip"
         )
@@ -143,6 +145,7 @@ class PesGui:
         self.t1_pop = Checkbutton(self.actions, text="populate team", variable=self.team1_populate)
         self.t2_con = Checkbutton(self.actions, text="convert all players", variable=self.team2_convert)
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
+        self.conv_a = Checkbutton(self.actions, text="convert all players (of max cost -> settings)", variable=self.convert_all, command=self.use_convert_all)
         self.sign_a = Checkbutton(self.actions, text="sign scouts, skip: ", variable=self.sign_all, command=self.use_sign_all)
         self.sign_a_skip = Entry(self.actions, textvariable=self.sign_skip, justify=RIGHT, width=4, state=DISABLED)
         self.perform = Button(self.actions, text="Perform", command= lambda: self.start(perform=True))
@@ -152,9 +155,10 @@ class PesGui:
         self.t2_con.grid(row=1, column=2, **actions_label_args)
         self.t2_pop.grid(row=1, column=3, **actions_label_args)
         Separator(self.actions, orient=HORIZONTAL).grid(row=2,sticky="ew",columnspan=4)
-        self.sign_a.grid(row=3, column=2, **actions_label_args)
-        self.sign_a_skip.grid(row=3, column=3, sticky=W)
-        self.perform.grid(row=3, column=4, **actions_label_args)
+        self.conv_a.grid(row=3, column=2, columnspan=2, **actions_label_args)
+        self.sign_a.grid(row=4, column=2, **actions_label_args)
+        self.sign_a_skip.grid(row=4, column=3, sticky=W)
+        self.perform.grid(row=4, column=4, **actions_label_args)
 
 
         # ------------ Settings  ----------
@@ -483,6 +487,7 @@ class PesGui:
         self.use_mail()
         self.use_shutdown()
         self.use_sign_all()
+        self.use_convert_all()
 
 
 
@@ -638,6 +643,25 @@ class PesGui:
         else:
             self.sign_a_skip['state'] = 'disabled'
             self.save_configs()
+
+    def use_convert_all(self):
+        if self.convert_all.get():
+            self.t1_pop['state'] = 'disabled'
+            self.t2_pop['state'] = 'disabled'
+            self.t1_con['state'] = 'disabled'
+            self.t2_con['state'] = 'disabled'
+            messagebox.showinfo('helPES: Potential risk', message="""
+Actions: 'convert all players' is selected
+            
+    This action will convert to EXP trainers all your players (of cost specified in Settings and below)
+Please double check - go to your team, filter players by costs you've chose in "Settings" and make sure you don't need listed players
+""")
+        else:
+            self.t1_pop['state'] = '!disabled'
+            self.t2_pop['state'] = '!disabled'
+            self.t1_con['state'] = '!disabled'
+            self.t2_con['state'] = '!disabled'
+        print('TODO')
 
     def select_path(self):
         self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES2020.exe','PES2020.exe')])
