@@ -49,8 +49,8 @@ class PesGui:
         self.sub_menu = Menu(menu) # declare submenu (also menu
         submenu = self.sub_menu
         self.menu.add_cascade(label="Edit", menu=submenu) # Make menu expandable, it's objects are sub_menu
-        submenu.add_command(label="Settings", command=self.home_stats_collect)
-        submenu.add_command(label="About", command=self.initial_stats_collect)
+        submenu.add_command(label="home_stats_cllect", command=self.home_stats_collect)
+        submenu.add_command(label="initial_stats_collect", command=self.initial_stats_collect)
         submenu.add_separator()
         submenu.add_command(label="Exit", command=self.frame.quit)
 
@@ -148,7 +148,7 @@ class PesGui:
         self.conv_a = Checkbutton(self.actions, text="convert all players (of max cost -> settings)", variable=self.convert_all, command=self.use_convert_all)
         self.sign_a = Checkbutton(self.actions, text="sign scouts, skip: ", variable=self.sign_all, command=self.use_sign_all)
         self.sign_a_skip = Entry(self.actions, textvariable=self.sign_skip, justify=RIGHT, width=4, state=DISABLED)
-        self.perform = Button(self.actions, text="Perform", command= lambda: self.start(perform=True))
+        self.perform = Button(self.actions, text="Perform", command= lambda: self.start(actions=True))
 
         self.t1_con.grid(row=0, column=2, **actions_label_args)
         self.t1_pop.grid(row=0, column=3, **actions_label_args)
@@ -229,7 +229,7 @@ class PesGui:
         self.az_resource_name = Entry(self.pes_settings, **settings_entry, textvariable=self.az_group_name)
         self.az_vm = Entry(self.pes_settings, **settings_entry, textvariable=self.az_vm_name)
 
-        player_cost_choices = [15,20,25,30]
+        player_cost_choices = [10,15,20,25,30]
         self.players_cost_select = Combobox(self.pes_settings, textvariable=self.players_cost_var, values=player_cost_choices, state='readonly')
 
         self.shutdown_delay = Entry(self.pes_settings, width=6, state=DISABLED, textvariable=self.delay_var)
@@ -264,6 +264,11 @@ class PesGui:
 
         self.shutdown.grid(column=1,row=12, columnspan=4, stick=W)
         self.shutdown_delay.grid(column=5, row=12)
+
+        # Combobox bind callback
+        def main_var_update(event):
+            main.max_player_cost = self.players_cost_var.get()
+        self.players_cost_select.bind("<<ComboboxSelected>>", main_var_update)
 
 
 
@@ -676,13 +681,13 @@ Please double check - go to your team, filter players by costs you've chose in "
     def new_window(self):
         self.window=Toplevel(gui)
 
-    def start(self, perform=False):
+    def start(self, actions=False):
         self.frame.pack_forget()
         self.frame2.pack(fill=BOTH, padx=4, pady=1)
         main.time.sleep(1)
 
         #Prepare threads
-        if perform:
+        if actions:
             self.script = threading.Thread(name='pes_run', target=self.perform_actions)
         else:
             self.script = threading.Thread(name='pes_run', target=self.play)
@@ -715,12 +720,21 @@ Please double check - go to your team, filter players by costs you've chose in "
         main.aborted = False
         main.gracefull_stop = False
         main.time.sleep(2)
-        main.dummy_playing_loop()
+        self.gui_playing_loop()
 
     # --------- Playing loop -----------
     def gui_playing_loop(self):
         logging.info('helPES playing loop started')
-        self.gui_start_pes()
+        #self.gui_start_pes()
+        if self.which_mode.get() == "custom":
+            logging.info("TODO mode custom")
+
+        elif self.which_mode.get() == "standard":
+            logging.info("TODO mode standard")
+            main.dummy_playing_loop()
+
+        elif self.which_mode.get() == "limited":
+            logging.info("TODO mode limited")
 
 
     # --------- Actions playing loop -------
@@ -729,8 +743,12 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.gui_start_pes()
         if self.sign_all.get():
             main.sign_all(self.sign_skip.get())
-        main.smart_players_convert(1, self.team1_populate.get(),self.team1_convert.get())
-        main.smart_players_convert(2, self.team2_populate.get(), self.team2_convert.get())
+        if self.convert_all.get():
+            #TODO add main convert all unused of cost ....
+            main.convert_all_perform()
+        else:
+            main.smart_players_convert(1, self.team1_populate.get(),self.team1_convert.get())
+            main.smart_players_convert(2, self.team2_populate.get(), self.team2_convert.get())
         self.run_status.set('Done')
         if self.shutdown_var.get():
             self.do_shutdown()

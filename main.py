@@ -2,7 +2,7 @@ import logging
 import  sys
 import os
 import shutil
-from keyboard import mouse
+#from keyboard import mouse
 from lackey import *
 import json
 import vdf
@@ -129,6 +129,7 @@ game_number = 0
 gracefull_stop = False
 aborted = False
 shutdown = False
+max_player_cost = 15
 
 # Saved settings (variables)
 # Load/prepare and load configuration.json
@@ -166,11 +167,18 @@ spots = {
     'player_rating' : ([921, 248, 93, 105], '-c tessedit_char_whitelist=0123456789 -psm 13'),
     'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 -psm 13'),
     'surname' : ([904, 95, 363, 86],'@'), #[921, 146, 294, 35],
-    'scouts' : ([553, 652, 83,26], '-psm 13'),
+    'scouts' : ([553, 652, 83,26], 'tessedit_char_whitelist=0123456789/ -psm 13'),
     'exp_trainers' : ([1111, 448, 42, 28], "-c tessedit_char_whitelist=0123456789 -psm 13"),
     'coach_contract' : ([1092, 442, 103, 45], "-c tessedit_char_whitelist=0123456789 -psm 13"),
     'formation1' : ([827, 377, 111, 37], "@"),
     'formation2' : ([821, 526, 123, 38], "@")
+}
+areas = {
+    'conv/10.JP' : [701, 294, 242, 77],
+    'conv/15.JP': [701, 294, 242, 77],
+    'conv/20.JP': [701, 294, 242, 77],
+    'conv/25.JP': [701, 294, 242, 77],
+    'conv/30.JP': [701, 294, 242, 77]
 }
 error_count = 0
 # Team template
@@ -261,10 +269,19 @@ def isok(img, seconds, similarity=0.89):
     # Update PES window
     global pes_region
     pes_region = pes.window()
+
+    if img in areas.keys():
+        area_coord = areas[img].copy()
+        area_coord[0] += pes_region.getX()
+        area_coord[1] += pes_region.getY()
+    else:
+        area_coord = pes_region
+
+
     #pes_region.highlight(1)
     #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
-    if pes_region.exists(Pattern(img).similar(similarity), seconds):
+    if area_coord.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
         #pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
         logger.debug('%s match found', img)
@@ -676,22 +693,6 @@ def exec_victim(turns_down=2):
             press_A()
         if isok('conv/converted.JPG', 5):
             press_A()
-# TODO convert all low level players - recognize level and decide of converting:
-def players_convert():
-    team_color = ''
-    for i in range(1,3):
-        if base_ok():
-            logger.info('Starting players to EXP trainers convertion')
-            team_change(i)
-        if base_ok():
-            press_A()
-        while True:
-            to_reserves()
-            press_A()
-            if find_victim():
-                exec_victim()
-            else:
-                break
 
 # Converts and populates squads of playing teams:
 def smart_players_convert(which_teams=12, populate=True, execute=True):
@@ -786,10 +787,10 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                 while not isok(value[3],1):
                     turn_left(1)
             turn_down(2)
-            if isok('conv/value_f.JPG',2,0.95):
+            if isok(f'conv/{max_player_cost}.JPG',2,0.95):
                 logger.info('Value filter applied')
             else:
-                while not isok('conv/value_f.JPG',1.5,0.98):
+                while not isok(f'conv/{max_player_cost}.JPG',1.5,0.98):
                     turn_left(1)
             turn_down(4)
             press_A()
@@ -1023,6 +1024,52 @@ def smart_playing_loop(file=False, smart=0, number=1000):
     #  3. Experience Points
     #  If out of match  - drops to main menu - new login to MyClub required
 
+#####################   NEW SCRIPTS GUI RELATED =======================
+# temporary variables:
+
+
+def convert_all_perform():
+    global error_count
+    if base_ok(3):
+        logger.info(f'Starting conversion of all players of max cost {max_player_cost}')
+        press_A()
+        if isok('conv/on_team.JPG',5):
+            logger.info('Entered team, proceeding to reserves')
+            time.sleep(0.5)
+            to_reserves()
+            while True:
+                press_A()
+                # Use filter
+                time.sleep(0.5)
+                if isok('conv/reserves-list.JPG',1):
+                    if isok('conv/no_players_left.JPG',0.5):
+                        press_A()
+                        while not base_ok(2):
+                            press_B()
+                        break
+                    press_rs()
+                    time.sleep(0.5)
+                    turn_down(2)
+                    if isok(f'conv/{max_player_cost}.JPG',1,0.95):
+                        logger.info('Value filter applied')
+                    else:
+                        while not isok(f'conv/{max_player_cost}.JPG',1,0.98):
+                            error_count -= 1
+                            turn_left(1)
+                    turn_down(4)
+                    press_A()
+                    time.sleep(0.5)
+                    if isok('conv/filtered.JPG', 2):
+                        logger.debug('Filter applied')
+                        keyDown(Key.DOWN)
+                        time.sleep(2)
+                        keyUp(Key.DOWN)
+                        exec_victim()
+            logger.info(f'Converting all players of cost {max_player_cost} and below has finished.')
+
+
+
+
 
 
 
@@ -1036,6 +1083,7 @@ if args.prepare:
 
 # Custom goes here:
 if args.custom:
+    initialize_pes()
     print('Runing with custom')
     # playing_loop()
     # initialize_pes()
@@ -1073,4 +1121,5 @@ def dummy_playing_loop():
             sys.exit()
         if gracefull_stop:
             break
+
     logger.info(f'Dummy playig loop finished')
