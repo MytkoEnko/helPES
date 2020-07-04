@@ -133,7 +133,6 @@ class PesGui:
             "team2_populate",
             "convert_all",
             "sign_all",
-            "sign_skip"
         )
 
         for variable in actions_variables:
@@ -146,8 +145,7 @@ class PesGui:
         self.t2_con = Checkbutton(self.actions, text="convert all players", variable=self.team2_convert)
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
         self.conv_a = Checkbutton(self.actions, text="convert all players (of max cost -> settings)", variable=self.convert_all, command=self.use_convert_all)
-        self.sign_a = Checkbutton(self.actions, text="sign scouts, skip: ", variable=self.sign_all, command=self.use_sign_all)
-        self.sign_a_skip = Entry(self.actions, textvariable=self.sign_skip, justify=RIGHT, width=4, state=DISABLED)
+        self.sign_a = Checkbutton(self.actions, text="sign scouts", variable=self.sign_all)
         self.perform = Button(self.actions, text="Perform", command= lambda: self.start(actions=True))
 
         self.t1_con.grid(row=0, column=2, **actions_label_args)
@@ -157,8 +155,7 @@ class PesGui:
         Separator(self.actions, orient=HORIZONTAL).grid(row=2,sticky="ew",columnspan=4)
         self.conv_a.grid(row=3, column=2, columnspan=2, **actions_label_args)
         self.sign_a.grid(row=4, column=2, **actions_label_args)
-        self.sign_a_skip.grid(row=4, column=3, sticky=W)
-        self.perform.grid(row=4, column=4, **actions_label_args)
+        self.perform.grid(row=4, column=3, **actions_label_args)
 
 
         # ------------ Settings  ----------
@@ -192,6 +189,7 @@ class PesGui:
             "az_subscription_id",
             "az_group_name",
             "az_vm_name",
+            "sign_skip"
         )
 
         for variable in settings_callbacks:
@@ -217,6 +215,8 @@ class PesGui:
 
         self.label_players_cost = Label(self.pes_settings, text="Use players of max cost:")
 
+        self.label_sign_skip = Label(self.pes_settings, text="Skip (don't sign) nr of first scouts:")
+
         settings_entry = dict(width=35, state=DISABLED)
 
         self.sendgrid_token = Entry(self.pes_settings, **settings_entry, textvariable=self.sendgrid_api_key)
@@ -234,6 +234,7 @@ class PesGui:
 
         self.shutdown_delay = Entry(self.pes_settings, width=6, state=DISABLED, textvariable=self.delay_var)
 
+        self.sign_a_skip = Entry(self.pes_settings, textvariable=self.sign_skip, justify=RIGHT, width=4)
         # Grid layout
         settings_lables = dict(sticky=E, pady=1, padx=4)
 
@@ -259,11 +260,16 @@ class PesGui:
         self.az_resource_name.grid(column=3, row=9, columnspan=2)
         self.az_vm.grid(column=3, row=10, columnspan=2)
 
-        self.label_players_cost.grid(column=1, row=11, columnspan=2, stick=W)
-        self.players_cost_select.grid(column=4, row=11)
+        Separator(self.pes_settings, orient=HORIZONTAL).grid(row=11, sticky="ew", columnspan=5)
 
-        self.shutdown.grid(column=1,row=12, columnspan=4, stick=W)
-        self.shutdown_delay.grid(column=5, row=12)
+        self.label_players_cost.grid(column=1, row=12, columnspan=2, stick=W)
+        self.players_cost_select.grid(column=4, row=12)
+
+        self.shutdown.grid(column=1,row=13, columnspan=4, stick=W)
+        self.shutdown_delay.grid(column=5, row=13)
+
+        self.label_sign_skip.grid(column=1, row=14, columnspan=2, stick=W)
+        self.sign_a_skip.grid(column=3, row=14, sticky=W)
 
         # Update default main vars from saved and Combobox bind callback
         def main_var_update(event):
@@ -484,7 +490,6 @@ class PesGui:
         self.use_azure()
         self.use_mail()
         self.use_shutdown()
-        self.use_sign_all()
         self.use_convert_all()
 
 
@@ -634,13 +639,6 @@ class PesGui:
             self.shutdown_delay['state'] = 'disabled'
             self.countdown.config(text='Waiting..')
 
-    def use_sign_all(self):
-        if self.sign_all.get():
-            self.sign_a_skip['state'] = '!disabled'
-            self.save_configs()
-        else:
-            self.sign_a_skip['state'] = 'disabled'
-            self.save_configs()
 
     def use_convert_all(self):
         if self.convert_all.get():
@@ -932,6 +930,6 @@ Please double check - go to your team, filter players by costs you've chose in "
 
 gui = Tk(className=" PES2020 Farmer") #create instance
 ######################
-gui.geometry("800x540")
+gui.geometry("800x550")
 p = PesGui(gui)
 gui.mainloop() # Run it
