@@ -717,10 +717,8 @@ Please double check - go to your team, filter players by costs you've chose in "
     def gui_playing_loop(self):
         logging.info('helPES playing loop started')
         #self.gui_start_pes()
-        if self.which_mode.get() == "custom":
-            logging.info("TODO mode custom")
 
-        elif self.which_mode.get() == "standard":
+        if self.which_mode.get() == "standard":
             logging.info("TODO mode standard")
             main.dummy_playing_loop()
 

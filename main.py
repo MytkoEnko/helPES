@@ -426,6 +426,41 @@ def team_change(squad):
 
 # Play one game and get back to base
 def play_one(mode=''):
+    global contract_m, contract_1, contract_2
+
+    def contract_renew(team=False):
+        '''team=False for manager contract, team=True for team contracts'''
+        global contract_m
+        for _ in range(1):
+            if not team:
+                if isok('img/contract-manager-upd.JPG', 10):
+                    press_A()
+                    if contract_m != 0:
+                        break
+
+            turn_right(1)
+            press_A()
+
+            if isok('img/pay-gp.JPG', 10):
+                press_A()
+
+            if isok('img/sure-pay.JPG', 10):
+                turn_right(1)
+                press_A()
+
+            if isok('img/contracts-renewed.JPG', 10):
+                press_A()
+                time.sleep(3)
+
+            if isok('img/contracts-renewed.JPG', 2):
+                press_A()
+
+            if not team and contract_m == 0 :
+                if isok('img/contract-manager-upd.JPG', 10):
+                    press_A()
+                    contract_m = 25
+
+
     if base_ok(30):
         turn_left(3)
     # On sim game
@@ -485,7 +520,6 @@ def play_one(mode=''):
         press_A()
 
     #Update runtime contract duration variables
-    global contract_m, contract_1, contract_2
     contract_m -= 1
     if team_nr == 1:
         contract_1 -= 1
@@ -494,57 +528,22 @@ def play_one(mode=''):
 
     # Contract manager upd
     if isok('img/contract-manager-upd.JPG', 160):
-        press_A()
+        contract_renew()
 
-    # If contract expires players only (for now)
-    #TODO choose to prolongue players contracts or not, use that signal to start shift_change()
-    if isok('img/contract-confirm1.JPG', 10) and not isok('img/contract-renewal-manager.JPG',5):
+    if isok('img/contract-confirm1.JPG', 10):
         if pes_gui and (mode == 'limited'):
-            turn_right(1)
-            press_A()
-
-            if isok('img/pay-gp.JPG', 10):
-                press_A()
-
-            if isok('img/sure-pay.JPG', 10):
-                turn_right(1)
-                press_A()
-
-            if isok('img/contracts-renewed.JPG', 10):
-                press_A()
-                time.sleep(3)
-
-            if isok('img/contracts-renewed.JPG', 2):
-                press_A()
+            contract_renew(True)
             # Update team contract duration
             if team_nr == 1:
                 contract_1 += 10
             elif team_nr == 2:
                 contract_2 += 10
 
-        else:
-            press_A()
-# TODO this is not right, only Aramburu:
-    if isok('img/contract-renewal-manager.JPG',5):
-        turn_right(1)
-        press_A()
-
-        if isok('img/pay-gp.JPG', 10):
-            press_A()
-
-        if isok('img/sure-pay.JPG', 10):
-            turn_right(1)
-            press_A()
-
-        if isok('img/contracts-renewed.JPG', 10):
-            press_A()
-            time.sleep(3)
-
-        if isok('img/contracts-renewed.JPG', 10):
-            press_A()
-
-        if isok('img/contract-manager-upd.JPG', 10):
-            press_A()
+        elif mode == 'standard':
+            if (team_nr == 1 and contract_1 == 0) or (team_nr == 2 and contract_2 == 0):
+                press_A()
+            else:
+                contract_renew(True)
 
     # Confirm got back to club house
     if base_ok(30):
