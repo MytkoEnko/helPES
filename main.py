@@ -148,6 +148,10 @@ def write_configurations():
         json.dump(pes_config, to_write)
 
 load_configurations()
+# Update runtime variables default values
+contract_1 = pes_config['gui']['team1_contract_var']
+contract_2 = pes_config['gui']['team2_contract_var']
+contract_m = pes_config['gui']['manager_contract_var']
 
 if len(pes_config['general']['game_path']) > 3:
     pes_path = r'{}'.format(repr(pes_config['general']['game_path']).replace("'",'"'))
@@ -421,7 +425,7 @@ def team_change(squad):
 
 
 # Play one game and get back to base
-def play_one():
+def play_one(mode=''):
     if base_ok(30):
         turn_left(3)
     # On sim game
@@ -480,6 +484,14 @@ def play_one():
     if isok('img/reward2.JPG', 20):
         press_A()
 
+    #Update runtime contract duration variables
+    global contract_m, contract_1, contract_2
+    contract_m -= 1
+    if team_nr == 1:
+        contract_1 -= 1
+    elif team_nr == 2:
+        contract_2 -= 1
+
     # Contract manager upd
     if isok('img/contract-manager-upd.JPG', 160):
         press_A()
@@ -487,10 +499,33 @@ def play_one():
     # If contract expires players only (for now)
     #TODO choose to prolongue players contracts or not, use that signal to start shift_change()
     if isok('img/contract-confirm1.JPG', 10) and not isok('img/contract-renewal-manager.JPG',5):
+        if pes_gui and (mode == 'limited'):
+            turn_right(1)
+            press_A()
 
-        press_A()
+            if isok('img/pay-gp.JPG', 10):
+                press_A()
 
-    elif isok('img/contract-renewal-manager.JPG',5):
+            if isok('img/sure-pay.JPG', 10):
+                turn_right(1)
+                press_A()
+
+            if isok('img/contracts-renewed.JPG', 10):
+                press_A()
+                time.sleep(3)
+
+            if isok('img/contracts-renewed.JPG', 2):
+                press_A()
+            # Update team contract duration
+            if team_nr == 1:
+                contract_1 += 10
+            elif team_nr == 2:
+                contract_2 += 10
+
+        else:
+            press_A()
+# TODO this is not right, only Aramburu:
+    if isok('img/contract-renewal-manager.JPG',5):
         turn_right(1)
         press_A()
 
@@ -513,6 +548,8 @@ def play_one():
 
     # Confirm got back to club house
     if base_ok(30):
+        global game_number
+        game_number += 1
         logger.info('1 more game')
 
     return
@@ -1065,6 +1102,8 @@ def convert_all_perform():
                         time.sleep(2)
                         keyUp(Key.DOWN)
                         exec_victim()
+                        global converted_nr
+                        converted_nr += 1
             logger.info(f'Converting all players of cost {max_player_cost} and below has finished.')
 
 

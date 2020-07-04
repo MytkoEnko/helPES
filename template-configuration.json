@@ -20,7 +20,6 @@
     "players_cost_var": 15 ,
     "delay_var": 4 ,
     "which_mode": "standard" ,
-    "continue_serie": true ,
     "games_number": 1000 ,
     "games_played_var": 1 ,
     "games_total_var": 2 ,

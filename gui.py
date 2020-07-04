@@ -265,7 +265,7 @@ class PesGui:
         self.shutdown.grid(column=1,row=12, columnspan=4, stick=W)
         self.shutdown_delay.grid(column=5, row=12)
 
-        # Combobox bind callback
+        # Update default main vars from saved and Combobox bind callback
         def main_var_update(event):
             main.max_player_cost = self.players_cost_var.get()
         self.players_cost_select.bind("<<ComboboxSelected>>", main_var_update)
@@ -285,29 +285,22 @@ class PesGui:
         # --------- Modes -------------
         #variables
         self.which_mode = StringVar(value=pes_config['gui']['which_mode'])
-        self.continue_serie = BooleanVar(value=pes_config['gui']['continue_serie'])
         self.games_number = IntVar(None,pes_config['gui']['games_number'])
         #callback
         self.which_mode.trace_variable("w", self.save_configs)
-        self.continue_serie.trace_variable("w", self.save_configs)
         self.games_number.trace_variable("w", self.save_configs)
 
-        self.mode_standard = Radiobutton(self.modes, text="Standard (Continue playing previous serie until exp trainers slot empty)", value='standard', variable=self.which_mode, command=self.toggle_mode)
-        self.mode_custom = Radiobutton(self.modes, text='Custom mode: ', value='custom', variable=self.which_mode, command=self.toggle_mode)
-        self.mode_limited = Radiobutton(self.modes, text="Limited (Do not convert/sign players, play same squads and renew contracts)", value='limited', variable=self.which_mode, command=self.toggle_mode)
+        self.mode_standard = Radiobutton(self.modes, text="Standard (Continue playing previous serie until exp trainers slot empty)", value='standard', variable=self.which_mode)
+        self.mode_limited = Radiobutton(self.modes, text="Limited (Do not convert/sign players, play same squads and renew contracts)", value='limited', variable=self.which_mode)
 
-        self.cont_s = Checkbutton(self.modes, text="Continue/start over", variable=self.continue_serie, state=DISABLED)
-        self.to_play_val = Entry(self.modes, width=5, justify=RIGHT, textvariable=self.games_number, state=DISABLED)
-        self.to_play = Label(self.modes, text="games to play")
+        self.to_play_val = Entry(self.modes, width=5, justify=RIGHT, textvariable=self.games_number)
+        self.to_play = Label(self.modes, text="games to play:")
         # Enable if custom is default
-        self.toggle_mode()
 
         modes_grid = dict(sticky=W, pady=3, padx=4)
-        self.mode_standard.grid(row=0, column=1, columnspan=4, **modes_grid)
-        self.mode_custom.grid(row=1, column=1, **modes_grid)
-        self.to_play_val.grid(row=1, column=2, padx=1)
-        self.to_play.grid(row=1, column=3, **modes_grid)
-        self.cont_s.grid(row=1, column=4, **modes_grid)
+        self.to_play_val.grid(row=0, column=2, **modes_grid)
+        self.to_play.grid(row=0, column=1)
+        self.mode_standard.grid(row=1, column=1, columnspan=4, **modes_grid)
         self.mode_limited.grid(row=2, column=1, columnspan=4, **modes_grid)
 
         # -------- Checks -------------
@@ -592,14 +585,14 @@ class PesGui:
 
 
 
-    def toggle_mode(self):
-        if self.which_mode.get() == 'custom':
-            self.cont_s['state'] = "!disabled"
-            self.to_play_val['state'] = "!disabled"
-        else:
-            self.games_number.set(1000)
-            self.cont_s['state'] = "disabled"
-            self.to_play_val['state'] = "disabled"
+    # def toggle_mode(self):
+    #     if self.which_mode.get() == 'custom':
+    #         self.cont_s['state'] = "!disabled"
+    #         self.to_play_val['state'] = "!disabled"
+    #     else:
+    #         self.games_number.set(1000)
+    #         self.cont_s['state'] = "disabled"
+    #         self.to_play_val['state'] = "disabled"
 
     def use_mail(self):
         if self.mail_send_var.get():
@@ -734,7 +727,10 @@ Please double check - go to your team, filter players by costs you've chose in "
             main.dummy_playing_loop()
 
         elif self.which_mode.get() == "limited":
-            logging.info("TODO mode limited")
+            logging.info("Limited playing loop selected")
+
+    def constructor(self):
+        print("test")
 
 
     # --------- Actions playing loop -------
@@ -769,7 +765,7 @@ Please double check - go to your team, filter players by costs you've chose in "
     def home_stats_collect(self):
         main.initialize_pes()
         main.base_ok()
-        print('MONEY')
+        logging.info("Updating GP and EXP trainers slots info")
         #GP
         self.gp_balance['state'] = '!disabled'
         self.gp_balance_var.set(int(float(main.recognize('money'))*1000))
@@ -839,7 +835,10 @@ Please double check - go to your team, filter players by costs you've chose in "
             'game_number' : ('games_played_var', 'games_total_var'),
             'converted_nr' : ('players_runtime_var', 'players_total_var'),
             'error_count' : ('errors_var', '@'),
-            'team_nr' : ('current_team_var', '@')
+            'team_nr' : ('current_team_var', '@'),
+            'contract_1' : ('team1_contract_var', '@'),
+            'contract_2' : ('team2_contract_var', '@'),
+            'contract_m' : ('manager_contract_var', '@')
         }
         while self.script.is_alive() and self.run_status.get() not in ('Aborting', 'Stopping'):
             self.run_status.set('Script is running')
@@ -853,18 +852,18 @@ Please double check - go to your team, filter players by costs you've chose in "
                         getattr(self, gui_vars[1]).set( 1 + getattr(self, gui_vars[1]).get())
 
         else:
-            print('status watcher else cond')
+            logging.debug('Status watcher else cond')
             self.abort.config(state='disabled')
             self.gracefull_stop.config(state='disabled')
             main.time.sleep(1)
             if self.run_status.get() in ('Aborting', "Stopping"):
-                print('status watcher detected aborted')
+                logging.debug('Status watcher detected aborted')
                 self.run_status.set('Aborted')
                 self.go_back.config(state='normal')
             elif self.run_status.get() not in ('Done', 'Aborted', 'Aborting'):
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
-                print('status watcher detected failure')
+                logging.debug('Status watcher detected failure')
                 self.do_shutdown()
             else:
                 self.go_back.config(state='normal')
