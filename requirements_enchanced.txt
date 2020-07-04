@@ -1,2 +1,3 @@
 sendgrid
-azure-mgmt
+azure-common
+azure-mgmt-compute
