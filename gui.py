@@ -711,6 +711,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         if self.which_mode.get() == "standard":
             main.logger.info("TODO mode standard")
             main.dummy_playing_loop(self.to_play_val.get())
+            #self.gui_games_loop(self.to_play_val.get(), 'standard')
 
         elif self.which_mode.get() == "limited":
             main.logger.info("Limited playing loop selected")
@@ -731,6 +732,34 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.run_status.set('Done')
         if self.shutdown_var.get():
             self.do_shutdown()
+
+    def gui_games_loop(self, games_number, mode):
+        self.gui_start_pes()
+        self.home_stats_collect()
+        self.initial_stats_collect()
+        for i in range(int(games_number)):
+            if mode == 'standard':
+                if main.contract_1 == 0 and main.contract_2 == 0:
+                    self.gui_shift_change()
+                    main.time.sleep(2)
+            # Add play_one here
+            print('TODO: add play_one here')
+
+            self.home_stats_collect()
+            main.logger.info(f'Numbers of games played: {i + 1}')
+            global game_number
+            game_number += 1
+            global error_count
+            error_count = 0
+            global team_nr
+            main.team_change(1 if team_nr > 1 else 2)
+            if main.gracefull_stop:
+                break
+
+        main.logger.info(f'Playig loop finished')
+
+
+
 
     # --- Reusable ----
 
