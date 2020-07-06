@@ -81,7 +81,8 @@ class PesGui:
             "games_total_var",
             "players_runtime_var",
             "players_total_var",
-            "exp_left_var"
+            "exp_left_var",
+            "scouts_left_var"
         )
 
         for variable in stats_variables:
@@ -292,6 +293,7 @@ class PesGui:
         #variables
         self.which_mode = StringVar(value=pes_config['gui']['which_mode'])
         self.games_number = IntVar(None,pes_config['gui']['games_number'])
+        self.games_to_play = IntVar(None,value=0)
         #callback
         self.which_mode.trace_variable("w", self.save_configs)
         self.games_number.trace_variable("w", self.save_configs)
@@ -710,8 +712,8 @@ Please double check - go to your team, filter players by costs you've chose in "
 
         if self.which_mode.get() == "standard":
             main.logger.info("TODO mode standard")
-            main.dummy_playing_loop(self.to_play_val.get())
-            #self.gui_games_loop(self.to_play_val.get(), 'standard')
+            #main.dummy_playing_loop(self.to_play_val.get())
+            self.gui_games_loop(self.to_play_val.get(), 'standard')
 
         elif self.which_mode.get() == "limited":
             main.logger.info("Limited playing loop selected")
@@ -737,7 +739,12 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.gui_start_pes()
         self.home_stats_collect()
         self.initial_stats_collect()
-        for i in range(int(games_number)):
+        # Set runtime games to play
+        exp, sco = int(self.exp_left_var.get()),int(self.scouts_left_var.get())
+        max_games_to_play = (150 - exp) if (exp >= sco) else (150 - sco)
+        real_games_to_play = max_games_to_play if int(max_games_to_play) <= int(games_number) else games_number
+        self.games_to_play.set(real_games_to_play)
+        for i in range(int(real_games_to_play)):
             if mode == 'standard':
                 if main.contract_1 == 0 and main.contract_2 == 0:
                     self.gui_shift_change()
@@ -747,16 +754,14 @@ Please double check - go to your team, filter players by costs you've chose in "
 
             self.home_stats_collect()
             main.logger.info(f'Numbers of games played: {i + 1}')
-            global game_number
-            game_number += 1
-            global error_count
-            error_count = 0
-            global team_nr
-            main.team_change(1 if team_nr > 1 else 2)
+            main.game_number += 1
+            main.error_count = 0
+            main.team_change(1 if self.team1_contract_var.get() >= self.team2_contract_var.get() else 2)
             if main.gracefull_stop:
                 break
 
         main.logger.info(f'Playig loop finished')
+        self.run_status.set('Done')
 
 
 
@@ -790,11 +795,12 @@ Please double check - go to your team, filter players by costs you've chose in "
     def initial_stats_collect(self):
         main.initialize_pes()
         main.base_ok()
-        main.logger.info('Checking teams and manager contracts duration')
+        main.logger.info('Checking teams and manager contracts duration and coach/trainer slots left')
         formations = ''
         for i in range(2):
             main.base_ok()
             main.press_X()
+            main.logger.info(f'Checking {i + 1}\'st team contracts')
             if formations == '':
                 # Recognize and check formations
                 message, first, second = '', True, True
@@ -803,11 +809,13 @@ Please double check - go to your team, filter players by costs you've chose in "
                     message += "First team doesn't have 4-3-3 formation. "
                     first = False
                 else:
+                    main.logger.info('Team 1 formation is 4-3-3')
                     formations = '4-3-3'
                 if main.recognize('formation2') != '4-3-3':
                     message += "Second team doesn't have 4-3-3 formation. "
                     second = False
                 else:
+                    main.logger.info('Team 2 formation is 4-3-3')
                     formations = '4-3-3'
                 if not first and second:
                     message += "Please, select same coach with 4-3-3 for both teams and try again"
@@ -822,14 +830,44 @@ Please double check - go to your team, filter players by costs you've chose in "
                 main.to_reserves()
                 main.turn_up(1)
                 if i + 1 == 1:
-                    self.team1_contract_var.set(int(main.recognize('contract_duration')))
+                    main.contract_1 = int(main.recognize('contract_duration'))
+                    main.logger.info('1\'st team contracts updated')
                 elif i + 1 == 2:
-                    self.team2_contract_var.set(int(main.recognize('contract_duration')))
+                    main.contract_2 = int(main.recognize('contract_duration'))
+                    main.logger.info('2\'nd team contracts updated')
                 main.turn_up(2)
                 main.turn_left(1)
-                self.manager_contract_var.set(int(main.recognize('coach_contract')))
+                main.contract_m =int(main.recognize('coach_contract'))
             while not main.base_ok():
                 main.press_B()
+        main.logger.info('Checking scouts slots availability')
+        if main.base_ok():
+            main.turn_right(4)
+            if main.isok('sign/scout.JPG', 3):
+                main.press_A()
+                if main.isok('sign/sign-enter.JPG', 4):
+                    main.press_A()
+                    if main.isok('sign/choose-slot.JPG', 9):
+                        main.press_A()
+                        main.time.sleep(0.5)
+                        if main.isok('sign/no-scouts.JPG', 3):
+                            main.press_A()
+                            self.scouts_left_var.set(0)
+                            main.logger.info('No scouts, 150 can receive')
+                        else:
+                            scouts_there = int(main.recognize('scouts').split('/')[1])
+                            self.scouts_left_var.set(scouts_there)
+                            main.logger.info(f'{scouts_there} scout slots taken, {150 - scouts_there} left.')
+                            main.press_B()
+                        # Get back to home once all sold
+                        if main.isok('sign/choose-slot.JPG', 5):
+                            main.press_B()
+                        if main.isok('sign/sign-enter.JPG', 5):
+                            main.press_B()
+                        if main.isok('sign/scout.JPG', 5):
+                            main.turn_left(4)
+                        if main.isok('img/club-house.JPG', 10):
+                            main.logger.info('Contracts durations and scout slots info updated')
 
 
 

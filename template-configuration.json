@@ -26,6 +26,7 @@
     "players_runtime_var": 3 ,
     "players_total_var": 4 ,
     "exp_left_var": 5 ,
+    "scouts_left_var": 12,
     "current_team_var": 2 ,
     "team1_contract_var": 25 ,
     "team2_contract_var": 24 ,
