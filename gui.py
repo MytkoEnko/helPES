@@ -589,16 +589,6 @@ class PesGui:
         print("Wow, this actually worked!")
 
 
-
-    # def toggle_mode(self):
-    #     if self.which_mode.get() == 'custom':
-    #         self.cont_s['state'] = "!disabled"
-    #         self.to_play_val['state'] = "!disabled"
-    #     else:
-    #         self.games_number.set(1000)
-    #         self.cont_s['state'] = "disabled"
-    #         self.to_play_val['state'] = "disabled"
-
     def use_mail(self):
         if self.mail_send_var.get():
             self.sendgrid_token['state'] = '!disabled'
@@ -715,23 +705,20 @@ Please double check - go to your team, filter players by costs you've chose in "
 
     # --------- Playing loop -----------
     def gui_playing_loop(self):
-        logging.info('helPES playing loop started')
+        main.logger.info('helPES playing loop started')
         #self.gui_start_pes()
 
         if self.which_mode.get() == "standard":
-            logging.info("TODO mode standard")
-            main.dummy_playing_loop()
+            main.logger.info("TODO mode standard")
+            main.dummy_playing_loop(self.to_play_val.get())
 
         elif self.which_mode.get() == "limited":
-            logging.info("Limited playing loop selected")
-
-    def constructor(self):
-        print("test")
+            main.logger.info("Limited playing loop selected")
 
 
     # --------- Actions playing loop -------
     def gui_actions_loop(self):
-        logging.info('helPES actions loop started')
+        main.logger.info('helPES actions loop started')
         self.gui_start_pes()
         if self.sign_all.get():
             main.sign_all(self.sign_skip.get())
@@ -750,7 +737,7 @@ Please double check - go to your team, filter players by costs you've chose in "
     def gui_start_pes(self):
         main.initialize_pes()
         if main.base_ok():
-            logging.info('Game is on, no need to start')
+            main.logger.info('Game is on, no need to start')
         else:
             main.start_game()
 
@@ -761,20 +748,20 @@ Please double check - go to your team, filter players by costs you've chose in "
     def home_stats_collect(self):
         main.initialize_pes()
         main.base_ok()
-        logging.info("Updating GP and EXP trainers slots info")
-        #GP
+        main.logger.info("Updating GP and EXP trainers slots info")
+        # GP
         self.gp_balance['state'] = '!disabled'
-        self.gp_balance_var.set(int(float(main.recognize('money'))*1000))
+        self.gp_balance_var.set(int(float(main.recognize('money')) * 1000))
         self.gp_balance['state'] = 'disabled'
         # EXP trainers
-        self.exp['state'] ='!disabled'
+        self.exp['state'] = '!disabled'
         self.exp_left_var.set(int(main.recognize('exp_trainers')))
         self.exp['state'] = 'disabled'
 
     def initial_stats_collect(self):
         main.initialize_pes()
         main.base_ok()
-        logging.info('Checking teams and manager contracts duration')
+        main.logger.info('Checking teams and manager contracts duration')
         formations = ''
         for i in range(2):
             main.base_ok()
@@ -782,7 +769,7 @@ Please double check - go to your team, filter players by costs you've chose in "
             if formations == '':
                 # Recognize and check formations
                 message, first, second = '', True, True
-                main.time.sleep(1) #Wait until team list opens
+                main.time.sleep(1)  # Wait until team list opens
                 if main.recognize('formation1') != '4-3-3':
                     message += "First team doesn't have 4-3-3 formation. "
                     first = False
@@ -795,19 +782,19 @@ Please double check - go to your team, filter players by costs you've chose in "
                     formations = '4-3-3'
                 if not first and second:
                     message += "Please, select same coach with 4-3-3 for both teams and try again"
-                    logging.error(f'{message}')
+                    main.logger.error(f'{message}')
                     break
             if main.isok('img/squad-list.JPG', 60):
-                main.turn_down(i+1)
+                main.turn_down(i + 1)
                 main.time.sleep(0.5)
                 main.press_A()
             if main.base_ok():
                 main.press_A()
                 main.to_reserves()
                 main.turn_up(1)
-                if i+1 == 1:
+                if i + 1 == 1:
                     self.team1_contract_var.set(int(main.recognize('contract_duration')))
-                elif i+1 == 2:
+                elif i + 1 == 2:
                     self.team2_contract_var.set(int(main.recognize('contract_duration')))
                 main.turn_up(2)
                 main.turn_left(1)
@@ -848,18 +835,18 @@ Please double check - go to your team, filter players by costs you've chose in "
                         getattr(self, gui_vars[1]).set( 1 + getattr(self, gui_vars[1]).get())
 
         else:
-            logging.debug('Status watcher else cond')
+            main.logger.debug('Status watcher else cond')
             self.abort.config(state='disabled')
             self.gracefull_stop.config(state='disabled')
             main.time.sleep(1)
             if self.run_status.get() in ('Aborting', "Stopping"):
-                logging.debug('Status watcher detected aborted')
+                main.logger.debug('Status watcher detected aborted')
                 self.run_status.set('Aborted')
                 self.go_back.config(state='normal')
             elif self.run_status.get() not in ('Done', 'Aborted', 'Aborting'):
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
-                logging.debug('Status watcher detected failure')
+                main.logger.debug('Status watcher detected failure')
                 self.do_shutdown()
             else:
                 self.go_back.config(state='normal')
@@ -884,7 +871,11 @@ Please double check - go to your team, filter players by costs you've chose in "
 
     def do_shutdown(self):
         sec_delay = int(self.delay_var.get() * 60)
-        logging.info(f'Shutting down after {self.delay_var.get()} minutes')
+        if self.shutdown_var.get():
+            main.logger.info(f'Shutting down after {self.delay_var.get()} minutes')
+        else:
+            main.logger.info('Auto-shutdown not selected, computer stays on')
+
         while self.shutdown_var.get():
             if sec_delay == 0:
                 os.system('shutdown -s')

@@ -681,44 +681,9 @@ def to_reserves():
             keyUp(Key.DOWN)
             keyUp(Key.LEFT)
 
-# NOT USED
-def find_victim():
-        if isok('conv/reserves-list.JPG', 5):
-            # create variable
-            ball_path = 'None'
-            if team_nr == 1:
-                del ball_path
-                ball_path='conv/white-ball.JPG'
-            if team_nr == 2:
-                del ball_path
-                ball_path='conv/bronze-ball.JPG'
-            # Jump down
-            pes.focus()
-            # Scroll to the end
-            keyDown(Key.DOWN)
-            time.sleep(5)
-            keyUp(Key.DOWN)
-            while not isok('conv/black-ball.JPG', 2):
-                # and not isok('conv/gold-ball.JPG',2) and not isok('conv/silver-ball.JPG', 2)
-                for i in range(6):
-                    if isok('conv/black-ball.JPG',0.5):
-                        logger.info('Found black ball, exiting')
-                        break
-                    if isok(ball_path, 0.5):
-                        logger.info('Found %s', ball_path)
-                        return True
-                    else:
-                        turn_right(1)
-                turn_up(1)
-            press_B()
-            time.sleep(1)
-            press_B()
-            time.sleep(1)
-            logger.warning('Other than white or bronze ball found, escaping script')
-            return False
 # Convert player into EXP trainer
 def exec_victim(turns_down=2):
-        logger.info('Looking for victim')
+        logger.info('Executing victim')
         press_X()
         if isok('conv/player-menu.JPG', 5):
             turn_down(turns_down)
@@ -730,14 +695,9 @@ def exec_victim(turns_down=2):
         if isok('conv/converted.JPG', 5):
             press_A()
 
+
 # Converts and populates squads of playing teams:
 def smart_players_convert(which_teams=12, populate=True, execute=True):
-    def safe_pl_rating():
-        try:
-            players_rating = int(recognize('player_rating'))
-        except ValueError:
-            players_rating = 85
-        return players_rating
 
     def team_execute():
         if base_ok(9):
@@ -763,14 +723,7 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
             if pes_gui:
                 global converted_nr
                 converted_nr += 1
-            # if safe_pl_rating() < rating:
-            #     logger.info('Converting player to EXP trainer')
-            #     exec_victim(3)
-            # else:
-            #     logger.warning('Player on position %s with rating %s or more is in the team, skipping this one', key,
-            #                    rating)
-            #     value[2] = recognize('surname', '')
-            #     continue
+
         with open("team1.json", "w") as to_write:
             json.dump(position, to_write)
         del position
@@ -832,29 +785,21 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
             press_A()
             time.sleep(0.5)
             if isok('conv/filtered.JPG', 2):
-                logger.info('Filters applied')
+                logger.debug('Filters applied')
                 if error_count < 15:
-                    error_count = 0
+                    error_count = 1
             keyDown(Key.DOWN)
             time.sleep(2)
             keyUp(Key.DOWN)
+            # Prepare list of already used players
+            team1_names = [value[2] for (key, value) in position1.items()]
+            team2_names = [value[2] for (key, value) in position2.items()]
+            known_names = team1_names + team2_names
             while not isok('conv/on_team.JPG',3):
                 error_count -= 1
                 time.sleep(0.5)
                 found = False
                 for i in range(6):
-                    #if isok(value[0],2):
-                     #   logger.info('Found match for %s', value[0])
-                        # if safe_pl_rating() < rating:
-                        #     logger.info('Player\'s rating is %s, which is smaller than %s',safe_pl_rating(), rating)
-                        #     if value[2] != recognize('surname',''):
-                        #         value[2] = recognize('surname','')
-                        #         logger.info('New player %s set on position %s', value[2], key)
-                        #         with open("team1.json", "w") as to_write:
-                        #             json.dump(position, to_write)
-                        #found = True
-                        #press_A()
-                        #break
                     try:
                         surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
                     except 'Tcl_AsyncDelete':
@@ -863,9 +808,6 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                         surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 
                     print(surname)
-                    team1_names = [value[2] for (key,value) in position1.items()]
-                    team2_names = [value[2] for (key,value) in position2.items()]
-                    known_names = team1_names + team2_names
                     if surname != '' and surname not in known_names:
                         value[2] = surname
                         logger.info('New player found: %s', surname)
@@ -881,17 +823,6 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                         while not isok('conv/on_team.JPG',3):
                             press_A()
                         break
-    #             elif safe_pl_rating() >= rating:
-    #                 logger.info('No low leveled players for %s position, picking any.', key)
-    #                 turn_down(10)
-    # #                while not safe_pl_rating() < rating and value[2] != recognize('surname',''):
-    #                 while not value[2] != recognize('surname', ''):
-    #                     logger.info('Player not found in the row, going up')
-    #                     turn_right(1)
-    #                     turn_up(1)
-    #                 logger.info('Another player found')
-    #                 press_A()
-    #                 break
                 else:
                     logger.info('No suitable players in reserves row, up for 1 row')
                     turn_up(1)
@@ -979,34 +910,6 @@ def initialize_pes():
 
 
 # Play one game after another changing squads in between
-#TODO find place for playing loop, find logick for number of games played etc.
-def playing_loop(number=1000, smart=False):
-    initialize_pes()
-    if base_ok():
-        logger.info('Game is on, no need to start')
-    else:
-        start_game()
-    game_number = 0
-    for i in range(number):
-        play_one()
-        game_number += 1
-        logger.info('Number of games played: %s', str(game_number))
-        team_change(2)
-        play_one()
-        game_number += 1
-        logger.info('Number of games played: %s', str(game_number))
-        team_change(1)
-        # pes_region.saveScreenCapture('./shot', 'test2')
-        #original = cv2.imread("./shot/test1.png")
-        #duplicate = cv2.imread("./shot/test2.png")
-        # if original.shape == duplicate.shape:
-        #     logger.info('Game seems to be working fine, continuing')
-        # else:
-        #     pes.close()
-        #     time.sleep(20)
-        #     playing_loop()
-
-    # return
 def smart_playing_loop(file=False, smart=0, number=1000):
     initialize_pes()
     if base_ok():
@@ -1145,10 +1048,11 @@ if args.custom:
     #r'"D:\\Steam\\steamapps\\common\\eFootball PES 2020\\PES2020.exe"'
 
 
-def dummy_playing_loop():
-    for i in range(10):
+
+def dummy_playing_loop(number):
+    for i in range(int(number)):
         time.sleep(2)
-        logger.info(f'Numbers of dummy games played: {i}')
+        logger.info(f'Numbers of dummy games played: {i+1}')
         global game_number
         game_number +=1
         global error_count
