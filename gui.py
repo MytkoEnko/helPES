@@ -733,7 +733,8 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.initial_stats_collect()
         # Set runtime games to play
         sco = 150 - int(self.scouts_left_var.get())
-        exp = (int((150 - int(self.exp_left_var.get()) - 22) / 22) + 1) * 20 + main.contract_1 + main.contract_2
+        exp_tmp = (150 - int(self.exp_left_var.get()) - 22) / 22
+        exp = (int(exp_tmp) + 1 if int(exp_tmp) < exp_tmp else int(exp_tmp)) * 20 + main.contract_1 + main.contract_2
         max_games_to_play = exp if exp <= sco else sco
         real_games_to_play = max_games_to_play if int(max_games_to_play) <= int(games_number) else games_number
         self.games_to_play.set(real_games_to_play)
