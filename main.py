@@ -129,7 +129,7 @@ game_number = 0
 gracefull_stop = False
 aborted = False
 shutdown = False
-max_player_cost = 15
+
 
 # Saved settings (variables)
 # Load/prepare and load configuration.json
@@ -152,6 +152,7 @@ load_configurations()
 contract_1 = pes_config['gui']['team1_contract_var']
 contract_2 = pes_config['gui']['team2_contract_var']
 contract_m = pes_config['gui']['manager_contract_var']
+max_player_cost = pes_config['gui']['players_cost_var']
 
 if len(pes_config['general']['game_path']) > 3:
     pes_path = r'{}'.format(repr(pes_config['general']['game_path']).replace("'",'"'))

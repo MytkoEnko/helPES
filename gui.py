@@ -293,7 +293,7 @@ class PesGui:
         #variables
         self.which_mode = StringVar(value=pes_config['gui']['which_mode'])
         self.games_number = IntVar(None,pes_config['gui']['games_number'])
-        self.games_to_play = IntVar(None,value=0)
+        self.games_to_play = IntVar(None,value=self.games_number.get())
         #callback
         self.which_mode.trace_variable("w", self.save_configs)
         self.games_number.trace_variable("w", self.save_configs)
@@ -410,7 +410,7 @@ class PesGui:
 
         pl_stats_entry = dict(width=5, justify=RIGHT, state=DISABLED)
         self.games_played = Entry(self.runstats, **pl_stats_entry, textvariable=self.games_played_var)
-        self.games_planned = Entry(self.runstats, **pl_stats_entry, textvariable=self.games_number)
+        self.games_planned = Entry(self.runstats, **pl_stats_entry, textvariable=self.games_to_play)
         self.current_team1 = Label(self.runstats, font='bold', text='1', **pl_stats_entry, anchor=CENTER)
         self.current_team2 = Label(self.runstats, font='bold', text='2', **pl_stats_entry, anchor=CENTER)
         self.current_team = Entry(self.runstats, **pl_stats_entry, textvariable=self.current_team_var)
@@ -708,15 +708,7 @@ Please double check - go to your team, filter players by costs you've chose in "
     # --------- Playing loop -----------
     def gui_playing_loop(self):
         main.logger.info('helPES playing loop started')
-        #self.gui_start_pes()
-
-        if self.which_mode.get() == "standard":
-            main.logger.info("TODO mode standard")
-            #main.dummy_playing_loop(self.to_play_val.get())
-            self.gui_games_loop(self.to_play_val.get(), 'standard')
-
-        elif self.which_mode.get() == "limited":
-            main.logger.info("Limited playing loop selected")
+        self.gui_games_loop(self.to_play_val.get(), self.which_mode.get())
 
 
     # --------- Actions playing loop -------
@@ -751,6 +743,7 @@ Please double check - go to your team, filter players by costs you've chose in "
                     main.time.sleep(2)
             # Add play_one here
             print('TODO: add play_one here')
+            main.play_one(mode)
 
             self.home_stats_collect()
             main.logger.info(f'Numbers of games played: {i + 1}')
