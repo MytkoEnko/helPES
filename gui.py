@@ -739,7 +739,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         max_games_to_play = exp if exp <= sco else sco
         real_games_to_play = max_games_to_play if int(max_games_to_play) <= int(games_number) else games_number
         self.games_to_play.set(real_games_to_play)
-        for i in range(int(real_games_to_play)):
+        for i in range(int(real_games_to_play) if mode == 'standard' else sco):
             if mode == 'standard':
                 if main.contract_1 == 0 and main.contract_2 == 0:
                     self.gui_shift_change()
@@ -757,6 +757,8 @@ Please double check - go to your team, filter players by costs you've chose in "
 
         main.logger.info(f'Playig loop finished')
         self.run_status.set('Done')
+        if self.shutdown_var.get():
+            self.do_shutdown()
 
 
 
