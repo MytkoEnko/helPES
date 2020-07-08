@@ -400,7 +400,7 @@ class PesGui:
 
         self.current_team_var.trace_variable("w", self.mark_team)
 
-        self.label_games_stats = Label(self.runstats, text="Games played/planned")
+        self.label_games_stats = Label(self.runstats, text="Games played/of max")
         self.label_current_team = Label(self.runstats, text="Team playing now")
         self.label_manager_stat = Label(self.runstats, text="Manager contract left")
         self.label_error = Label(self.runstats, text="Errors occured")
@@ -902,9 +902,12 @@ Please double check - go to your team, filter players by costs you've chose in "
             self.gracefull_stop.config(state='disabled')
             main.time.sleep(1)
             if self.run_status.get() in ('Aborting', "Stopping"):
-                main.logger.debug('Status watcher detected aborted')
-                self.run_status.set('Aborted')
-                self.go_back.config(state='normal')
+                main.logger.info('Status watcher detected aborting pressed, stopping script..')
+                while self.script.is_alive():
+                    main.time.sleep(2)
+                else:
+                    self.run_status.set('Aborted')
+                    self.go_back.config(state='normal')
             elif self.run_status.get() not in ('Done', 'Aborted', 'Aborting'):
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
