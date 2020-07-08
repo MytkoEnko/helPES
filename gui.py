@@ -125,7 +125,7 @@ class PesGui:
         self.team2_populate = BooleanVar(value=pes_config['gui']['team2_populate'])
         self.convert_all = BooleanVar(value=pes_config['gui']['convert_all'])
         self.sign_all = BooleanVar(value=pes_config['gui']['sign_all'])
-        self.sign_skip = IntVar(value=pes_config['gui']['sign_skip'])
+
         #add callback
         actions_variables = (
             "team1_convert",
@@ -174,6 +174,7 @@ class PesGui:
         self.az_subscription_id = StringVar(value=pes_config['secrets']['az_subscription_id'])
         self.az_group_name = StringVar(value=pes_config['general']['az_group_name'])
         self.az_vm_name = StringVar(value=pes_config['general']['az_vm_name'])
+        self.sign_skip = IntVar(value=pes_config['gui']['sign_skip'])
 
         #add callback
         settings_callbacks = (
@@ -744,7 +745,6 @@ Please double check - go to your team, filter players by costs you've chose in "
                     self.gui_shift_change()
                     main.time.sleep(2)
             # Add play_one here
-            print('TODO: add play_one here')
             main.play_one(mode)
 
             self.home_stats_collect()
@@ -771,8 +771,8 @@ Please double check - go to your team, filter players by costs you've chose in "
             main.start_game()
 
     def gui_shift_change(self, team=12):
-        main.sign_all()
-        main.smart_players_convert(team)
+        main.sign_all(self.sign_skip.get())
+        main.smart_players_convert(which_teams=team)
 
     def home_stats_collect(self):
         main.initialize_pes()
