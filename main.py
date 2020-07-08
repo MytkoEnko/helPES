@@ -699,6 +699,11 @@ def exec_victim(turns_down=2):
 
 # Converts and populates squads of playing teams:
 def smart_players_convert(which_teams=12, populate=True, execute=True):
+    '''This function performs converting to EXP trainers and assigning new
+    players to selected teams (1, 2, 12)'''
+    for team in range(2):
+        if not isthere(f'team{team +1}.json'):
+            shutil.copy('template-team.json', f'team{team +1}.json')
 
     def team_execute():
         if base_ok(9):
