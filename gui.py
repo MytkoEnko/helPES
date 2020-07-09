@@ -5,7 +5,6 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import ImageTk, Image
 import os
-import json
 import threading
 import logging
 
@@ -580,7 +579,7 @@ class PesGui:
 
     def tesseract_check(self):
         try:
-            tess_version = main.pytesseract.get_tesseract_version()
+            tess_version = main.pytesseract_get_tesseract_version()
             self.tesseract_version.config(foreground='green', text=tess_version)
             self.tesseract_label.config(foreground='green')
         except:

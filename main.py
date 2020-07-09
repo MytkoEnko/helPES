@@ -1,18 +1,16 @@
 import logging
-import  sys
+
 import os
-import shutil
-#from keyboard import mouse
+import time
+import sys
+
+from shutil import copy
 from lackey import *
-import json
-import vdf
-import pytesseract
+from json import load as json_load, dump as json_dump
+from vdf import load as vdf_load
+from pytesseract import image_to_string as pytesseract_image_to_string, get_tesseract_version as pytesseract_get_tesseract_version
 import argparse
-try:
-    from PIL import Image
-except ImportError:
-    import Image
-import cv2
+from cv2 import resize as cv2_resize
 from azure_vm import *
 from pesmail import send_mail
 
@@ -70,7 +68,7 @@ def makebkp():
         logger.info("Creating backup and importing pes settings file")
         os.rename(settings_file, settings_backup)
         logger.info('Backup created: %s', os.listdir(settings_path))
-        shutil.copy(settings_pesbot, settings_file)
+        copy(settings_pesbot, settings_file)
         logger.info("Settings copied, folder contents: %s", os.listdir(settings_path))
     else:
         logger.warning("Something is wrong, please check settings folder")
@@ -105,7 +103,7 @@ def get_pes_exe():
     else:
         lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
         with open(lib_path, "r") as read_steam:
-            steam_lib = vdf.load(read_steam)
+            steam_lib = vdf_load(read_steam)
 
         steam_library = {number: location for number, location in steam_lib['LibraryFolders'].items() if number.isdigit()}
         alternative_pes_path = ''
@@ -135,17 +133,17 @@ shutdown = False
 # Load/prepare and load configuration.json
 def load_configurations():
     if not isthere('configuration.json'):
-        shutil.copy('template-configuration.json', 'configuration.json')
+        copy('template-configuration.json', 'configuration.json')
 
     if isthere('configuration.json'):
         with open('configuration.json', 'r') as to_read:
             global pes_config
-            pes_config = json.load(to_read)
+            pes_config = json_load(to_read)
 
 def write_configurations():
     global  pes_config
     with open('configuration.json', "w") as to_write:
-        json.dump(pes_config, to_write)
+        json_dump(pes_config, to_write)
 
 load_configurations()
 # Update runtime variables default values
@@ -202,7 +200,7 @@ position = {
     'cf': ['conv/cf.JPG', [3,1,0,0], '@', 'conv/cf_f.JPG', 13],
 }
 # with open('team1.json', "w") as to_write:
-#     json.dump(position, to_write)
+#     json_dump(position, to_write)
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 # Buttons
@@ -363,7 +361,7 @@ def recognize(object_name, conf_options='outputbase digits'):
         conf_options = spots[object_name][1]
     pict = Region(*coordset(pes_frame, object_name))
     pict_size = (pict.getW()*3,pict.getH()*3)
-    image_value = pytesseract.image_to_string(cv2.resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
+    image_value = pytesseract_image_to_string(cv2_resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
     time.sleep(1)
     #pict.highlight(1)
     return image_value
@@ -703,14 +701,14 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
     players to selected teams (1, 2, 12)'''
     for team in range(2):
         if not isthere(f'team{team +1}.json'):
-            shutil.copy('template-team.json', f'team{team +1}.json')
+            copy('template-team.json', f'team{team +1}.json')
 
     def team_execute():
         if base_ok(9):
             logger.info('On base, entering team for execution')
             press_A()
         with open('team1.json', 'r') as to_read:
-            position = json.load(to_read)
+            position = json_load(to_read)
         for key, value in position.items():
             logger.info('Position %s, name %s', key, value[2])
             to_reserves()
@@ -731,7 +729,7 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                 converted_nr += 1
 
         with open("team1.json", "w") as to_write:
-            json.dump(position, to_write)
+            json_dump(position, to_write)
         del position
         while not base_ok(3):
             press_B()
@@ -752,9 +750,9 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
             team_file2 = 'team1.json'
 
         with open(team_file1, 'r') as to_read:
-            position1 = json.load(to_read)
+            position1 = json_load(to_read)
         with open(team_file2, 'r') as to_read2:
-            position2 = json.load(to_read2)
+            position2 = json_load(to_read2)
 
         for key, value in position1.items():
             logger.info('Position %s, name %s', key, value[2])
@@ -819,7 +817,7 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                         logger.info('New player found: %s', surname)
                         found = True
                         with open(team_file1, "w") as to_write:
-                            json.dump(position1, to_write)
+                            json_dump(position1, to_write)
                     if not found:
                         logger.info('Not %s, turning right', key)
                         turn_right(1)
