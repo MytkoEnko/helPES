@@ -74,7 +74,7 @@ class PesGui:
 
         # ----------- Stats ------------
 
-        #set variables and trace them
+        #set variables and trace them at the end of __init__
         stats_variables = (
             "games_played_var",
             "games_total_var",
@@ -86,7 +86,6 @@ class PesGui:
 
         for variable in stats_variables:
             setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
-            getattr(self, variable).trace_variable("w", self.save_configs)
 
         stats_labels = dict(sticky=W, pady=3, padx=4)
         self.games_runtime = Label(self.stats, text="Games played").grid(row=0, column=2, **stats_labels)
@@ -135,9 +134,6 @@ class PesGui:
             "sign_all",
         )
 
-        for variable in actions_variables:
-            #setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
-            getattr(self, variable).trace_variable("w", self.save_configs)
         # non standard callback
 
         self.t1_con = Checkbutton(self.actions, text="convert all players", variable=self.team1_convert)
@@ -193,8 +189,6 @@ class PesGui:
             "sign_skip"
         )
 
-        for variable in settings_callbacks:
-            getattr(self, variable).trace_variable("w", self.save_configs)
 
         self.mail_send = Checkbutton(self.pes_settings, text="Send email when script crashes or completes", variable=self.mail_send_var, command=self.use_mail)
         self.azure_vm = Checkbutton(self.pes_settings, text="Run on azure vm (see documentation)", variable=self.azure_vm_var, command=self.use_azure)
@@ -294,9 +288,6 @@ class PesGui:
         self.which_mode = StringVar(value=pes_config['gui']['which_mode'])
         self.games_number = IntVar(None,pes_config['gui']['games_number'])
         self.games_to_play = IntVar(None,value=self.games_number.get())
-        #callback
-        self.which_mode.trace_variable("w", self.save_configs)
-        self.games_number.trace_variable("w", self.save_configs)
 
         self.mode_standard = Radiobutton(self.modes, text="Standard (Continue playing previous serie until exp trainers slot empty)", value='standard', variable=self.which_mode)
         self.mode_limited = Radiobutton(self.modes, text="Limited (Do not convert/sign players, play same squads and renew contracts)", value='limited', variable=self.which_mode)
@@ -390,15 +381,11 @@ class PesGui:
         )
         for variable in play_variables:
             setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
-            getattr(self, variable).trace_variable("w", self.save_configs)
 
         # not standard variables:
         self.current_team_var = IntVar(value=pes_config['gui']['current_team_var'])
         self.errors_var = IntVar(value=0)
         self.run_status = StringVar(value='Starting')
-        self.run_status.trace_variable('w', self.run_status_changes)
-
-        self.current_team_var.trace_variable("w", self.mark_team)
 
         self.label_games_stats = Label(self.runstats, text="Games played/of max")
         self.label_current_team = Label(self.runstats, text="Team playing now")
@@ -487,6 +474,27 @@ class PesGui:
         self.countdown.grid(row=1, column=5, sticky=E, pady=2, padx=4)
         self.go_back.grid(row=1, column=6)
 
+        #Place all trace variables at the end of __init__
+        # ALL CALLBACKS
+        self.run_status.trace_variable('w', self.run_status_changes)
+
+        self.current_team_var.trace_variable("w", self.mark_team)
+
+        self.which_mode.trace_variable("w", self.save_configs)
+        self.games_number.trace_variable("w", self.save_configs)
+
+        for variable in settings_callbacks:
+            getattr(self, variable).trace_variable("w", self.save_configs)
+
+        for variable in actions_variables:
+            #setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            getattr(self, variable).trace_variable("w", self.save_configs)
+
+        for variable in stats_variables:
+            getattr(self, variable).trace_variable("w", self.save_configs)
+
+        for variable in play_variables:
+            getattr(self, variable).trace_variable("w", self.save_configs)
 
         #Refresh once loading
         self.use_azure()
