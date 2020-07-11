@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.ttk import *
 import main
+import azure_vm
 from tkinter import filedialog
 from tkinter import messagebox
 from PIL import ImageTk, Image
@@ -507,13 +508,16 @@ class PesGui:
         #================= END of the class ==================
 
     def test_azure(self):
-        print("Azure test")
+        for key in azure_vm.azure_variables.keys():
+            azure_vm.azure_variables[key] = getattr(self, key).get()
+        response = azure_vm.azure_perform('check_vm')
+        messagebox.showinfo('Vm test result', message=response)
 
     def test_email(self):
-        print("Email test")
+        main.logger.info("Email test")
         response = main.send_mail(
-            sendgrid_api_key=pes_config['secrets']['sendgrid_api_key'],
-            to_email=pes_config['general']['email_address'],
+            sendgrid_api_key=self.sendgrid_api_key.get(),
+            to_email=self.email_address.get(),
             alt_content="helPES test mail confirmation"
         )
 
@@ -732,8 +736,7 @@ Please double check - go to your team, filter players by costs you've chose in "
             main.smart_players_convert(1, self.team1_populate.get(),self.team1_convert.get())
             main.smart_players_convert(2, self.team2_populate.get(), self.team2_convert.get())
         self.run_status.set('Done')
-        if self.shutdown_var.get():
-            self.do_shutdown()
+
 
     def gui_games_loop(self, games_number, mode):
         self.gui_start_pes()
@@ -764,8 +767,7 @@ Please double check - go to your team, filter players by costs you've chose in "
 
         main.logger.info(f'Playig loop finished')
         self.run_status.set('Done')
-        if self.shutdown_var.get():
-            self.do_shutdown()
+
 
 
 
@@ -911,12 +913,16 @@ Please double check - go to your team, filter players by costs you've chose in "
             self.gracefull_stop.config(state='disabled')
             main.time.sleep(1)
             if self.run_status.get() in ('Aborting', "Stopping"):
-                main.logger.info('Status watcher detected aborting pressed, stopping script..')
+                main.logger.info('Status watcher detected aborting, stopping script..')
                 while self.script.is_alive():
                     main.time.sleep(2)
                 else:
                     self.run_status.set('Aborted')
                     self.go_back.config(state='normal')
+                    self.do_shutdown()
+            elif self.run_status.get() == 'Done':
+                self.go_back.config(state='normal')
+                self.do_shutdown()
             elif self.run_status.get() not in ('Done', 'Aborted', 'Aborting'):
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
@@ -944,6 +950,13 @@ Please double check - go to your team, filter players by costs you've chose in "
                 self.label_script_status.config(foreground=color)
 
     def do_shutdown(self):
+        if self.mail_send_var.get():
+            try:
+                main.send_mail(sendgrid_api_key=self.sendgrid_api_key.get(),
+                          to_email=self.email_address.get())
+            except:
+                messagebox.showinfo('Email not sent', message="Error occurred while trying to send email")
+
         sec_delay = int(self.delay_var.get() * 60)
         if self.shutdown_var.get():
             main.logger.info(f'Shutting down after {self.delay_var.get()} minutes')
@@ -952,7 +965,12 @@ Please double check - go to your team, filter players by costs you've chose in "
 
         while self.shutdown_var.get():
             if sec_delay == 0:
-                os.system('shutdown -s')
+                if self.azure_vm_var.get():
+                    for key in azure_vm.azure_variables.keys():
+                        azure_vm.azure_variables[key] = getattr(self, key).get()
+                    azure_vm.azure_perform('stop_vm')
+                else:
+                    os.system('shutdown -s')
             else:
                 mins, secs = divmod(sec_delay,60)
                 hours, remain = divmod(mins, 60)

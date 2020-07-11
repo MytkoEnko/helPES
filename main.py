@@ -11,7 +11,6 @@ from vdf import load as vdf_load
 from pytesseract import image_to_string as pytesseract_image_to_string, get_tesseract_version as pytesseract_get_tesseract_version
 import argparse
 from cv2 import resize as cv2_resize
-from azure_vm import *
 from pesmail import send_mail
 
 # ---------------------------------------------- ARGUMENTS PARSING
@@ -127,7 +126,7 @@ game_number = 0
 gracefull_stop = False
 aborted = False
 shutdown = False
-
+error_threshold = 30
 
 # Saved settings (variables)
 # Load/prepare and load configuration.json
@@ -273,6 +272,7 @@ def isok(img, seconds, similarity=0.89):
     global pes_region
     pes_region = pes.window()
 
+    # For specified images limit the area where "to look for"
     if img in areas.keys():
         area_coord = areas[img].copy()
         area_coord[0] += pes_region.getX()
@@ -293,20 +293,12 @@ def isok(img, seconds, similarity=0.89):
         logger.warning('%s not found', img)
         global error_count
         error_count +=1
-        error_check()
+        if error_count >= error_threshold:
+            pes_region.saveScreenCapture('./shot', 'screen_to_mail')
+            logger.error(f'{error_count} errors occurred, this is more than {error_threshold}. Failing script.')
+            sys.exit()
         return False
 
-# Errors number checking
-def error_check(allowed=30):
-    global error_count
-    if error_count > allowed:
-        logger.info('Global error count is higher than %s, switching off in 5 minutes',allowed)
-        global pes_region
-        pes_region.saveScreenCapture('./shot', 'screen_to_mail')
-        time.sleep(5)
-        send_mail(sendgrid_api_key=pes_config['secrets']['sendgrid_api_key'], to_email=pes_config['general']['email_address'])
-        time.sleep(300)
-        stop_vm(compute_client)
 # press_A when matched photo (a) within timeout (b)
 def proceed(a, b):
     isok(a, b)
