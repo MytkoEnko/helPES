@@ -508,6 +508,7 @@ class PesGui:
         #================= END of the class ==================
 
     def test_azure(self):
+        main.logger.info("VM test")
         for key in azure_vm.azure_variables.keys():
             azure_vm.azure_variables[key] = getattr(self, key).get()
         response = azure_vm.azure_perform('check_vm')
@@ -786,7 +787,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         main.smart_players_convert(which_teams=team)
 
     def home_stats_collect(self):
-        main.initialize_pes()
+        #main.initialize_pes()
         main.base_ok()
         main.logger.info("Updating GP and EXP trainers slots info")
         # GP
@@ -799,7 +800,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.exp['state'] = 'disabled'
 
     def initial_stats_collect(self):
-        main.initialize_pes()
+        #main.initialize_pes()
         main.base_ok()
         main.logger.info('Checking teams and manager contracts duration and coach/trainer slots left')
         formations = ''
@@ -926,7 +927,7 @@ Please double check - go to your team, filter players by costs you've chose in "
             elif self.run_status.get() not in ('Done', 'Aborted', 'Aborting'):
                 self.run_status.set('Failed')
                 self.go_back.config(state='normal')
-                main.logger.debug('Status watcher detected failure')
+                main.logger.error('Status watcher detected failure')
                 self.do_shutdown()
             else:
                 self.go_back.config(state='normal')
