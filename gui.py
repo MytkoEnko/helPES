@@ -8,9 +8,14 @@ from PIL import ImageTk, Image
 import os
 import threading
 import logging
+from sys import exc_info
+from requests import get
+from webbrowser import open_new_tab
 
 pes_config = main.pes_config
-
+new_release_url = 'https://github.com/MytkoEnko/helPES//releases/latest'
+report_issue_url = 'https://github.com/MytkoEnko/helPES/issues'
+donate_url = 'https://twitter.com/mytko_enko'
 
 
 class PesGui:
@@ -21,22 +26,29 @@ class PesGui:
         # ================== Top section =====================
 
         self.top_section = Frame(master)
-        topsection = self.top_section
 
         # ----------- LOGO ----------------
         self.img = PhotoImage(file="logo.png")
-        self.logo = Label(topsection, image=self.img)
+        self.logo = Label(self.top_section, image=self.img)
 
         # ----------- Description ----------
-        self.description_frame = LabelFrame(topsection, text="About")
-        self.description = Label(self.description_frame,wraplength=500, text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-
+        self.description_frame = LabelFrame(self.top_section, text="About")
+        self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual it the first place.")
+        self.version_label = Label(self.description_frame, text="Checking version..")
+        self.version_get = Label(self.description_frame, text="Checking updates..", cursor="hand2")
+        self.donate_button = Button(self.description_frame, text="Donate", command= lambda: self.open_link(donate_url))
+        self.report_issue = Button(self.description_frame, text="Report issue", command= lambda: self.open_link(report_issue_url))
         # ------------ Layout ---------------
-        topsection.pack(side=TOP, fill=X)
-        self.logo.pack(side=LEFT)
-        self.description_frame.pack(side=LEFT, fill=BOTH, expand=YES)
-        self.description.pack(side=TOP)
+        self.top_section.pack(side=TOP, fill=X)
+        self.logo.pack(side=LEFT, fill=Y)
+        self.description_frame.pack(side=LEFT, fill=BOTH)#, expand=YES)
+        self.description.grid(row=0, column=0, sticky=W, pady=4, padx=2, rowspan=3)
+        self.version_label.grid(row=0, column=2, columnspan=2)
+        self.version_get.grid(row=1, column=2, columnspan=2)
+        self.donate_button.grid(row=2, column=2, padx=(10,10), pady=(5,5))
+        self.report_issue.grid(row=2, column=3, padx=(10,10), pady=(5,5))
 
+        self.version_get.bind("<Button-1>", lambda e: self.open_link(new_release_url) )
         # =================  FRAME 1 =========================
         self.frame = Frame(master)
         self.frame.pack(fill=BOTH, padx=4, pady=1)
@@ -502,6 +514,7 @@ class PesGui:
         self.use_mail()
         self.use_shutdown()
         self.use_convert_all()
+        self.get_version()
 
 
 
@@ -704,6 +717,28 @@ Please double check - go to your team, filter players by costs you've chose in "
     def back(self):
         self.frame2.pack_forget()
         self.frame.pack(fill=BOTH, padx=4, pady=1)
+
+    def get_version(self):
+        url = 'https://api.github.com/repos/tesseract-ocr/tesseract/releases/latest'
+        headers = {'content_type': 'application/json'}
+        try:
+            response = get(url, headers=headers)
+            data = response.json()
+            with open('version', "r") as ver:
+                version = ver.read().strip("\n")
+                ver.close()
+                self.version_label['text'] = version
+                if str(version) != str(data['tag_name']):
+                    self.version_get['text'] = f'{data["tag_name"]} available!'
+                    global new_release_url
+                    new_release_url = data["html_url"]
+                else:
+                    self.version_get['text'] = 'Latest version'
+        except:
+            main.logger.error(f'Could not check version: {exc_info()}')
+
+    def open_link(self, url):
+        open_new_tab(url)
 
     ###################### RUN GAME #######################
     def perform_actions(self):
@@ -1010,7 +1045,7 @@ Please double check - go to your team, filter players by costs you've chose in "
             self.text.after(0, append)
 
 
-gui = Tk(className=" PES2020 Farmer") #create instance
+gui = Tk(className=" helPES") #create instance
 ######################
 gui.geometry("800x550")
 p = PesGui(gui)
