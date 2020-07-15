@@ -34,8 +34,8 @@ class PesGui:
         # ----------- Description ----------
         self.description_frame = LabelFrame(self.top_section, text="About")
         self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual it the first place.")
-        self.version_label = Label(self.description_frame, text="Checking version..")
-        self.version_get = Label(self.description_frame, text="Checking updates..", cursor="hand2")
+        self.version_label = Label(self.description_frame, text="Checking version..", font=('bold',20), foreground='dodger blue')
+        self.version_get = Label(self.description_frame, text="Checking updates..", foreground='deep sky blue')
         self.donate_button = Button(self.description_frame, text="Donate", command= lambda: self.open_link(donate_url))
         self.report_issue = Button(self.description_frame, text="Report issue", command= lambda: self.open_link(report_issue_url))
         # ------------ Layout ---------------
@@ -532,7 +532,8 @@ class PesGui:
         response = main.send_mail(
             sendgrid_api_key=self.sendgrid_api_key.get(),
             to_email=self.email_address.get(),
-            alt_content="helPES test mail confirmation"
+            alt_content="helPES test mail confirmation",
+            alt_subject="helPES mail test"
         )
 
         if response == 202:
@@ -729,7 +730,7 @@ Please double check - go to your team, filter players by costs you've chose in "
                 ver.close()
                 self.version_label['text'] = version
                 if str(version) != str(data['tag_name']):
-                    self.version_get['text'] = f'{data["tag_name"]} available!'
+                    self.version_get.config(cursor="hand2", text=f'{data["tag_name"]} available!')
                     global new_release_url
                     new_release_url = data["html_url"]
                 else:
