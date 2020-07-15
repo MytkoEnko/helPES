@@ -988,7 +988,35 @@ Please double check - go to your team, filter players by costs you've chose in "
     def do_shutdown(self):
         if self.mail_send_var.get():
             try:
-                main.send_mail(sendgrid_api_key=self.sendgrid_api_key.get(),
+                if self.run_status.get() == 'Done':
+                    main.logger.info("Sending statistics to email")
+                    send_stats = f'''
+<table style="font-weight:bold">
+  <tr>
+    <td>Games played:</td>
+    <td>{self.games_played_var.get()}</td>
+  </tr>
+  <tr>
+    <td>Players converted:</td>
+    <td>{self.players_runtime_var.get()}</td>
+  </tr>
+  <tr>
+    <td>GP balance:</td>
+    <td>{self.gp_balance_var.get()}</td>
+  </tr>
+  <tr>
+    <td>EXP trainers:</td>
+    <td>{self.exp_left_var.get()}</td>
+  </tr>
+</table>
+'''
+                    main.send_mail(sendgrid_api_key=self.sendgrid_api_key.get(),
+                                   to_email=self.email_address.get(),
+                                   file_path="logo.png",
+                                   alt_content=send_stats,
+                                   alt_subject="helPES script run is done")
+                else:
+                    main.send_mail(sendgrid_api_key=self.sendgrid_api_key.get(),
                           to_email=self.email_address.get())
             except:
                 messagebox.showinfo('Email not sent', message="Error occurred while trying to send email")

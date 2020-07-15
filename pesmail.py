@@ -20,8 +20,8 @@ def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png', send
     message = Mail(
         from_email='pes-python@dmytro.pl',
         to_emails=to_email,
-        subject=alt_subject + " " + str(date) if alt_subject else 'PES script hang mail ' + str(date),
-        html_content=alt_content if alt_content else f'<strong>Last 30 lines of pes-f.log</strong> <br> {body} <br> <img src="cid:my_content_id"></img>')
+        subject=alt_subject + " " + str(date) if alt_subject else 'helPES script hang mail ' + str(date),
+        html_content=alt_content + '<br> <img src="cid:my_content_id"></img>' if alt_content else f'<strong>Last 30 lines of helPES.log</strong> <br> {body} <br> <img src="cid:my_content_id"></img>')
 
     with open(file_path, 'rb') as f:
         data = f.read()
