@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import *
 import main
-import azure_vm
+import azure_vm as azure_virtual
 from tkinter import filedialog
 from tkinter import messagebox
 from PIL import ImageTk, Image
@@ -522,9 +522,9 @@ class PesGui:
 
     def test_azure(self):
         main.logger.info("VM test")
-        for key in azure_vm.azure_variables.keys():
-            azure_vm.azure_variables[key] = getattr(self, key).get()
-        response = azure_vm.azure_perform('check_vm')
+        for key in azure_virtual.azure_variables.keys():
+            azure_virtual.azure_variables[key] = getattr(self, key).get()
+        response = azure_virtual.azure_perform('check_vm')
         messagebox.showinfo('Vm test result', message=response)
 
     def test_email(self):
@@ -1002,9 +1002,9 @@ Please double check - go to your team, filter players by costs you've chose in "
         while self.shutdown_var.get():
             if sec_delay == 0:
                 if self.azure_vm_var.get():
-                    for key in azure_vm.azure_variables.keys():
-                        azure_vm.azure_variables[key] = getattr(self, key).get()
-                    azure_vm.azure_perform('stop_vm')
+                    for key in azure_virtual.azure_variables.keys():
+                        azure_virtual.azure_variables[key] = getattr(self, key).get()
+                    azure_virtual.azure_perform('stop_vm')
                 else:
                     os.system('shutdown -s')
             else:
@@ -1047,6 +1047,7 @@ Please double check - go to your team, filter players by costs you've chose in "
 
 gui = Tk(className=" helPES") #create instance
 ######################
-gui.geometry("800x550")
+gui.iconbitmap('favicon.ico')
+gui.geometry("870x615")
 p = PesGui(gui)
 gui.mainloop() # Run it

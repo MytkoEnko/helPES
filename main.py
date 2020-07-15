@@ -32,7 +32,7 @@ logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(levelname)s:%(asctime)s:%(funcName)20s() ]: %(message)s')
 
 # File handler - file name, format, level
-file_handler = logging.FileHandler('pes-f.log')
+file_handler = logging.FileHandler('helPES.log')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 

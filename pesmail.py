@@ -5,19 +5,22 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
 
 
-def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png', sendgrid_api_key='',to_email='', alt_content=''):
+def send_mail(date=datetime.utcnow(),file_path = 'shot/screen_to_mail.png', sendgrid_api_key='',to_email='', alt_content='',alt_subject=''):
 
-    with open("pes-f.log", 'r') as f:
-        data = f.readlines()
-    tail = data[-30:]
-    body = ''
-    for i in tail:
-        body += i + "<br>"
+    try:
+        with open("helPES.log", 'r') as f:
+            data = f.readlines()
+        tail = data[-30:]
+        body = ''
+        for i in tail:
+            body += i + "<br>"
+    except:
+        body = "Could not read logs"
 
     message = Mail(
         from_email='pes-python@dmytro.pl',
         to_emails=to_email,
-        subject='PES script hang mail ' + str(date),
+        subject=alt_subject + " " + str(date) if alt_subject else 'PES script hang mail ' + str(date),
         html_content=alt_content if alt_content else f'<strong>Last 30 lines of pes-f.log</strong> <br> {body} <br> <img src="cid:my_content_id"></img>')
 
     with open(file_path, 'rb') as f:
