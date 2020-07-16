@@ -383,12 +383,6 @@ def start_game():
         press_A()
     if isok('img/featured-players.JPG', 17):
         press_A()
-    # if isok('img/proceed-btn.JPG', 25):
-    #     press_A()
-    # if isok('img/no-new-updates.JPG', 25):
-    #     press_A()
-    # if isok('img/proceed-small.JPG', 120):
-    #     press_A()
 
     # TODO if auction then hope:
     if isok('img/auction-report.jpg', 10):
@@ -1037,7 +1031,6 @@ if args.custom:
     #         char for char in recognize('surname', '') if ord(char) < 128 and not char.isdigit() and not char == ' ')
     #     print(surname, i)
     # TODO post tasks:
-    # daily-bonus.JPG
     #
     #
     #pes_region.saveScreenCapture('./shot', 'screen_to_mail')
