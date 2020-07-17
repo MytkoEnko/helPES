@@ -399,14 +399,13 @@ def start_game():
 def team_change(squad):
     if base_ok(60):
         press_X()
-    if isok('img/squad-list.JPG', 60):
-        turn_down(squad)
-        time.sleep(1)
-        press_A()
-    global team_nr
-    team_nr = squad
-    logger.info('Team number changed to: %s', team_nr)
-    return
+        if isok('img/squad-list.JPG', 60):
+            turn_down(squad)
+            time.sleep(1)
+            press_A()
+        global team_nr
+        team_nr = squad
+        logger.info('Team number changed to: %s', team_nr)
 
 
 # Play one game and get back to base
@@ -448,95 +447,94 @@ def play_one(mode=''):
 
     if base_ok(30):
         turn_left(3)
-    # On sim game
-    if isok('img/sim-game.JPG', 30):
-        press_A()
-    # Sim match start
-    if isok('img/kickoff.JPG', 30):
-        press_A()
-    # Match started - switch to stat look
-    if isok('img/match-started.JPG', 160):
-        press_A()
-        #TODO find another way:
-        #pes_region.saveScreenCapture('./shot', 'test1')
-    if isok('img/skip-graphic.JPG', 120):
-        press_Y()
-        #if isok('img/skip-graphic.JPG', 10):
-        #   press_Y()
-    # Halftime - click ok to start new match
-    if isok('img/halftime.JPG', 650):
-        press_A()
-    if isok('img/second-half.JPG', 120):
-        press_A()
-    # Skip highlights 6' 6"
-    if isok('img/highlights.JPG', 820):
-        press_menu()
-        #if isok('img/fulltime.JPG',10):
-        #    press_A()
-        #else:
-        #    press_menu()
+        # On sim game
+        if isok('img/sim-game.JPG', 30):
+            press_A()
+        # Sim match start
+        if isok('img/kickoff.JPG', 30):
+            press_A()
+        # Match started - switch to stat look
+        if isok('img/match-started.JPG', 160):
+            press_A()
+            #TODO find another way:
+            #pes_region.saveScreenCapture('./shot', 'test1')
+        if isok('img/skip-graphic.JPG', 120):
+            press_Y()
+            #if isok('img/skip-graphic.JPG', 10):
+            #   press_Y()
+        # Halftime - click ok to start new match
+        if isok('img/halftime.JPG', 650):
+            press_A()
+        if isok('img/second-half.JPG', 120):
+            press_A()
+        # Skip highlights 6' 6"
+        if isok('img/highlights.JPG', 820):
+            press_menu()
+            #if isok('img/fulltime.JPG',10):
+            #    press_A()
+            #else:
+            #    press_menu()
 
-    # Experience
-    if isok('img/next-finish.JPG', 230):
-        press_A()
-    
-
-    # Experience points (press A twice to proceed)
-    if isok('img/experience.JPG', 30):
-        press_A()
-        time.sleep(0.8)
-        if isok('img/experience.JPG', 2):
+        # Experience
+        if isok('img/next-finish.JPG', 230):
             press_A()
 
-    # Level up
-    if isok('img/levelup.JPG', 20):
-        press_A()
 
-    # Changes rating
-    if isok('img/rating.JPG', 20):
-        press_A()
-
-    #TODO Find a way to recognize and write down reward (income) and spendings (expenses on contracts)
-    # Rewards
-    if isok('img/reward.JPG', 20):
-        press_A()
-
-    if isok('img/reward2.JPG', 20):
-        press_A()
-
-    #Update runtime contract duration variables
-    contract_m -= 1
-    if team_nr == 1:
-        contract_1 -= 1
-    elif team_nr == 2:
-        contract_2 -= 1
-
-    # Contract manager upd
-    if isok('img/contract-manager-upd.JPG', 160):
-        contract_renew()
-
-    if isok('img/contract-confirm1.JPG', 10):
-        if pes_gui and (mode == 'limited'):
-            contract_renew(True)
-            # Update team contract duration
-            if team_nr == 1:
-                contract_1 += 10
-            elif team_nr == 2:
-                contract_2 += 10
-
-        elif mode == 'standard':
-            if (team_nr == 1 and contract_1 == 0) or (team_nr == 2 and contract_2 == 0):
+        # Experience points (press A twice to proceed)
+        if isok('img/experience.JPG', 30):
+            press_A()
+            time.sleep(0.8)
+            if isok('img/experience.JPG', 2):
                 press_A()
-            else:
+
+        # Level up
+        if isok('img/levelup.JPG', 20):
+            press_A()
+
+        # Changes rating
+        if isok('img/rating.JPG', 20):
+            press_A()
+
+        #TODO Find a way to recognize and write down reward (income) and spendings (expenses on contracts)
+        # Rewards
+        if isok('img/reward.JPG', 20):
+            press_A()
+
+        if isok('img/reward2.JPG', 20):
+            press_A()
+
+        #Update runtime contract duration variables
+        contract_m -= 1
+        if team_nr == 1:
+            contract_1 -= 1
+        elif team_nr == 2:
+            contract_2 -= 1
+
+        # Contract manager upd
+        if isok('img/contract-manager-upd.JPG', 160):
+            contract_renew()
+
+        if isok('img/contract-confirm1.JPG', 10):
+            if pes_gui and (mode == 'limited'):
                 contract_renew(True)
+                # Update team contract duration
+                if team_nr == 1:
+                    contract_1 += 10
+                elif team_nr == 2:
+                    contract_2 += 10
 
-    # Confirm got back to club house
-    if base_ok(30):
-        global game_number
-        game_number += 1
-        logger.info('1 more game')
+            elif mode == 'standard':
+                if (team_nr == 1 and contract_1 == 0) or (team_nr == 2 and contract_2 == 0):
+                    press_A()
+                else:
+                    contract_renew(True)
 
-    return
+        # Confirm got back to club house
+        if base_ok(30):
+            global game_number
+            game_number += 1
+            logger.info('1 more game')
+
 
 
 
