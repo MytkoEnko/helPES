@@ -794,9 +794,8 @@ Please double check - go to your team, filter players by costs you've chose in "
             # Add play_one here
             main.play_one(mode)
 
-            self.home_stats_collect()
             main.logger.info(f'Numbers of games played: {i + 1}')
-            main.game_number += 1
+            self.home_stats_collect()
             main.error_count = 0
             main.team_change(1 if self.team1_contract_var.get() >= self.team2_contract_var.get() else 2)
             if main.gracefull_stop:
@@ -987,9 +986,10 @@ Please double check - go to your team, filter players by costs you've chose in "
                 self.label_script_status.config(foreground=color)
 
     def do_shutdown(self):
+        status = self.run_status.get()
         if self.mail_send_var.get():
             try:
-                if self.run_status.get() == 'Done':
+                if status == 'Done':
                     main.logger.info("Sending statistics to email")
                     send_stats = f'''
 <table style="font-weight:bold">
@@ -1016,6 +1016,8 @@ Please double check - go to your team, filter players by costs you've chose in "
                                    file_path="logo.png",
                                    alt_content=send_stats,
                                    alt_subject="helPES script run is done")
+                elif status == 'Aborted':
+                    pass
                 else:
                     main.send_mail(sendgrid_api_key=self.sendgrid_api_key.get(),
                           to_email=self.email_address.get())
@@ -1024,11 +1026,14 @@ Please double check - go to your team, filter players by costs you've chose in "
 
         sec_delay = int(self.delay_var.get() * 60)
         if self.shutdown_var.get():
-            main.logger.info(f'Shutting down after {self.delay_var.get()} minutes')
+            if status == 'Aborted':
+                main.logger.info('Auto-shutdown is selected but script was aborted manually, skipping shutdow')
+            else:
+                main.logger.info(f'Shutting down after {self.delay_var.get()} minutes')
         else:
             main.logger.info('Auto-shutdown not selected, computer stays on')
 
-        while self.shutdown_var.get():
+        while self.shutdown_var.get() and status in ['Done', 'Failed']:
             if sec_delay == 0:
                 if self.azure_vm_var.get():
                     for key in azure_virtual.azure_variables.keys():
