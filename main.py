@@ -181,7 +181,10 @@ areas = {
     'conv/15.JP': [701, 294, 242, 77],
     'conv/20.JP': [701, 294, 242, 77],
     'conv/25.JP': [701, 294, 242, 77],
-    'conv/30.JP': [701, 294, 242, 77]
+    'conv/30.JP': [701, 294, 242, 77],
+    'img/rating.JPG' : [471, 92, 361, 108],
+    'img/reward.JPG' : [395, 106, 508, 272],
+
 }
 error_count = 0
 # Team template
@@ -323,7 +326,7 @@ def base_ok(a=5):
 def locate(im_path):
     dupa = pes_region.exists(Pattern(im_path).similar(0.8), 5)
     #adjust = set_pes_frame()
-    print('Coordinates: ',dupa.getX()-pes_frame[0], dupa.getY()-pes_frame[1], dupa.getW(), dupa.getH())
+    print(f'Coordinates: {dupa.getX()-pes_frame[0]}, {dupa.getY()-pes_frame[1]}, {dupa.getW()}, {dupa.getH()}')
     dupa.highlight(1)
 
 # Playground
@@ -485,7 +488,7 @@ def play_one(mode=''):
             #else:
             #    press_menu()
 
-        # Experience
+        # Game ended
         if isok('img/next-finish.JPG', 230):
             press_A()
 
