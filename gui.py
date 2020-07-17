@@ -787,6 +787,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         real_games_to_play = max_games_to_play if int(max_games_to_play) <= int(games_number) else games_number
         self.games_to_play.set(real_games_to_play)
         for i in range(int(real_games_to_play) if mode == 'standard' else sco):
+            main.team_change(1 if self.team1_contract_var.get() >= self.team2_contract_var.get() else 2)
             if mode == 'standard':
                 if main.contract_1 == 0 and main.contract_2 == 0:
                     self.gui_shift_change()
@@ -797,7 +798,6 @@ Please double check - go to your team, filter players by costs you've chose in "
             main.logger.info(f'Numbers of games played: {i + 1}')
             self.home_stats_collect()
             main.error_count = 0
-            main.team_change(1 if self.team1_contract_var.get() >= self.team2_contract_var.get() else 2)
             if main.gracefull_stop:
                 break
 
@@ -872,9 +872,11 @@ Please double check - go to your team, filter players by costs you've chose in "
                 main.to_reserves()
                 main.turn_up(1)
                 if i + 1 == 1:
+                    main.team_nr = 1
                     main.contract_1 = int(main.recognize('contract_duration'))
                     main.logger.info('1\'st team contracts updated')
                 elif i + 1 == 2:
+                    main.team_nr = 2
                     main.contract_2 = int(main.recognize('contract_duration'))
                     main.logger.info('2\'nd team contracts updated')
                 main.turn_up(2)
