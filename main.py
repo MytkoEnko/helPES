@@ -12,6 +12,7 @@ from pytesseract import image_to_string as pytesseract_image_to_string, get_tess
 import argparse
 from cv2 import resize as cv2_resize
 from pesmail import send_mail
+from sys import exc_info
 
 # ---------------------------------------------- ARGUMENTS PARSING
 
@@ -347,16 +348,25 @@ def coordset(pes_xy, object_name):
 # Takes object name, checks it's relevant coordinates and recognizes value
 
 def recognize(object_name, conf_options='outputbase digits'):
-    if conf_options != 'outputbase digits':
-        conf_options = conf_options
-    elif spots[object_name][1] != '@':
-        conf_options = spots[object_name][1]
-    pict = Region(*coordset(pes_frame, object_name))
-    pict_size = (pict.getW()*3,pict.getH()*3)
-    image_value = pytesseract_image_to_string(cv2_resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
-    time.sleep(1)
-    #pict.highlight(1)
-    return image_value
+    try:
+        if conf_options != 'outputbase digits':
+            conf_options = conf_options
+        elif spots[object_name][1] != '@':
+            conf_options = spots[object_name][1]
+        pict = Region(*coordset(pes_frame, object_name))
+        pict_size = (pict.getW()*3,pict.getH()*3)
+        image_value = pytesseract_image_to_string(cv2_resize(pict.getBitmap(),pict_size), lang='equ+eng', config=conf_options)
+        time.sleep(1)
+        # pict.highlight(1)
+        return image_value
+    except:
+        logger.error(f'Could not recognize image: {exc_info()}')
+        global pes_region
+        pes_region = pes.window()
+        pes_region.saveScreenCapture('./shot', 'screen_to_mail')
+        return -1
+
+
 
 
 ###########################################################

@@ -8,7 +8,7 @@ from PIL import ImageTk, Image
 import os
 import threading
 import logging
-from sys import exc_info
+from main import exc_info
 from requests import get
 from webbrowser import open_new_tab
 
