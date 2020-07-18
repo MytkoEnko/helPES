@@ -278,9 +278,10 @@ def isok(img, seconds, similarity=0.89):
 
     # For specified images limit the area where "to look for"
     if img in areas.keys():
-        area_coord = areas[img].copy()
-        area_coord[0] += pes_region.getX()
-        area_coord[1] += pes_region.getY()
+        area_holder = areas[img].copy()
+        area_holder[0] += pes_region.getX()
+        area_holder[1] += pes_region.getY()
+        area_coord = Region(*area_holder)
     else:
         area_coord = pes_region
 
@@ -342,8 +343,8 @@ def coordset(pes_xy, object_name):
     obj_coordinates = spots[object_name][0].copy()
     # spots[object_name][0] = spots[object_name][0] + pes_xy[0]
     # spots[object_name][1] = spots[object_name][1] + pes_xy[1]
-    obj_coordinates[0] = obj_coordinates[0] + pes_xy[0]
-    obj_coordinates[1] = obj_coordinates[1] + pes_xy[1]
+    obj_coordinates[0] += pes_xy[0]
+    obj_coordinates[1] += pes_xy[1]
     logger.info('Object x=%s, y=%s, w=%s, h=%s', *obj_coordinates)
     return obj_coordinates
 
