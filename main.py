@@ -184,7 +184,12 @@ areas = {
     'conv/30.JP': [701, 294, 242, 77],
     'img/rating.JPG' : [471, 92, 361, 108],
     'img/reward.JPG' : [395, 106, 508, 272],
-
+    'img/press-button.jpg' : [144, 418, 445, 106],
+    'img/this-week-pick-up.JPG' : [243, 33, 442, 107],
+    'img/game-screen.JPG' : [11, 36, 355, 142],
+    'img/myclub-enter.JPG': [11, 36, 355, 142],
+    'img/sure-start.JPG' : [19, 226, 461, 141],
+    'img/proceed.JPG' : [9, 676, 552, 75]
 }
 error_count = 0
 # Team template
@@ -383,8 +388,6 @@ def start_game():
     pes.focus()
     if isok('img/press-button.jpg', 180):
         press_A()
-    if isok('img/online-confirm.jpg', 25) or isok('img/no-new-updates.JPG', 20):
-        press_A()
     if isok('img/this-week-pick-up.JPG', 30):
         press_B()
     if isok('img/game-screen.JPG', 30, 0.7):
@@ -393,20 +396,28 @@ def start_game():
         press_A()
         if isok('img/sure-start.JPG', 15):
             press_A()
-    if isok('img/live-update.JPG', 17):
-        press_A()
-    if isok('img/featured-players.JPG', 17):
-        press_A()
-
-    # TODO if auction then hope:
-    if isok('img/auction-report.jpg', 10):
-        press_A()
-        if isok('img/big-ok.JPG', 15):
+    # Proceed to home
+    while True:
+        if isok('img/proceed.JPG', 3):
             press_A()
-    # Loaded successfully
-    if base_ok(20):
-        logger.info("Game started successfully, logged in to game, can proceed with scripts")
-    return
+        if base_ok(2):
+            logger.info("Game started successfully, logged in to game, can proceed with scripts")
+            break
+        else:
+            global error_count
+            error_count = 0
+    # # TODO test more scenarios and remove:
+    # if isok('img/live-update.JPG', 17):
+    #     press_A()
+    # if isok('img/featured-players.JPG', 17):
+    #     press_A()
+    # if isok('img/online-confirm.jpg', 25) or isok('img/no-new-updates.JPG', 20):
+    #     press_A()
+
+    # if isok('img/auction-report.jpg', 10):
+    #     press_A()
+    #     if isok('img/big-ok.JPG', 15):
+    #         press_A()
 
 
 # Change team and get back to base
