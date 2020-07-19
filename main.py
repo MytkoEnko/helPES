@@ -189,7 +189,15 @@ areas = {
     'img/game-screen.JPG' : [11, 36, 355, 142],
     'img/myclub-enter.JPG': [11, 36, 355, 142],
     'img/sure-start.JPG' : [19, 226, 461, 141],
-    'img/proceed.JPG' : [9, 676, 552, 75]
+    'img/proceed.JPG' : [9, 676, 552, 75],
+    'img/club-house.JPG' : [296, 653, 260, 98],
+    'img/sim-game.JPG' : [85, 102, 450, 574],
+    'img/kickoff.JPG' : [496, 595, 311, 127],
+    'img/skip-graphic.JPG' : [971, 68, 295, 128],
+    'img/highlights.JPG' : [11, 34, 530, 287],
+    'img/next-finish.JPG' : [487, 532, 330, 175],
+    'img/contract-manager-upd.JPG' : [420, 72, 503, 122],
+    'img/game-proceed.JPG' : [11, 657, 316, 96],
 }
 error_count = 0
 # Team template
@@ -296,7 +304,7 @@ def isok(img, seconds, similarity=0.89):
 
     if area_coord.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
-        #pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
+        pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
         logger.debug('%s match found', img)
         return True
     else:
@@ -479,54 +487,31 @@ def play_one(mode=''):
         if isok('img/kickoff.JPG', 30):
             press_A()
         # Match started - switch to stat look
-        if isok('img/match-started.JPG', 160):
-            press_A()
-            #TODO find another way:
-            #pes_region.saveScreenCapture('./shot', 'test1')
         if isok('img/skip-graphic.JPG', 120):
             press_Y()
             #if isok('img/skip-graphic.JPG', 10):
             #   press_Y()
-        # Halftime - click ok to start new match
-        if isok('img/halftime.JPG', 650):
+        time.sleep(200)
+        if isok('img/next-finish.JPG', 320):
             press_A()
-        if isok('img/second-half.JPG', 120):
-            press_A()
+
         # Skip highlights 6' 6"
-        if isok('img/highlights.JPG', 820):
+        time.sleep(200)
+        if isok('img/highlights.JPG', 620):
             press_menu()
             #if isok('img/fulltime.JPG',10):
             #    press_A()
             #else:
             #    press_menu()
 
-        # Game ended
+        # Proceed to contracts:
         if isok('img/next-finish.JPG', 230):
             press_A()
-
-
-        # Experience points (press A twice to proceed)
-        if isok('img/experience.JPG', 30):
-            press_A()
-            time.sleep(0.8)
-            if isok('img/experience.JPG', 2):
+        while True:
+            if isok('img/game-proceed.JPG', 2) and not isok('img/contract-manager-upd.JPG', 0.5):
                 press_A()
-
-        # Level up
-        if isok('img/levelup.JPG', 20):
-            press_A()
-
-        # Changes rating
-        if isok('img/rating.JPG', 20):
-            press_A()
-
-        #TODO Find a way to recognize and write down reward (income) and spendings (expenses on contracts)
-        # Rewards
-        if isok('img/reward.JPG', 20):
-            press_A()
-
-        if isok('img/reward2.JPG', 20):
-            press_A()
+            elif isok('img/contract-manager-upd.JPG', 1):
+                break
 
         #Update runtime contract duration variables
         contract_m -= 1
@@ -539,7 +524,7 @@ def play_one(mode=''):
         if isok('img/contract-manager-upd.JPG', 160):
             contract_renew()
 
-        if isok('img/contract-confirm1.JPG', 10):
+        if isok('img/contract-confirm1.JPG', 5):
             if pes_gui and (mode == 'limited'):
                 contract_renew(True)
                 # Update team contract duration
