@@ -820,6 +820,9 @@ Please double check - go to your team, filter players by costs you've chose in "
     def gui_shift_change(self, team=12):
         main.sign_all(self.sign_skip.get())
         main.smart_players_convert(which_teams=team)
+        main.contract_1 = 10
+        main.contract_2 = 10
+        #self.initial_stats_collect()
 
     def home_stats_collect(self):
         #main.initialize_pes()
