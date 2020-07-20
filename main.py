@@ -247,7 +247,7 @@ def press_Y():
     return
 
 def press_menu():
-    simulate_button(Key.SHIFT, 0.6)
+    simulate_button(Key.MINUS, 0.6)
     return
 
 def press_rs():
@@ -305,7 +305,7 @@ def isok(img, seconds, similarity=0.89):
 
     if area_coord.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
-        pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
+        #pes_region.exists(Pattern(img).similar(similarity), seconds).highlight(1)
         logger.debug('%s match found', img)
         return True
     else:
@@ -413,7 +413,7 @@ def start_game():
                     break
     # Proceed to home
     while True:
-        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 1):
+        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 3):
             press_A()
         elif base_ok(2):
             logger.info("Game started successfully, logged in to game, can proceed with scripts")
@@ -979,15 +979,16 @@ def convert_all_perform():
             time.sleep(0.5)
             to_reserves()
             while True:
+                if isok('conv/no_players_left.JPG', 0.5):
+                    press_A()
+                    while not base_ok(2):
+                        error_count -= 10
+                        press_B()
+                    break
                 press_A()
                 # Use filter
                 time.sleep(0.5)
                 if isok('conv/reserves-list.JPG',1):
-                    if isok('conv/no_players_left.JPG',0.5):
-                        press_A()
-                        while not base_ok(2):
-                            press_B()
-                        break
                     press_rs()
                     time.sleep(0.5)
                     turn_down(2)
