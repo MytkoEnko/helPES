@@ -2,7 +2,7 @@ dummy/
 .idea/
 __pycache__/
 venv/
-pes-f.log
+helPES.log
 test2.log
 games_played.txt
 shot/screen_to_mail.png
