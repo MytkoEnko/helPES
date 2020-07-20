@@ -198,6 +198,7 @@ areas = {
     'img/next-finish.JPG' : [487, 532, 330, 175],
     'img/contract-manager-upd.JPG' : [420, 72, 503, 122],
     'img/game-proceed.JPG' : [11, 657, 316, 96],
+    'img/ok.JPG' : [164, 377, 999, 299],
 }
 error_count = 0
 # Team template
@@ -392,28 +393,31 @@ def recognize(object_name, conf_options='outputbase digits'):
 
 # Start game and go to "Club house" which is base point of the game
 def start_game():
+    global error_count
     logger.info('Starting interaction with %s', pes.getName())
     pes.focus()
     if isok('img/press-button.jpg', 180):
         press_A()
-    if isok('img/this-week-pick-up.JPG', 30):
-        press_B()
-    if isok('img/game-screen.JPG', 30, 0.7):
-        turn_down(1)
-    if isok('img/myclub-enter.JPG', 60, 0.7):
-        press_A()
-        if isok('img/sure-start.JPG', 15):
+    while True:
+        error_count = 0
+        if isok('img/this-week-pick-up.JPG', 2):
+            press_B()
+        elif isok('img/ok.JPG',2):
             press_A()
+        elif isok('img/game-screen.JPG', 2, 0.7):
+            turn_down(1)
+            if isok('img/myclub-enter.JPG', 1, 0.7):
+                press_A()
+                if isok('img/sure-start.JPG', 15):
+                    press_A()
+                    break
     # Proceed to home
     while True:
-        if isok('img/proceed.JPG', 3):
+        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 1):
             press_A()
-        if base_ok(2):
+        elif base_ok(2):
             logger.info("Game started successfully, logged in to game, can proceed with scripts")
             break
-        else:
-            global error_count
-            error_count = 0
     # # TODO test more scenarios and remove:
     # if isok('img/live-update.JPG', 17):
     #     press_A()
