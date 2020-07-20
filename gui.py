@@ -814,6 +814,9 @@ Please double check - go to your team, filter players by costs you've chose in "
         main.initialize_pes()
         if main.base_ok():
             main.logger.info('Game is on, no need to start')
+        elif main.pes.isRunning(1):
+            main.logger.error('Game is on, but "cursor" is not on "Squad Management", can\'t proceed. Failing.')
+            main.error_count += 30
         else:
             main.start_game()
 
