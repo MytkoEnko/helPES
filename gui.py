@@ -16,6 +16,7 @@ pes_config = main.pes_config
 new_release_url = 'https://github.com/MytkoEnko/helPES/releases/latest'
 report_issue_url = 'https://github.com/MytkoEnko/helPES/issues'
 donate_url = 'https://www.patreon.com/helPES'
+patreon_campaign_url = 'https://www.patreon.com/api/campaigns/4955126'
 paypal_url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7DH8PG4ERBPJS&source=url'
 twitter_url = 'https://twitter.com/helPESSS'
 
@@ -45,6 +46,7 @@ class PesGui:
         # ----------- Description ----------
         self.description_frame = LabelFrame(self.top_section, text="About")
         self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual it the first place.")
+        self.patreon = Label(self.description_frame,justify=CENTER, text="If you like it - support this project on Patreon")
         self.version_label = Label(self.description_frame, text="Checking version..", font=('bold',20), foreground='dodger blue')
         self.version_get = Label(self.description_frame, text="Checking updates..", foreground='deep sky blue')
         self.donate_button = Button(self.description_frame, text="Patreon", command= lambda: self.open_link(donate_url), style="Donate.TButton")
@@ -53,7 +55,8 @@ class PesGui:
         self.top_section.pack(side=TOP, fill=X)
         self.logo.pack(side=LEFT, fill=Y)
         self.description_frame.pack(side=LEFT, fill=BOTH)#, expand=YES)
-        self.description.grid(row=0, column=0, sticky=W, pady=4, padx=2, rowspan=3)
+        self.description.grid(row=0, column=0, sticky=W, pady=4, padx=3, rowspan=1)
+        self.patreon.grid(row=2, column=0, pady=4, padx=2, rowspan=2)
         self.version_label.grid(row=0, column=2, columnspan=2)
         self.version_get.grid(row=1, column=2, columnspan=2)
         self.donate_button.grid(row=2, column=2, padx=(10,10), pady=(5,5))
@@ -529,6 +532,7 @@ class PesGui:
         self.use_shutdown()
         self.use_convert_all()
         self.get_version()
+        self.gather_patreon()
 
 
 
@@ -751,6 +755,14 @@ Please double check - go to your team, filter players by costs you've chose in "
                     self.version_get['text'] = 'Latest version'
         except:
             main.logger.error(f'Could not check version: {exc_info()}')
+
+    def gather_patreon(self):
+        try:
+            response = get(patreon_campaign_url)
+            data = response.json()['data']['attributes']
+            self.patreon['text'] = self.patreon['text'] + f'\n{data["patron_count"]} patrons support us with {round(data["pledge_sum"] / 100)} {data["currency"]}/month'
+        except:
+            print(f'Could not check version: {exc_info()}')
 
     def open_link(self, url):
         open_new_tab(url)
@@ -1105,6 +1117,6 @@ gui = Tk(className=" helPES") #create instance
 ######################
 gui.iconbitmap('favicon.ico')
 gui.geometry("875x675")
-gui.resizable(False,False)
+#gui.resizable(False,False)
 p = PesGui(gui)
 gui.mainloop() # Run it
