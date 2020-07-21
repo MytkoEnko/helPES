@@ -23,6 +23,15 @@ class PesGui:
         global pes_config
         main.pes_gui = True
 
+        # ================== Style =======================
+        style = Style()
+        primary_blue = 'dodger blue'
+        primary_pink = 'deep pink'
+        lb_wrapper_settings = dict(pady=3, padx=3, ipadx=4, ipady=4)
+        style.configure("Start.TButton", padding=4, relief="flat", foreground=primary_blue)
+        style.configure("Donate.TButton", padding=4, relief="flat", foreground=primary_pink)
+        style.configure("TLabelframe.Label", foreground=primary_blue)
+
         # ================== Top section =====================
 
         self.top_section = Frame(master)
@@ -36,7 +45,7 @@ class PesGui:
         self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual it the first place.")
         self.version_label = Label(self.description_frame, text="Checking version..", font=('bold',20), foreground='dodger blue')
         self.version_get = Label(self.description_frame, text="Checking updates..", foreground='deep sky blue')
-        self.donate_button = Button(self.description_frame, text="Donate", command= lambda: self.open_link(donate_url))
+        self.donate_button = Button(self.description_frame, text="Donate", command= lambda: self.open_link(donate_url), style="Donate.TButton")
         self.report_issue = Button(self.description_frame, text="Report issue", command= lambda: self.open_link(report_issue_url))
         # ------------ Layout ---------------
         self.top_section.pack(side=TOP, fill=X)
@@ -81,9 +90,9 @@ class PesGui:
         self.pes_settings = LabelFrame(self.midwrap, text="Settings")
 
         self.midwrap.pack(side=TOP, fill=X)
-        self.pes_settings.pack(side=RIGHT, fill=Y)
-        self.stats.pack(side=TOP, fill=X)
-        self.actions.pack(side=TOP, fill=X)
+        self.pes_settings.pack(side=RIGHT, fill=Y, **lb_wrapper_settings)
+        self.stats.pack(side=TOP, fill=X, **lb_wrapper_settings)
+        self.actions.pack(side=TOP, fill=X, **lb_wrapper_settings)
 
         # ----------- Stats ------------
 
@@ -118,11 +127,11 @@ class PesGui:
         self.players_t = Entry(self.stats, **stats_entry, textvariable=self.players_total_var)
         self.exp = Entry(self.stats, **stats_entry, textvariable=self.exp_left_var)
 
-        self.games_r.grid(row=0, column=1)
-        self.games_t.grid(row=0, column=3)
-        self.players_r.grid(row=1, column=1)
-        self.players_t.grid(row=1, column=3)
-        self.exp.grid(row=2, column=1)
+        self.games_r.grid(row=0, column=1, **stats_labels)
+        self.games_t.grid(row=0, column=3, **stats_labels)
+        self.players_r.grid(row=1, column=1, **stats_labels)
+        self.players_t.grid(row=1, column=3, **stats_labels)
+        self.exp.grid(row=2, column=1, **stats_labels)
 
         #----------- Actions --------------
 
@@ -155,13 +164,13 @@ class PesGui:
         self.t2_pop = Checkbutton(self.actions, text="populate team", variable=self.team2_populate)
         self.conv_a = Checkbutton(self.actions, text="convert all players (of max cost -> settings)", variable=self.convert_all, command=self.use_convert_all)
         self.sign_a = Checkbutton(self.actions, text="sign scouts", variable=self.sign_all)
-        self.perform = Button(self.actions, text="Perform", command= lambda: self.start(actions=True))
+        self.perform = Button(self.actions, text="Perform", command= lambda: self.start(actions=True), style="Start.TButton")
 
         self.t1_con.grid(row=0, column=2, **actions_label_args)
         self.t1_pop.grid(row=0, column=3, **actions_label_args)
         self.t2_con.grid(row=1, column=2, **actions_label_args)
         self.t2_pop.grid(row=1, column=3, **actions_label_args)
-        Separator(self.actions, orient=HORIZONTAL).grid(row=2,sticky="ew",columnspan=4)
+        Separator(self.actions, orient=HORIZONTAL).grid(row=2,sticky="ew",columnspan=4, padx=3)
         self.conv_a.grid(row=3, column=2, columnspan=2, **actions_label_args)
         self.sign_a.grid(row=4, column=2, **actions_label_args)
         self.perform.grid(row=4, column=3, **actions_label_args)
@@ -205,7 +214,7 @@ class PesGui:
 
         self.mail_send = Checkbutton(self.pes_settings, text="Send email when script crashes or completes", variable=self.mail_send_var, command=self.use_mail)
         self.azure_vm = Checkbutton(self.pes_settings, text="Run on azure vm (see documentation)", variable=self.azure_vm_var, command=self.use_azure)
-        self.shutdown = Checkbutton(self.pes_settings, text="Shutdown PC/VM when script ends/completes, delay minutes: ", variable=self.shutdown_var, command=self.use_shutdown)
+        self.shutdown = Checkbutton(self.pes_settings, text="Shutdown when completes or fails, delay minutes: ", variable=self.shutdown_var, command=self.use_shutdown)
 
 
         self.label_sendgrid = Label(self.pes_settings, text="sendgrid_token")
@@ -245,15 +254,16 @@ class PesGui:
         self.sign_a_skip = Entry(self.pes_settings, textvariable=self.sign_skip, justify=RIGHT, width=4)
         # Grid layout
         settings_lables = dict(sticky=E, pady=1, padx=4)
+        settings_checkboxes = dict(padx=4, pady=2)
 
-        self.mail_send.grid(column=1,row=1, columnspan=5, stick=W)
+        self.mail_send.grid(column=1,row=1, columnspan=5, stick=W, **settings_checkboxes)
         self.email_test.grid(column=4, row=1, stick=E)
         self.label_sendgrid.grid(column=2, row=2, **settings_lables)
         self.label_mail.grid(column=2, row=3, **settings_lables)
         self.sendgrid_token.grid(column=3, row=2, columnspan=2)
         self.email_addr.grid(column=3, row=3, columnspan=2)
 
-        self.azure_vm.grid(column=1,row=4, columnspan=5, stick=W)
+        self.azure_vm.grid(column=1,row=4, columnspan=5, stick=W, **settings_checkboxes)
         self.azure_test.grid(column=4, row=4, stick=E)
         self.label_client_id.grid(column=2, row=5, **settings_lables)
         self.label_secret.grid(column=2, row=6, **settings_lables)
@@ -268,16 +278,16 @@ class PesGui:
         self.az_resource_name.grid(column=3, row=9, columnspan=2)
         self.az_vm.grid(column=3, row=10, columnspan=2)
 
-        Separator(self.pes_settings, orient=HORIZONTAL).grid(row=11, sticky="ew", columnspan=5)
+        Separator(self.pes_settings, orient=HORIZONTAL).grid(row=11, sticky="ew", columnspan=5, pady=5, padx=3)
 
-        self.label_players_cost.grid(column=1, row=12, columnspan=2, stick=W)
+        self.label_players_cost.grid(column=1, row=12, columnspan=2, stick=W, **settings_checkboxes)
         self.players_cost_select.grid(column=4, row=12)
 
-        self.shutdown.grid(column=1,row=13, columnspan=4, stick=W)
-        self.shutdown_delay.grid(column=5, row=13)
+        self.shutdown.grid(column=1,row=13, columnspan=4, stick=W, **settings_checkboxes)
+        self.shutdown_delay.grid(column=4, row=13)
 
-        self.label_sign_skip.grid(column=1, row=14, columnspan=2, stick=W)
-        self.sign_a_skip.grid(column=3, row=14, sticky=W)
+        self.label_sign_skip.grid(column=1, row=14, columnspan=2, stick=W, **settings_checkboxes)
+        self.sign_a_skip.grid(column=3, row=14, sticky=W, **settings_checkboxes)
 
         # Update default main vars from saved and Combobox bind callback
         def main_var_update(event):
@@ -293,8 +303,8 @@ class PesGui:
         self.checks = LabelFrame(self.botwrap, text="Checks")
 
         self.botwrap.pack(side=TOP, fill=X)
-        self.modes.pack(side=LEFT, fill=Y)
-        self.checks.pack(side=TOP, fill=X)
+        self.modes.pack(side=LEFT, fill=Y, **lb_wrapper_settings)
+        self.checks.pack(side=TOP, fill=X, **lb_wrapper_settings)
 
         # --------- Modes -------------
         #variables
@@ -355,7 +365,7 @@ class PesGui:
 
 
         # -------- Run / quit buttons
-        self.start_button = Button(self.botwrap, text="Start", command=self.start)
+        self.start_button = Button(self.botwrap, text="Start", command=self.start, style="Start.TButton")
         self.start_button.pack(side=LEFT, padx=2, pady=2)
         self.quit_button = Button(self.botwrap, text="Quit", command=self.frame.quit)
         self.quit_button.pack(side=LEFT, padx=2, pady=2)
@@ -379,9 +389,9 @@ class PesGui:
 
 
         self.runwrap.pack(side=TOP, fill=X)
-        self.runstats.pack(side=TOP, fill=X)
+        self.runstats.pack(side=TOP, fill=X, **lb_wrapper_settings)
         self.logs.pack(side=TOP, fill=X)
-        self.controls.pack(side=TOP, fill=X)
+        self.controls.pack(side=TOP, fill=X, **lb_wrapper_settings)
 
         # ---------- PLay stats ----------
 
@@ -429,7 +439,7 @@ class PesGui:
         self.label_team_contract.grid(row=2, column=4, **pl_stats_labels)
         self.label_manager_stat.grid(row=1, column=7, **pl_stats_labels)
         self.label_gp_balance.grid(row=2, column=7, **pl_stats_labels)
-        self.label_script_status.grid(row=1, rowspan=2, column=10)
+        self.label_script_status.grid(row=1, rowspan=2, column=10, columnspan=2, padx=50)
 
         self.games_played.grid(row=1, column=2)
         self.games_planned.grid(row=1, column=3)
@@ -443,7 +453,7 @@ class PesGui:
 
 
         # ----------- LOGS -------------
-        self.logs = Text(self.logs, background="black", foreground='white', height=18)
+        self.logs = Text(self.logs, background="black", foreground='white', height=20)
         self.logs.insert(END,'''
  /$$                 /$$ /$$$$$$$  /$$$$$$$$  /$$$$$$ 
 | $$                | $$| $$__  $$| $$_____/ /$$__  $$
@@ -1090,6 +1100,7 @@ Please double check - go to your team, filter players by costs you've chose in "
 gui = Tk(className=" helPES") #create instance
 ######################
 gui.iconbitmap('favicon.ico')
-gui.geometry("870x615")
+gui.geometry("875x665")
+gui.resizable(False,False)
 p = PesGui(gui)
 gui.mainloop() # Run it
