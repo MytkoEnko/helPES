@@ -7,3 +7,5 @@ test2.log
 games_played.txt
 shot/screen_to_mail.png
 configuration.json
+*.log
+version

@@ -45,7 +45,7 @@ class PesGui:
         self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual it the first place.")
         self.version_label = Label(self.description_frame, text="Checking version..", font=('bold',20), foreground='dodger blue')
         self.version_get = Label(self.description_frame, text="Checking updates..", foreground='deep sky blue')
-        self.donate_button = Button(self.description_frame, text="Donate", command= lambda: self.open_link(donate_url), style="Donate.TButton")
+        self.donate_button = Button(self.description_frame, text="Patreon", command= lambda: self.open_link(donate_url), style="Donate.TButton")
         self.report_issue = Button(self.description_frame, text="Report issue", command= lambda: self.open_link(report_issue_url))
         # ------------ Layout ---------------
         self.top_section.pack(side=TOP, fill=X)
@@ -1100,7 +1100,7 @@ Please double check - go to your team, filter players by costs you've chose in "
 gui = Tk(className=" helPES") #create instance
 ######################
 gui.iconbitmap('favicon.ico')
-gui.geometry("875x665")
+gui.geometry("875x675")
 gui.resizable(False,False)
 p = PesGui(gui)
 gui.mainloop() # Run it
