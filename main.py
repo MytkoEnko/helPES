@@ -199,6 +199,7 @@ areas = {
     'img/contract-manager-upd.JPG' : [420, 72, 503, 122],
     'img/game-proceed.JPG' : [11, 657, 316, 96],
     'img/ok.JPG' : [164, 377, 999, 299],
+    'img/coins.JPG' : [1085, 59, 50, 42],
 }
 error_count = 0
 # Team template
@@ -328,11 +329,11 @@ def proceed(a, b):
 def base_ok(a=5):
     global error_count
     if isok('img/club-house.JPG', a):
-        logger.info('On home menu')
+        logger.info('On "Club House" menu')
         error_count = 0
         return True
     else:
-        logger.error('Not on home base, can\' proceed')
+        logger.error('Not on "Club House", can\' proceed')
         error_count +=13
         return False
 
@@ -398,6 +399,7 @@ def start_game():
     pes.focus()
     if isok('img/press-button.jpg', 180):
         press_A()
+        time.sleep(20)
     while True:
         error_count = 0
         if isok('img/this-week-pick-up.JPG', 2):
@@ -413,24 +415,12 @@ def start_game():
                     break
     # Proceed to home
     while True:
+        error_count = 0
         if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 3):
             press_A()
         elif base_ok(2):
             logger.info("Game started successfully, logged in to game, can proceed with scripts")
             break
-    # # TODO test more scenarios and remove:
-    # if isok('img/live-update.JPG', 17):
-    #     press_A()
-    # if isok('img/featured-players.JPG', 17):
-    #     press_A()
-    # if isok('img/online-confirm.jpg', 25) or isok('img/no-new-updates.JPG', 20):
-    #     press_A()
-
-    # if isok('img/auction-report.jpg', 10):
-    #     press_A()
-    #     if isok('img/big-ok.JPG', 15):
-    #         press_A()
-
 
 # Change team and get back to base
 def team_change(squad):

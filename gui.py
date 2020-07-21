@@ -84,7 +84,7 @@ class PesGui:
         self.support_menu = Menu(self.menu, tearoff=False)
         support = self.support_menu
         self.menu.add_cascade(label="Support", menu=support)
-        support.add_command(label="Become patron on Patrinite", command= lambda: self.open_link(donate_url))
+        support.add_command(label="Become patron on Patreon", command= lambda: self.open_link(donate_url))
         support.add_command(label="Donate with PayPal", command= lambda: self.open_link(paypal_url))
         support.add_command(label="Discuss on Twitter", command= lambda: self.open_link(twitter_url))
 
@@ -840,11 +840,12 @@ Please double check - go to your team, filter players by costs you've chose in "
         main.initialize_pes()
         if main.base_ok():
             main.logger.info('Game is on, no need to start')
-        elif main.pes.isRunning(1):
-            main.logger.error('Game is on, but "cursor" is not on "Squad Management", can\'t proceed. Failing.')
-            main.error_count += 30
         else:
-            main.start_game()
+            if main.isok('img/coins.JPG',2):
+                main.logger.error('Game is on, but we are not on "Club House", aborting.')
+                sys.exit()
+            else:
+                main.start_game()
 
     def gui_shift_change(self, team=12):
         main.sign_all(self.sign_skip.get())
@@ -1117,6 +1118,6 @@ gui = Tk(className=" helPES") #create instance
 ######################
 gui.iconbitmap('favicon.ico')
 gui.geometry("875x675")
-#gui.resizable(False,False)
+gui.resizable(False,False)
 p = PesGui(gui)
 gui.mainloop() # Run it
