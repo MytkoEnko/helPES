@@ -13,9 +13,11 @@ from requests import get
 from webbrowser import open_new_tab
 
 pes_config = main.pes_config
-new_release_url = 'https://github.com/MytkoEnko/helPES//releases/latest'
+new_release_url = 'https://github.com/MytkoEnko/helPES/releases/latest'
 report_issue_url = 'https://github.com/MytkoEnko/helPES/issues'
-donate_url = 'https://twitter.com/mytko_enko'
+donate_url = 'https://www.patreon.com/helPES'
+paypal_url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7DH8PG4ERBPJS&source=url'
+twitter_url = 'https://twitter.com/helPESSS'
 
 
 class PesGui:
@@ -67,19 +69,21 @@ class PesGui:
         menu = self.menu
         master.config(menu=menu) #point menu to created menu
 
-        self.sub_menu = Menu(menu) # declare submenu (also menu
+        self.sub_menu = Menu(self.menu, tearoff=False) # declare submenu (also menu
         submenu = self.sub_menu
         self.menu.add_cascade(label="Edit", menu=submenu) # Make menu expandable, it's objects are sub_menu
-        submenu.add_command(label="home_stats_cllect", command=self.home_stats_collect)
-        submenu.add_command(label="initial_stats_collect", command=self.initial_stats_collect)
+        # submenu.add_command(label="home_stats_cllect", command=self.home_stats_collect)
+        # submenu.add_command(label="initial_stats_collect", command=self.initial_stats_collect)
         submenu.add_separator()
         submenu.add_command(label="Exit", command=self.frame.quit)
 
         #support menu
-        self.support_menu = Menu(self.menu)
+        self.support_menu = Menu(self.menu, tearoff=False)
         support = self.support_menu
         self.menu.add_cascade(label="Support", menu=support)
-        support.add_command(label="Donate", command=self.print_message)
+        support.add_command(label="Become patron on Patrinite", command= lambda: self.open_link(donate_url))
+        support.add_command(label="Donate with PayPal", command= lambda: self.open_link(paypal_url))
+        support.add_command(label="Discuss on Twitter", command= lambda: self.open_link(twitter_url))
 
 
         # =============== Middle section ===============
