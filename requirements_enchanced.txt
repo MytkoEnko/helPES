@@ -1,3 +1,0 @@
-sendgrid
-azure-common
-azure-mgmt-compute
