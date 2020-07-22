@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['C:/Users/Dmytro-pc/PycharmProjects/helPES/gui.py'],
-             pathex=['C:\\Users\\Dmytro-pc\\PycharmProjects\\helPES'],
+a = Analysis(['C:/Users/Dmytro-pc/PycharmProjects/test_helPES/helPES/gui.py'],
+             pathex=['C:\\Users\\Dmytro-pc\\PycharmProjects\\test_helPES\\helPES'],
              binaries=[],
              datas=[
                 ('./conv', 'conv/'),
@@ -15,6 +15,9 @@ a = Analysis(['C:/Users/Dmytro-pc/PycharmProjects/helPES/gui.py'],
                 ('./main.py', '.'),
                 ('./pesmail.py', '.'),
                 ('./logo.png', '.'),
+		('./version', '.'),
+		('./favicon.ico', '.'),
+		('./README.md', '.'),
                 ('./template-configuration.json', '.'),
                 ('./template-team.json', '.'),
                 ('./settings.dat', '.')],
@@ -32,12 +35,14 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='gui',
+          name='helPES',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
+          console=False,
+	  version='file_version_info.txt',
+	  icon='favicon.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -45,4 +50,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='gui')
+               name='helPES')
