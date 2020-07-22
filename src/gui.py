@@ -738,7 +738,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.frame.pack(fill=BOTH, padx=4, pady=1)
 
     def get_version(self):
-        url = 'https://api.github.com/repos/tesseract-ocr/tesseract/releases/latest'
+        url = 'https://api.github.com/repos/MytkoEnko/helPES/releases/latest'
         headers = {'content_type': 'application/json'}
         try:
             response = get(url, headers=headers)

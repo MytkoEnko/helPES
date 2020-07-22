@@ -2,7 +2,7 @@
 
 ### This application automates some Pro Evolution Soccer (PES) routines in myClub
 
-![helPES logo](./logo.png "Anna Berkowska's helPES logo")
+![helPES logo](src/logo.png "Anna Berkowska's helPES logo")
 -----
 ### Features:
 - Sign your scouts (with possibility to skip first n)
