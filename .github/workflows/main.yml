@@ -1,0 +1,85 @@
+name: Build helPES
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+
+jobs:
+
+  build:
+
+    env:
+      reponame: ${{ github.event.repository.name }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Prepare version file
+      run: |
+        cd src/
+        python3 prepare_version_file.py
+
+
+    - name: Package Application
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: src
+
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: pes
+#        path: src/dist/windows
+
+    - name: Set variables
+      run: |
+        APP_V="${GITHUB_REF##*/}"
+        APP_N=$reponame-$APP_V
+        echo "::set-env name=app_name::$APP_N"
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - first change
+          - second change
+        draft: true
+        prerelease: false
+
+#    - name: Upload Release Asset
+#      id: upload-release-asset
+#      uses: actions/upload-release-asset@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#        asset_path: src/dist/windows/main.exe
+#        asset_name: ${{ env.app_name }}.exe
+#        asset_content_type: application/octet-stream
+
+    - name: Create archive
+      run: |
+        cd src/dist/windows
+        zip -r ${{ env.app_name }}.zip .
+
+    - name: Upload archive
+      id: upload_release_asset_archive
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: src/dist/windows/${{ env.app_name }}.zip
+        asset_name: ${{ env.app_name }}.zip
+        asset_content_type: application/zip
