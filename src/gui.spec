@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['C:/Users/Dmytro-pc/PycharmProjects/test_helPES/helPES/gui.py'],
-             pathex=['C:\\Users\\Dmytro-pc\\PycharmProjects\\test_helPES\\helPES'],
+a = Analysis(['gui.py'],
+             pathex=['C:\\Users\\User\\PycharmProjects\\helPES'],
              binaries=[],
              datas=[
                 ('./conv', 'conv/'),
@@ -17,7 +17,7 @@ a = Analysis(['C:/Users/Dmytro-pc/PycharmProjects/test_helPES/helPES/gui.py'],
                 ('./logo.png', '.'),
 		('./version', '.'),
 		('./favicon.ico', '.'),
-		('./README.md', '.'),
+		('../README.md', '.'),
                 ('./template-configuration.json', '.'),
                 ('./template-team.json', '.'),
                 ('./settings.dat', '.')],
