@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter.ttk import *
-import main
+import main as main
 import azure_vm as azure_virtual
 from tkinter import filedialog
 from tkinter import messagebox
