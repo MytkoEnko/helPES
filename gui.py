@@ -290,11 +290,11 @@ class PesGui:
         self.label_players_cost.grid(column=1, row=12, columnspan=2, stick=W, **settings_checkboxes)
         self.players_cost_select.grid(column=4, row=12)
 
-        self.shutdown.grid(column=1,row=13, columnspan=4, stick=W, **settings_checkboxes)
-        self.shutdown_delay.grid(column=4, row=13)
+        self.label_sign_skip.grid(column=1, row=13, columnspan=2, stick=W, **settings_checkboxes)
+        self.sign_a_skip.grid(column=3, row=13, sticky=W, **settings_checkboxes)
 
-        self.label_sign_skip.grid(column=1, row=14, columnspan=2, stick=W, **settings_checkboxes)
-        self.sign_a_skip.grid(column=3, row=14, sticky=W, **settings_checkboxes)
+        self.shutdown.grid(column=1,row=14, columnspan=4, stick=W, **settings_checkboxes)
+        self.shutdown_delay.grid(column=4, row=14)
 
         # Update default main vars from saved and Combobox bind callback
         def main_var_update(event):
