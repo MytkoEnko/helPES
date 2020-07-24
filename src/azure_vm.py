@@ -24,7 +24,7 @@ def azure_perform(action):
     subscription_id = azure_variables['az_subscription_id']
 
     compute_client = ComputeManagementClient(credentials, subscription_id)
-    resource_group_name = azure_variables['cloud']
+    resource_group_name = azure_variables['az_group_name']
     vm_name = azure_variables['az_vm_name']
     if action == 'start_vm':
         compute_client.virtual_machines.start(resource_group_name, vm_name)
@@ -32,7 +32,13 @@ def azure_perform(action):
         compute_client.virtual_machines.deallocate(resource_group_name, vm_name)
     if action == 'check_vm':
         try:
-            message = compute_client.virtual_machines.get(resource_group_name, vm_name)
+            response = compute_client.virtual_machines.get(resource_group_name, vm_name).as_dict()
+            message = f'Name: {response["name"]}, \n' \
+                      f'Type: {response["type"]}, \n' \
+                      f'Location: {response["location"]}, \n' \
+                      f'VM id: {response["vm_id"]},\n' \
+                      f'Provisioning state: {response["provisioning_state"]}'
+            print(message)
         except:
             message = 'Something went wrong, could\'t complete test\n' + traceback.format_exc()
         return message
