@@ -38,7 +38,6 @@ def azure_perform(action):
                       f'Location: {response["location"]}, \n' \
                       f'VM id: {response["vm_id"]},\n' \
                       f'Provisioning state: {response["provisioning_state"]}'
-            print(message)
         except:
             message = 'Something went wrong, could\'t complete test\n' + traceback.format_exc()
         return message
