@@ -416,7 +416,7 @@ def start_game():
     # Proceed to home
     while True:
         error_count = 0
-        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 3):
+        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 3) or isok('img/close.JPG', 2):
             press_A()
         elif base_ok(2):
             logger.info("Game started successfully, logged in to game, can proceed with scripts")
