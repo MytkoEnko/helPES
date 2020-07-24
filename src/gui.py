@@ -16,7 +16,8 @@ pes_config = main.pes_config
 new_release_url = 'https://github.com/MytkoEnko/helPES/releases/latest'
 report_issue_url = 'https://github.com/MytkoEnko/helPES/issues'
 donate_url = 'https://www.patreon.com/helPES'
-patreon_campaign_url = 'https://www.patreon.com/api/campaigns/4955126'
+patreon_campaign_url = 'https://www.patreon.com/api/campaigns/4955126?fields[campaign]=patron_count,pledge_sum,currency&include=null'
+#https://www.patreon.com/api/campaigns/4955126?fields[campaign]=patron_count,pledge_sum,currency&include=null
 paypal_url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7DH8PG4ERBPJS&source=url'
 twitter_url = 'https://twitter.com/helPESSS'
 
