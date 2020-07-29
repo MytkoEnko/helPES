@@ -1,6 +1,11 @@
 # helPES
 
 ### This application automates some Pro Evolution Soccer (PES) routines in myClub
+![GitHub issues](https://img.shields.io/github/issues-raw/MytkoEnko/helPES?style=flat-square)
+![GitHub Releases](https://img.shields.io/github/downloads/MytkoEnko/helPES/latest/total)
+
+![Twitter Follow](https://img.shields.io/twitter/follow/helPESSS?label=Twitter&style=flat-square)
+
 
 ![helPES logo](src/logo.png "Anna Berkowska's helPES logo")
 -----
@@ -62,4 +67,7 @@ To successfully use helPES you will need:
     
 ------------
 
-##### If you like it please support us on Patreon/Paypal. 
+##### If you like it please support us on:
+[Patreon](https://www.patreon.com/helPES)
+
+[Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7DH8PG4ERBPJS&source=url) 

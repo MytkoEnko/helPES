@@ -45,7 +45,7 @@ VSVersionInfo(
         StringStruct(u'FileDescription', u'helPES App'),
         StringStruct(u'FileVersion', u'{get_file_version()}'),
         StringStruct(u'InternalName', u'helPES'),
-        StringStruct(u'LegalCopyright', u'No Copyright © 2020'),
+        StringStruct(u'LegalCopyright', u'MytkoEnko © 2020'),
         StringStruct(u'OriginalFilename', u'helPES.exe'),
         StringStruct(u'ProductName', u'helPES'),
         StringStruct(u'ProductVersion', u'{get_file_version()}')])

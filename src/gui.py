@@ -20,7 +20,8 @@ patreon_campaign_url = 'https://www.patreon.com/api/campaigns/4955126?fields[cam
 #https://www.patreon.com/api/campaigns/4955126?fields[campaign]=patron_count,pledge_sum,currency&include=null
 paypal_url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7DH8PG4ERBPJS&source=url'
 twitter_url = 'https://twitter.com/helPESSS'
-
+wiki_url = 'https://github.com/MytkoEnko/helPES/wiki'
+youtube_url = 'https://www.youtube.com/playlist?list=PLURb2aKsWkfv6X-AwwU06_hLiWkrPCQZc'
 
 class PesGui:
     def __init__(self, master):
@@ -46,7 +47,7 @@ class PesGui:
 
         # ----------- Description ----------
         self.description_frame = LabelFrame(self.top_section, text="About")
-        self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual it the first place.")
+        self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual in the first place.")
         self.patreon = Label(self.description_frame,justify=CENTER, text="If you like it - support this project on Patreon")
         self.version_label = Label(self.description_frame, text="Checking version..", font=('bold',20), foreground='dodger blue')
         self.version_get = Label(self.description_frame, text="Checking updates..", foreground='deep sky blue')
@@ -85,9 +86,12 @@ class PesGui:
         self.support_menu = Menu(self.menu, tearoff=False)
         support = self.support_menu
         self.menu.add_cascade(label="Support", menu=support)
-        support.add_command(label="Become patron on Patreon", command= lambda: self.open_link(donate_url))
-        support.add_command(label="Donate with PayPal", command= lambda: self.open_link(paypal_url))
+        support.add_command(label="See documentation wiki", command= lambda: self.open_link(wiki_url))
         support.add_command(label="Discuss on Twitter", command= lambda: self.open_link(twitter_url))
+        support.add_command(label="Watch on Youtube", command= lambda: self.open_link(youtube_url))
+        support.add_command(label="Donate with PayPal", command= lambda: self.open_link(paypal_url))
+        support.add_command(label="Become patron on Patreon", command= lambda: self.open_link(donate_url))
+
 
 
         # =============== Middle section ===============
