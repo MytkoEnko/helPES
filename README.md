@@ -3,11 +3,13 @@
 ### This application automates some Pro Evolution Soccer (PES) routines in myClub
 ![GitHub issues](https://img.shields.io/github/issues-raw/MytkoEnko/helPES?style=flat-square)
 ![GitHub Releases](https://img.shields.io/github/downloads/MytkoEnko/helPES/latest/total)
-
 ![Twitter Follow](https://img.shields.io/twitter/follow/helPESSS?label=Twitter&style=flat-square)
-
+![YouTube Video Likes](https://img.shields.io/youtube/likes/1aa6YVsSKeM?style=social)
 
 ![helPES logo](src/logo.png "Anna Berkowska's helPES logo")
+![GitHub Releases (by Asset)](https://img.shields.io/github/downloads/mytkoenko/helpes/latest/helPES-v1.0.zip?color=green&label=Download&style=for-the-badge)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/donate/?token=ED2KScvCaoOMELItg0T_ulvcYIlL0F5O5fRLDfhN6GCx-6yKAKmNYndxQj5ZhoCasL_PSG&country.x=PL&locale.x=PL)
+[![Donate](https://img.shields.io/badge/Donate-patreon-red)](https://www.patreon.com/helPES)
 -----
 ### Features:
 - Sign your scouts (with possibility to skip first n)
@@ -28,11 +30,22 @@
 - Program resizes game window to 1280x720 and manipulates it emulating controller, you can't use your computer in meanwhile
 - Program detects game by window name (eg. "eFootball PES 2020"), if you have folder with same name opened it can mull
 - Entire game window must be visible on your PC screen, program itself doesn't need to
-- As for now only supports usage of managers with 4-3-3 tactics
-- As for now to use email sending you'll need your own sendgrid token (see wiki instructions)
-- For using on Azure VM you'll need to set it up and provide the progam with 
+- As for now **only** supports usage of **managers with 4-3-3 tactics**
+- As for now to use email sending you'll need your own sendgrid token (see wiki instructions or youtube video)
+- For using on Azure VM you'll need to set it up and provide the program with all the necessary credentials
+- You need to start "Playing loop" or "Actions" only from:
+    - desktop before PES even started
+    - myClub **Club House/Squad Management:**
+    
+    ![helPES start](./img/readme_house.JPG)
+
+##### Known issues:
+- helPES won't start if Steam is not installed
+- On first run it can detect PES executable but may fail to run it, should work after helPES restart.
+- 
 -----
 
+![helPES logo](./img/screenshot.JPG "helPES screenshot")
 ### Requirements:
 To successfully use helPES you will need:
 - Windows 10 (PC or Azure VM with graphic card)
@@ -41,19 +54,19 @@ To successfully use helPES you will need:
 ### Installation
 1. Install tesseract-ocr
 2. Add tesseract-ocr executable to system PATH (see wiki for detailed steps)
-3. Download and extract archive with latest program version to a folder, enter it and run helPES.exe 
-4. Windows can warn you of untrusted software producer, it is because program is generated from code above and does not have software producer's signature
+3. Download and extract the archive with the latest program version to a folder, enter it and run helPES.exe 
+4. Windows can warn you of untrusted software producer, it is because the program is generated from code above and does not have software producer's signature
 ### Usage:
 1. Open helPES.exe make sure everything is "green" in **Checks section**:
-    - **Settings are ready** - each time you run program your PES settings file will be backed up and replaced by the one provided by this program. When you done with the usage of program - press "Revert" button to revert to your original settings file
-    - **Game path** - it should automatically detect your PES2020.exe file, if it doesn't - please select manually using button.
+    - **Settings are ready** - each time you run the program your PES settings file will be backed up and replaced by the one provided by this program. When you done with the usage of program - press "Revert" button to revert to your original settings file
+    - **Game path** - it should automatically detect your PES2020.exe file, if it doesn't - please select manually using the button.
     - **Tesseract version** - it will check if tesseract executable is in PATH and print it's version. If it's not - please fix it first.
 2. Configure **Settings**
-    - **Send email** - if you select this and provide your email and sendgrid token - each time script completes it will send you an email with statistics, also when it fails - will take screenshot of game window, attach last 30 lines of detailed logs and send it to you. Use **Test email** button to send yourself a test mail and make sure everything is working fine.
-    - **Run on azure vm** - this is only affects the way the machine is turned off after program is failed/completed. If selected and all necessary information provided - instead of shutting down **deallcoate** call will be sent to Azure instance, so it will be correctly stopped and won't spend your funds.
+    - **Send email** - if you select this and provide your email and sendgrid token - each time script completes it will send you an email with statistics, also when it fails - will take screenshot of game window, attach last 30 lines of detailed logs and send it to you. Use the **Test email** button to send yourself a test mail and make sure everything is working fine.
+    - **Run on azure vm** - this only affects the way the machine is turned off after the program is failed/completed. If selected and all necessary information provided - instead of shutting down **deallcoate** call will be sent to Azure instance, so it will be correctly stopped and won't spend your funds.
     - **Use players of max cost** - is self explanatory, for any purpose only players of selected and below costs will be used.
     - **Skip scouts** - it will skip first n scouts when signing players. Use it if you have some 5-stars scouts you would like to keep.
-    - **Shutdown** - when program fails or completes it will shut down computer/VM with specified delay in minutes. To stop countdown or unset auto shutdown just deselect it at any time during program run.
+    - **Shutdown** - when the program fails or completes it will shut down computer/VM with specified delay in minutes. To stop countdown or unset auto shutdown just deselect it at any time during program run.
 3. Actions - there is several checkboxes for selection, when selected press **Perform** button to start performing selected actions:
     - **Convert all players (Team 1/2)** will convert all players from selected squad (except bench players)
     - **Pupulate team (1/2)** will select new players of max cost (see Settings) for the selected squads
@@ -61,13 +74,13 @@ To successfully use helPES you will need:
     - **Convert all** - alternative way to convert not needed players to EXP trainers, this will just go to your current squad, to reserves, filter all reserves players **by cost**, and will convert them one by one. There is a better "builtin" way to convert all at once via myClub Members menu, but there you can only filter by overall rating.
 4. Modes - just select one of two **Standard/Limited** modes of SIM games, and let the program run it for you.
     - **Standard** will waste your scouts and players of max costs, will run specified nr of games or until is out of EXP or scout slots.
-        - During "populating" squad it will try to use players on their natural position, so your chances to win or draw in SIM game is higher.
-    - **Limited** will just use same squads and renew contracts.
-    - In all cases program will use top two squads from "Squad list" and alternately play them (this is to keep teamss stamina high and increase chances of higher rewards and EXP points gained by players what can make them more valuable EXP trainers later)
+        - During "populating" squad it will try to use players on their natural position, so your chances to win or draw in a SIM game is higher.
+    - **Limited** will just use the same squads and renew contracts.
+    - In all cases program will use top two squads from "Squad list" and alternately play them (this is to keep teams stamina high and increase chances of higher rewards and EXP points gained by players what can make them more valuable EXP trainers later)
     
 ------------
 
 ##### If you like it please support us on:
-[Patreon](https://www.patreon.com/helPES)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/donate/?token=ED2KScvCaoOMELItg0T_ulvcYIlL0F5O5fRLDfhN6GCx-6yKAKmNYndxQj5ZhoCasL_PSG&country.x=PL&locale.x=PL)
+[![Donate](https://img.shields.io/badge/Donate-patreon-red)](https://www.patreon.com/helPES)
 
-[Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7DH8PG4ERBPJS&source=url) 
