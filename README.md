@@ -1,6 +1,7 @@
 # helPES
 
 ### This application automates some Pro Evolution Soccer (PES) routines in myClub
+![Build helPES](https://github.com/MytkoEnko/helPES/workflows/Build%20helPES/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues-raw/MytkoEnko/helPES?style=flat-square)
 ![GitHub Releases](https://img.shields.io/github/downloads/MytkoEnko/helPES/latest/total)
 ![Twitter Follow](https://img.shields.io/twitter/follow/helPESSS?label=Twitter&style=flat-square)
