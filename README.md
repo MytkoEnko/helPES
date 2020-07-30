@@ -60,7 +60,7 @@ To successfully use helPES you will need:
 4. Windows can warn you of untrusted software producer, it is because the program is generated from code above and does not have software producer's signature
 ### Usage:
 1. Open helPES.exe make sure everything is "green" in **Checks section**:
-    - **Settings are ready** - each time you run the program your PES settings file will be backed up and replaced by the one provided by this program. When you done with the usage of program - press "Revert" button to revert to your original settings file
+    - **Settings are ready** - each time you run the program your PES settings file will be backed up and replaced by the one provided by this program. **When you done with the usage of program - press "Revert" button to revert to your original settings file**
     - **Game path** - it should automatically detect your PES2020.exe file, if it doesn't - please select manually using the button.
     - **Tesseract version** - it will check if tesseract executable is in PATH and print it's version. If it's not - please fix it first.
 2. Configure **Settings**
@@ -79,7 +79,22 @@ To successfully use helPES you will need:
         - During "populating" squad it will try to use players on their natural position, so your chances to win or draw in a SIM game is higher.
     - **Limited** will just use the same squads and renew contracts.
     - In all cases program will use top two squads from "Squad list" and alternately play them (this is to keep teams stamina high and increase chances of higher rewards and EXP points gained by players what can make them more valuable EXP trainers later)
-    
+5. Running screen:
+    - **Live stats**:
+        - shows how many games played of scheduled (or max possible)
+        - how many errors occurred
+        - which team is playing now
+        - how much contracts left for each team, for manager
+        - how much "last seen" GP you have
+        - program running status
+    - **Controls**:
+        - Abort - will start "aborting" the app, it might take few seconds up to a minute.
+        - Graceful stop - it will finish the current game and stop.
+        - Duplicating the "Power off" check from Settings, when countdown starts you can uncheck it to prevent shutdown.
+        - Go back - only active when program is not running.
+        
+![helPES logo](./img/screenshot2.JPG "helPES screenshot")
+
 ------------
 
 ##### If you like it please support us on:
