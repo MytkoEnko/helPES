@@ -16,7 +16,7 @@ from sys import exc_info
 
 # ---------------------------------------------- ARGUMENTS PARSING
 
-parser = argparse.ArgumentParser(description="PES-farming script. Use to automate sim matches.")
+parser = argparse.ArgumentParser(description="helPES App. Use it to automate sim matches and else.")
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-r", "--restore", help="Restores PES original settings file to let you play normally", action="store_true")
 group.add_argument("-p", "--prepare", help="Copies prepared PES settings file to let script navigate in game", action="store_true")

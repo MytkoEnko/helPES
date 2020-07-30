@@ -47,7 +47,7 @@ class PesGui:
 
         # ----------- Description ----------
         self.description_frame = LabelFrame(self.top_section, text="About")
-        self.description = Label(self.description_frame,wraplength=420, text="This is free open-source program that was created to help PES players to automate some in-game actions that should not be manual in the first place.")
+        self.description = Label(self.description_frame,wraplength=420, text="This is a free open-source program that was created to help PES players to automate some in-game actions that should not be manual in the first place.")
         self.patreon = Label(self.description_frame,justify=CENTER, text="If you like it - support this project on Patreon")
         self.version_label = Label(self.description_frame, text="Checking version..", font=('bold',20), foreground='dodger blue')
         self.version_get = Label(self.description_frame, text="Checking updates..", foreground='deep sky blue')
@@ -324,7 +324,7 @@ class PesGui:
         self.games_number = IntVar(None,pes_config['gui']['games_number'])
         self.games_to_play = IntVar(None,value=self.games_number.get())
 
-        self.mode_standard = Radiobutton(self.modes, text="Standard (Continue playing previous serie until exp trainers slot empty)", value='standard', variable=self.which_mode)
+        self.mode_standard = Radiobutton(self.modes, text="Standard (Continue previous loop until exp trainers/scouts slots empty)", value='standard', variable=self.which_mode)
         self.mode_limited = Radiobutton(self.modes, text="Limited (Do not convert/sign players, play same squads and renew contracts)", value='limited', variable=self.which_mode)
 
         self.to_play_val = Entry(self.modes, width=5, justify=RIGHT, textvariable=self.games_number)
@@ -425,9 +425,9 @@ class PesGui:
         self.label_games_stats = Label(self.runstats, text="Games played/of max")
         self.label_current_team = Label(self.runstats, text="Team playing now")
         self.label_manager_stat = Label(self.runstats, text="Manager contract left")
-        self.label_error = Label(self.runstats, text="Errors occured")
+        self.label_error = Label(self.runstats, text="Errors occurred")
         self.label_team_contract = Label(self.runstats, text="Teams contracts left")
-        self.label_gp_balance = Label(self.runstats, text="GP balance")
+        self.label_gp_balance = Label(self.runstats, text="GP amount")
         self.label_script_status = Label(self.runstats, textvar=self.run_status, foreground="light steel blue", font='bold')
 
         pl_stats_entry = dict(width=5, justify=RIGHT, state=DISABLED)
@@ -496,8 +496,8 @@ class PesGui:
 
         # ----------- Controls ----------
         self.abort = Button(self.controls, text="Abort", command=self.abort_pressed)
-        self.gracefull_stop = Button(self.controls, text="Gracefull stop", command=self.do_gracefull_stop)
-        self.poweroff = Checkbutton(self.controls, text="Poweroff after finish, delay m: ", variable=self.shutdown_var, command=self.use_shutdown)
+        self.gracefull_stop = Button(self.controls, text="Graceful stop", command=self.do_gracefull_stop)
+        self.poweroff = Checkbutton(self.controls, text="Power off after finish, delay m: ", variable=self.shutdown_var, command=self.use_shutdown)
         self.delay = Entry(self.controls, width=6, state=DISABLED, justify=RIGHT, textvariable=self.delay_var)
         self.countdown = Label(self.controls, text="Waiting.." )
         self.go_back = Button(self.controls, text="Go back", command=self.back, state=DISABLED)
@@ -562,7 +562,7 @@ class PesGui:
         if response == 202:
             message = "202 Accepted \n Check your email to verify"
         else:
-            message = "Could not send message, please check token, email address and sendgrid settings"
+            message = "Could not send a message, please check the token, email address and sendgrid settings"
         messagebox.showinfo('Email test response', message=message)
 
 
@@ -832,7 +832,7 @@ Please double check - go to your team, filter players by costs you've chose in "
             if main.gracefull_stop:
                 break
 
-        main.logger.info(f'Playig loop finished')
+        main.logger.info(f'Playing loop finished')
         self.run_status.set('Done')
 
 
@@ -984,7 +984,7 @@ Please double check - go to your team, filter players by costs you've chose in "
                         getattr(self, gui_vars[1]).set( 1 + getattr(self, gui_vars[1]).get())
 
         else:
-            main.logger.debug('Status watcher else cond')
+            main.logger.debug('Status watcher else condition')
             self.abort.config(state='disabled')
             self.gracefull_stop.config(state='disabled')
             main.time.sleep(1)
@@ -1067,7 +1067,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         sec_delay = int(self.delay_var.get() * 60)
         if self.shutdown_var.get():
             if status == 'Aborted':
-                main.logger.info('Auto-shutdown is selected but script was aborted manually, skipping shutdow')
+                main.logger.info('Auto-shutdown is selected but script was aborted manually, skipping shutdown')
             else:
                 main.logger.info(f'Shutting down after {self.delay_var.get()} minutes')
         else:
