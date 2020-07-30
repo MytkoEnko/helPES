@@ -2,13 +2,14 @@
 
 ### This application automates some Pro Evolution Soccer (PES) routines in myClub
 ![Build helPES](https://github.com/MytkoEnko/helPES/workflows/Build%20helPES/badge.svg)
-![GitHub issues](https://img.shields.io/github/issues-raw/MytkoEnko/helPES?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues-raw/MytkoEnko/helPES)
 ![GitHub Releases](https://img.shields.io/github/downloads/MytkoEnko/helPES/latest/total)
-![Twitter Follow](https://img.shields.io/twitter/follow/helPESSS?label=Twitter&style=flat-square)
+![GitHub](https://img.shields.io/github/license/mytkoenko/helpes)
+![Twitter Follow](https://img.shields.io/twitter/follow/helPESSS?label=Twitter&style=flat)
 ![YouTube Video Likes](https://img.shields.io/youtube/likes/1aa6YVsSKeM?style=social)
 
 ![helPES logo](src/logo.png "Anna Berkowska's helPES logo")
-![GitHub Releases (by Asset)](https://img.shields.io/github/downloads/mytkoenko/helpes/latest/helPES-v1.0.0.zip?color=green&label=Download&style=for-the-badge)
+[![Donate](https://img.shields.io/badge/Download-helPES-green?style=for-the-badge&logo=windows)](https://github.com/MytkoEnko/helPES/releases/download/v1.0.0/helPES-v1.0.0.zip)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/donate/?token=ED2KScvCaoOMELItg0T_ulvcYIlL0F5O5fRLDfhN6GCx-6yKAKmNYndxQj5ZhoCasL_PSG&country.x=PL&locale.x=PL)
 [![Donate](https://img.shields.io/badge/Donate-patreon-red)](https://www.patreon.com/helPES)
 -----
