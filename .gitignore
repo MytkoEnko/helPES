@@ -6,3 +6,4 @@ src/shot/screen_to_mail.png
 src/configuration.json
 *.log
 src/version
+src/tesseract_bin/tessdata/*.traineddata
