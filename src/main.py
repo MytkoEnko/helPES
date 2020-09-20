@@ -8,7 +8,7 @@ from shutil import copy
 from lackey import *
 from json import load as json_load, dump as json_dump
 from vdf import load as vdf_load
-from pytesseract import image_to_string as pytesseract_image_to_string, get_tesseract_version as pytesseract_get_tesseract_version
+from pytesseract import image_to_string as pytesseract_image_to_string, get_tesseract_version as pytesseract_get_tesseract_version, pytesseract
 import argparse
 from cv2 import resize as cv2_resize
 from pesmail import send_mail
@@ -365,6 +365,9 @@ def coordset(pes_xy, object_name):
 
 
 # Takes object name, checks it's relevant coordinates and recognizes value
+
+    #use custom tesseract bin:
+pytesseract.tesseract_cmd = f'{os.path.realpath("./tesseract_bin/tesseract.exe")}'
 
 def recognize(object_name, conf_options='outputbase digits'):
     try:

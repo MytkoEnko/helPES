@@ -25,6 +25,14 @@ jobs:
         cd src/
         python3 prepare_version_file.py
 
+    - name: Download languages for tesseract
+      uses: wei/wget@v1
+      with:
+        args: |
+          -O ./src/tesseract_bin/tessdata/eng.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/4.00/eng.traineddata
+          -O ./src/tesseract_bin/tessdata/equ.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/equ.traineddata
+          -O ./src/tesseract_bin/tessdata/osd.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/osd.traineddata
+
 
     - name: Package Application
       uses: JackMcKew/pyinstaller-action-windows@main
