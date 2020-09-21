@@ -87,17 +87,17 @@ def revertbackup():
         logger.warning("No backup or something is wrong with file structure. Skipping")
 
 
-def get_pes_exe():
+def get_pes_exe(version="21"):
     prgm_path = ""
     if os.environ.get("PROGRAMFILES(X86)") is None:  # this case is 32bit
         prgm_path = os.environ.get("PROGRAMFILES")
     else:
         prgm_path = os.environ.get("PROGRAMFILES(X86)")
 
-    default_pes_path = prgm_path + '\Steam\steamapps\common\eFootball PES 2020\PES2020.exe'
+    default_pes_path = prgm_path + f'\Steam\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
     if isthere(default_pes_path):
         print('Pes installed in default location:' + default_pes_path)
-        pes_config['general']['game_path'] = repr(default_pes_path).replace("'",'"')
+        pes_config['general'][f'game_path{version}'] = repr(default_pes_path).replace("'",'"')
         write_configurations()
         return repr(default_pes_path).replace("'",'"')
     else:
@@ -109,11 +109,11 @@ def get_pes_exe():
         alternative_pes_path = ''
 
         for loc in steam_library.values():
-            new_path = loc + '\steamapps\common\eFootball PES 2020\PES2020.exe'
+            new_path = loc + f'\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
             if isthere(new_path):
                 alternative_pes_path = new_path
-        logger.info("Pes installed in alternative location: %s", alternative_pes_path)
-        pes_config['general']['game_path'] = alternative_pes_path
+        logger.info(f"PES20{version} installed in alternative location: {alternative_pes_path}")
+        pes_config['general'][f'game_path{version}'] = alternative_pes_path
         write_configurations()
         return repr(alternative_pes_path).replace("'",'"')
 
@@ -128,6 +128,7 @@ gracefull_stop = False
 aborted = False
 shutdown = False
 error_threshold = 30
+efootball_version = ""
 
 # Saved settings (variables)
 # Load/prepare and load configuration.json
@@ -152,8 +153,8 @@ contract_2 = pes_config['gui']['team2_contract_var']
 contract_m = pes_config['gui']['manager_contract_var']
 max_player_cost = pes_config['gui']['players_cost_var']
 
-if len(pes_config['general']['game_path']) > 3:
-    pes_path = r'{}'.format(repr(pes_config['general']['game_path']).replace("'",'"'))
+if len(pes_config['general']['game_path20']) > 3:
+    pes_path = r'{}'.format(repr(pes_config['general']['game_path20']).replace("'",'"'))
 else:
     pes_path = r'{}'.format(get_pes_exe())
 
