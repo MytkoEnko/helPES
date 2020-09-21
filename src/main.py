@@ -46,78 +46,6 @@ stream_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-# -------------------------------------------- SETTINGS FILE HANDLING
-
-settings_path = os.path.expanduser('~/Documents/KONAMI/eFootball PES 2020/')
-settings_file = settings_path + 'settings.dat'
-settings_backup = settings_path + 'settings.dat.pes-bkp'
-settings_pesbot = 'settings.dat'
-
-def isthere(a):
-    if os.path.exists(a):
-        return True
-    else:
-        return False
-
-
-def makebkp():
-    if isthere(settings_file) and isthere(settings_backup):
-        logger.info("There is settings and settings backup files. We can start playing")
-        return True
-    if isthere(settings_file) and not isthere(settings_backup):
-        logger.info("Creating backup and importing pes settings file")
-        os.rename(settings_file, settings_backup)
-        logger.info('Backup created: %s', os.listdir(settings_path))
-        copy(settings_pesbot, settings_file)
-        logger.info("Settings copied, folder contents: %s", os.listdir(settings_path))
-    else:
-        logger.warning("Something is wrong, please check settings folder")
-
-
-def revertbackup():
-    if isthere(settings_backup) and isthere(settings_file):
-        logger.info("Backup is there, reverting:")
-        os.remove(settings_file)
-        logger.info("%s removed, starting revert from %s",
-                    os.path.basename(settings_file),
-                    os.path.basename(settings_backup))
-        os.rename(settings_backup, settings_file)
-        logger.info("Backup reverted to %s", os.path.basename(settings_file))
-    else:
-        logger.warning("No backup or something is wrong with file structure. Skipping")
-
-
-def get_pes_exe(version="21"):
-    prgm_path = ""
-    if os.environ.get("PROGRAMFILES(X86)") is None:  # this case is 32bit
-        prgm_path = os.environ.get("PROGRAMFILES")
-    else:
-        prgm_path = os.environ.get("PROGRAMFILES(X86)")
-
-    default_pes_path = prgm_path + f'\Steam\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
-    if isthere(default_pes_path):
-        print('Pes installed in default location:' + default_pes_path)
-        pes_config['general'][f'game_path{version}'] = repr(default_pes_path).replace("'",'"')
-        write_configurations()
-        return repr(default_pes_path).replace("'",'"')
-    else:
-        lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
-        with open(lib_path, "r") as read_steam:
-            steam_lib = vdf_load(read_steam)
-
-        steam_library = {number: location for number, location in steam_lib['LibraryFolders'].items() if number.isdigit()}
-        alternative_pes_path = ''
-
-        for loc in steam_library.values():
-            new_path = loc + f'\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
-            if isthere(new_path):
-                alternative_pes_path = new_path
-        logger.info(f"PES20{version} installed in alternative location: {alternative_pes_path}")
-        pes_config['general'][f'game_path{version}'] = alternative_pes_path
-        write_configurations()
-        return repr(alternative_pes_path).replace("'",'"')
-
-
 # ------------------------------------------ DEFINE GAME VARIABLES
 # Runtime variables:
 pes_config = {}
@@ -220,6 +148,79 @@ position = {
 }
 # with open('team1.json', "w") as to_write:
 #     json_dump(position, to_write)
+
+# -------------------------------------------- PES SETTINGS FILE HANDLING
+
+settings_path = os.path.expanduser('~/Documents/KONAMI/eFootball PES 2020/')
+settings_file = settings_path + 'settings.dat'
+settings_backup = settings_path + 'settings.dat.pes-bkp'
+settings_pesbot = 'settings.dat'
+
+def isthere(a):
+    if os.path.exists(a):
+        return True
+    else:
+        return False
+
+
+def makebkp():
+    if isthere(settings_file) and isthere(settings_backup):
+        logger.info("There is settings and settings backup files. We can start playing")
+        return True
+    if isthere(settings_file) and not isthere(settings_backup):
+        logger.info("Creating backup and importing pes settings file")
+        os.rename(settings_file, settings_backup)
+        logger.info('Backup created: %s', os.listdir(settings_path))
+        copy(settings_pesbot, settings_file)
+        logger.info("Settings copied, folder contents: %s", os.listdir(settings_path))
+    else:
+        logger.warning("Something is wrong, please check settings folder")
+
+
+def revertbackup():
+    if isthere(settings_backup) and isthere(settings_file):
+        logger.info("Backup is there, reverting:")
+        os.remove(settings_file)
+        logger.info("%s removed, starting revert from %s",
+                    os.path.basename(settings_file),
+                    os.path.basename(settings_backup))
+        os.rename(settings_backup, settings_file)
+        logger.info("Backup reverted to %s", os.path.basename(settings_file))
+    else:
+        logger.warning("No backup or something is wrong with file structure. Skipping")
+
+
+def get_pes_exe(version="21"):
+    prgm_path = ""
+    if os.environ.get("PROGRAMFILES(X86)") is None:  # this case is 32bit
+        prgm_path = os.environ.get("PROGRAMFILES")
+    else:
+        prgm_path = os.environ.get("PROGRAMFILES(X86)")
+
+    default_pes_path = prgm_path + f'\Steam\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
+    if isthere(default_pes_path):
+        print('Pes installed in default location:' + default_pes_path)
+        pes_config['general'][f'game_path{version}'] = repr(default_pes_path).replace("'",'"')
+        write_configurations()
+        return repr(default_pes_path).replace("'",'"')
+    else:
+        lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
+        with open(lib_path, "r") as read_steam:
+            steam_lib = vdf_load(read_steam)
+
+        steam_library = {number: location for number, location in steam_lib['LibraryFolders'].items() if number.isdigit()}
+        alternative_pes_path = ''
+
+        for loc in steam_library.values():
+            new_path = loc + f'\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
+            if isthere(new_path):
+                alternative_pes_path = new_path
+        logger.info(f"PES20{version} installed in alternative location: {alternative_pes_path}")
+        pes_config['general'][f'game_path{version}'] = alternative_pes_path
+        write_configurations()
+        return repr(alternative_pes_path).replace("'",'"')
+
+
 # ------------------------------------------- GAME
 # Define navigation (works together with settings file for PES controller)
 # Buttons
