@@ -56,9 +56,17 @@ gracefull_stop = False
 aborted = False
 shutdown = False
 error_threshold = 30
-efootball_version = ""
+pes_path = ''
+pesName = ''
 
-# Saved settings (variables)
+
+# Check if path exists
+def isthere(a):
+    if os.path.exists(a):
+        return True
+    else:
+        return False
+
 # Load/prepare and load configuration.json
 def load_configurations():
     if not isthere('configuration.json'):
@@ -75,19 +83,74 @@ def write_configurations():
         json_dump(pes_config, to_write)
 
 load_configurations()
+
+def get_pes_exe(version="21"):
+    prgm_path = ""
+    if os.environ.get("PROGRAMFILES(X86)") is None:  # this case is 32bit
+        prgm_path = os.environ.get("PROGRAMFILES")
+    else:
+        prgm_path = os.environ.get("PROGRAMFILES(X86)")
+
+    default_pes_path = prgm_path + f'\Steam\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
+    if isthere(default_pes_path):
+        print('Pes installed in default location:' + default_pes_path)
+        pes_config['general'][f'game_path{version}'] = repr(default_pes_path).replace("'",'"')
+        write_configurations()
+        return repr(default_pes_path).replace("'",'"')
+    else:
+        lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
+        with open(lib_path, "r") as read_steam:
+            steam_lib = vdf_load(read_steam)
+
+        steam_library = {number: location for number, location in steam_lib['LibraryFolders'].items() if number.isdigit()}
+        alternative_pes_path = ''
+
+        for loc in steam_library.values():
+            new_path = loc + f'\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
+            if isthere(new_path):
+                alternative_pes_path = new_path
+        if alternative_pes_path:
+            logger.info(f"PES20{version} installed in alternative location: {alternative_pes_path}")
+            pes_config['general'][f'game_path{version}'] = alternative_pes_path
+            write_configurations()
+            return alternative_pes_path
+        else:
+            return alternative_pes_path
+
 # Update runtime variables default values
 contract_1 = pes_config['gui']['team1_contract_var']
 contract_2 = pes_config['gui']['team2_contract_var']
 contract_m = pes_config['gui']['manager_contract_var']
 max_player_cost = pes_config['gui']['players_cost_var']
 
-if len(pes_config['general']['game_path20']) > 3:
-    pes_path = r'{}'.format(repr(pes_config['general']['game_path20']).replace("'",'"'))
-else:
-    pes_path = r'{}'.format(get_pes_exe())
+def set_paths(version="01"):
+    for i in "21","20":
+        #if len(pes_config['general'][f'game_path{i}']) < 300:
+        pes_config['general'][f'game_path{i}'] = r'{}'.format(get_pes_exe(i))
+    if not pes_config['general']['pes_version']:
+        pes_config['general']['pes_version'] = "21" if pes_config['general'][f'game_path21'] \
+            else "20" if pes_config['general'][f'game_path21'] \
+            else "NO_PES_INSTALLED"
+        write_configurations()
+    global pes_path
+    if version == "01":
+        pes_path = r'{}'.format(repr(pes_config['general'][f'game_path{pes_config["general"]["pes_version"]}']).replace("'",'"'))
+    else:
+        pes_path = r'{}'.format(repr(pes_config['general'][f'game_path{version}']).replace("'", '"'))
+        pes_config['general']['pes_version'] = version
+        write_configurations()
 
-pes_launcher = App(f'{pes_path}')
-pesName = 'eFootball PES 2020'
+    global pesName
+    pesName = f'eFootball PES 20{pes_config["general"]["pes_version"]}'
+    print(pes_config['general']['pes_version'], pesName, pes_path +" from set_paths")
+
+set_paths()
+
+# if len(pes_config['general']['game_path20']) > 3:
+#     pes_path = r'{}'.format(repr(pes_config['general']['game_path20']).replace("'",'"'))
+# else:
+#     pes_path = r'{}'.format(get_pes_exe())
+
 pes = App() # Global variable to be used for app reference after initialization
 pes_region = None
 team_nr = 0
@@ -156,12 +219,6 @@ settings_file = settings_path + 'settings.dat'
 settings_backup = settings_path + 'settings.dat.pes-bkp'
 settings_pesbot = 'settings.dat'
 
-def isthere(a):
-    if os.path.exists(a):
-        return True
-    else:
-        return False
-
 
 def makebkp():
     if isthere(settings_file) and isthere(settings_backup):
@@ -189,36 +246,6 @@ def revertbackup():
     else:
         logger.warning("No backup or something is wrong with file structure. Skipping")
 
-
-def get_pes_exe(version="21"):
-    prgm_path = ""
-    if os.environ.get("PROGRAMFILES(X86)") is None:  # this case is 32bit
-        prgm_path = os.environ.get("PROGRAMFILES")
-    else:
-        prgm_path = os.environ.get("PROGRAMFILES(X86)")
-
-    default_pes_path = prgm_path + f'\Steam\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
-    if isthere(default_pes_path):
-        print('Pes installed in default location:' + default_pes_path)
-        pes_config['general'][f'game_path{version}'] = repr(default_pes_path).replace("'",'"')
-        write_configurations()
-        return repr(default_pes_path).replace("'",'"')
-    else:
-        lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
-        with open(lib_path, "r") as read_steam:
-            steam_lib = vdf_load(read_steam)
-
-        steam_library = {number: location for number, location in steam_lib['LibraryFolders'].items() if number.isdigit()}
-        alternative_pes_path = ''
-
-        for loc in steam_library.values():
-            new_path = loc + f'\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
-            if isthere(new_path):
-                alternative_pes_path = new_path
-        logger.info(f"PES20{version} installed in alternative location: {alternative_pes_path}")
-        pes_config['general'][f'game_path{version}'] = alternative_pes_path
-        write_configurations()
-        return repr(alternative_pes_path).replace("'",'"')
 
 
 # ------------------------------------------- GAME
@@ -871,8 +898,10 @@ def set_pes_frame():
 
 def initialize_pes():
     global pes
+    pes_launcher = App(f'{pes_path}')
     App.focus(pesName)
     pes = App(pesName)
+    print(pes_config['general']['pes_version'], pesName, pes_path + " from initialize")
     if not pes.isRunning():
         makebkp()
         pes_launcher.open()

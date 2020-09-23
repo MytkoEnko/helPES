@@ -97,14 +97,28 @@ class PesGui:
         # =============== Middle section ===============
         # --------- Layout ------------
         self.midwrap = Frame(self.frame)
+        self.version_select = LabelFrame(self.midwrap, text="PES version")
         self.stats = LabelFrame(self.midwrap, text="Stats")
         self.actions = LabelFrame(self.midwrap, text="Actions")
         self.pes_settings = LabelFrame(self.midwrap, text="Settings")
 
         self.midwrap.pack(side=TOP, fill=X)
         self.pes_settings.pack(side=RIGHT, fill=Y, **lb_wrapper_settings)
+        self.version_select.pack(side=TOP, fill=X, **lb_wrapper_settings)
         self.stats.pack(side=TOP, fill=X, **lb_wrapper_settings)
         self.actions.pack(side=TOP, fill=X, **lb_wrapper_settings)
+
+        # --------- Select game version ---------
+
+        #variables
+        self.pes_version = StringVar(value=pes_config['general']['pes_version'])
+
+        self.pes_2020 = Radiobutton(self.version_select, text="PES2020", value='20', variable=self.pes_version, command=self.update_version_paths, state=DISABLED if len(pes_config['general']['game_path20']) < 3 else NORMAL)
+        self.pes_2021 = Radiobutton(self.version_select, text="PES2021", value='21', variable=self.pes_version, command=self.update_version_paths, state=DISABLED if len(pes_config['general']['game_path21']) < 3 else NORMAL)
+
+        modes_grid = dict(sticky=W, pady=3, padx=4)
+        self.pes_2020.grid(row=1, column=2, columnspan=1, **modes_grid)
+        self.pes_2021.grid(row=1, column=1, columnspan=1, **modes_grid)
 
         # ----------- Stats ------------
 
@@ -354,9 +368,9 @@ class PesGui:
 
 
         #Game path
-        self.game_path = StringVar(value=eval(main.get_pes_exe()))
+        self.game_path = StringVar(value=eval(main.pes_path))
         self.path_found_label = Label(self.checks, text="Game path: ", font='bold')
-        self.path_found_label['text'] += 'detected' if len(self.game_path.get()) > 3 else 'unknown'
+        self.path_found_label['text'] += 'detected' if len(self.game_path.get()) != "NO_PES_INSTALLED" else 'unknown'
         self.path_found_label['foreground'] = 'green' if self.path_found_label['text'] == "Game path: detected" else 'red'
         self.path_button = Button(
             self.checks,
@@ -517,6 +531,7 @@ class PesGui:
 
         self.which_mode.trace_variable("w", self.save_configs)
         self.games_number.trace_variable("w", self.save_configs)
+        self.pes_version.trace_variable("w",self.save_configs)
 
         for variable in settings_callbacks:
             getattr(self, variable).trace_variable("w", self.save_configs)
@@ -636,6 +651,13 @@ class PesGui:
             self.tesseract_label.config(foreground='red')
             self.tesseract_version.config(foreground='red', text="Not installed or not in PATH")
 
+    def update_version_paths(self):
+        main.set_paths(self.pes_version.get())
+        self.game_path.set(eval(main.pes_path))
+        self.status['text'] = "Path: " + self.game_path.get()
+        main.pesName = f'eFootball PES 20{pes_config["general"]["pes_version"]}'
+        print(pes_config['general']['pes_version'], main.pesName, main.pes_path +" from update_version")
+
 
     def print_message(self):
         print("Wow, this actually worked!")
@@ -702,13 +724,17 @@ Please double check - go to your team, filter players by costs you've chose in "
         print('TODO')
 
     def select_path(self):
-        self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES2020.exe','PES2020.exe')])
+        self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES202*.exe','PES202*.exe')])
         self.game_path.set(self.filename)
-        if len(self.game_path.get()) > 3:
+        if len(self.game_path.get()) != "NO_PES_INSTALLED":
             self.path_found_label['text'] += 'Game path: detected'
             self.path_found_label['foreground'] = 'green'
             global pes_config
-            pes_config['general']['game_path'] = self.game_path.get()
+            try:
+                pes_config['general'][f'game_path{pes_config["general"]["pes_version"]}'] = self.game_path.get()
+            except:
+                # HERE POPUP GOES
+                main.logger.error(f'Something went wrong: {exc_info()}')
             self.save_configs()
 
     def new_window(self):

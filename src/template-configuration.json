@@ -37,6 +37,8 @@
     "email_address": "email@example.com" ,
     "az_group_name": "az_group_name" ,
     "az_vm_name": "az_vm_name" ,
-    "game_path": ""
+    "pes_version": "",
+    "game_path21": "",
+    "game_path20": ""
   }
 }
