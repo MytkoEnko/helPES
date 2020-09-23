@@ -142,7 +142,12 @@ def set_paths(version="01"):
 
     global pesName
     pesName = f'eFootball PES 20{pes_config["general"]["pes_version"]}'
-    print(pes_config['general']['pes_version'], pesName, pes_path +" from set_paths")
+
+    global settings_path,settings_file,settings_backup,settings_pesbot
+    settings_path = os.path.expanduser(f'~/Documents/KONAMI/eFootball PES 20{"21 SEASON UPDATE" if pes_config["general"]["pes_version"]  == "21" else "20"}/')
+    settings_file = settings_path + 'settings.dat'
+    settings_backup = settings_path + 'settings.dat.pes-bkp'
+    settings_pesbot = f'settings{pes_config["general"]["pes_version"]}.dat'
 
 set_paths()
 
@@ -213,12 +218,6 @@ position = {
 #     json_dump(position, to_write)
 
 # -------------------------------------------- PES SETTINGS FILE HANDLING
-
-settings_path = os.path.expanduser('~/Documents/KONAMI/eFootball PES 2020/')
-settings_file = settings_path + 'settings.dat'
-settings_backup = settings_path + 'settings.dat.pes-bkp'
-settings_pesbot = 'settings.dat'
-
 
 def makebkp():
     if isthere(settings_file) and isthere(settings_backup):

@@ -354,13 +354,11 @@ class PesGui:
         # -------- Checks -------------
         # Settings
         self.settings_ready = Label(self.checks, text="Settings are ready: ",  anchor=W, font='bold')
-        self.settings_ready["text"] += 'Ok' if main.isthere(main.settings_file) and main.isthere(main.settings_backup) else 'No'
         self.settings_toggle = Button(
             self.checks,
             text="Checking",
             command=self.settings_switch)
-        self.settings_toggle["text"] = "Copy settings" if self.settings_ready["text"] == "Settings are ready: No" else "Revert"
-        self.settings_ready.config(foreground='red' if self.settings_ready["text"] == "Settings are ready: No" else "green")
+        self.settings_toggle_update()
 
 
         self.settings_ready.grid(row=1, column=1)
@@ -633,14 +631,17 @@ class PesGui:
     def settings_switch(self):
         if self.settings_toggle["text"] == "Copy settings":
             main.makebkp()
-            self.settings_toggle["text"] = "Revert"
             self.settings_ready["text"] = "Settings are ready: Ok"
-            self.settings_ready['foreground'] = "green"
+            self.settings_toggle_update()
         else:
             main.revertbackup()
             self.settings_ready["text"] = "Settings are ready: No"
-            self.settings_toggle["text"] = "Copy settings"
-            self.settings_ready['foreground'] = "red"
+            self.settings_toggle_update()
+
+    def settings_toggle_update(self):
+        self.settings_ready["text"] = f'Settings are ready: {"Ok" if main.isthere(main.settings_file) and main.isthere(main.settings_backup) else "No"}'
+        self.settings_toggle["text"] = "Copy settings" if self.settings_ready["text"] == "Settings are ready: No" else "Revert"
+        self.settings_ready.config(foreground='red' if self.settings_ready["text"] == "Settings are ready: No" else "green")
 
     def tesseract_check(self):
         try:
@@ -656,8 +657,7 @@ class PesGui:
         self.game_path.set(eval(main.pes_path))
         self.status['text'] = "Path: " + self.game_path.get()
         main.pesName = f'eFootball PES 20{pes_config["general"]["pes_version"]}'
-        print(pes_config['general']['pes_version'], main.pesName, main.pes_path +" from update_version")
-
+        self.settings_toggle_update()
 
     def print_message(self):
         print("Wow, this actually worked!")
