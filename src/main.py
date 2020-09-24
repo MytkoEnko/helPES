@@ -162,14 +162,14 @@ team_nr = 0
 pes_frame = []
 spots = {
     # use '@' to use default
-    'money' : ([987, 67, 79, 29], '-psm 13'),
-    'player_position' : ([957, 228, 51, 27], '-c tessedit_char_whitelist=BCDFMGKLRSW -psm 13'), #[949, 223, 69, 33],
-    'player_rating' : ([921, 248, 93, 105], '-c tessedit_char_whitelist=0123456789 -psm 13'),
-    'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 -psm 13'),
-    'surname' : ([904, 95, 363, 86],'@'), #[921, 146, 294, 35],
-    'scouts' : ([553, 652, 83,26], 'tessedit_char_whitelist=0123456789/ -psm 13'),
-    'exp_trainers' : ([1111, 448, 42, 28], "-c tessedit_char_whitelist=0123456789 -psm 13"),
-    'coach_contract' : ([1092, 442, 103, 45], "-c tessedit_char_whitelist=0123456789 -psm 13"),
+    'money' : ([987, 67, 79, 29], '--psm 13'),
+    'player_position' : ([957, 228, 51, 27], '-c tessedit_char_whitelist=BCDFMGKLRSW --psm 13'), #[949, 223, 69, 33],
+    'player_rating' : ([921, 248, 93, 105], '-c tessedit_char_whitelist=0123456789 --psm 13'),
+    'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 --psm 5'),
+    'surname' : ([904, 95, 363, 86],''), #[921, 146, 294, 35],
+    'scouts' : ([553, 652, 83,26], 'tessedit_char_whitelist=0123456789/ --psm 13'),
+    'exp_trainers' : ([1111, 448, 42, 28], "-c tessedit_char_whitelist=0123456789 --psm 13"),
+    'coach_contract' : ([1092, 442, 103, 45], "-c tessedit_char_whitelist=0123456789 --psm 13"),
     'formation1' : ([827, 377, 111, 37], "@"),
     'formation2' : ([821, 526, 123, 38], "@")
 }
@@ -181,18 +181,23 @@ areas = {
     'conv/30.JP': [701, 294, 242, 77],
     'img/rating.JPG' : [471, 92, 361, 108],
     'img/reward.JPG' : [395, 106, 508, 272],
-    'img/press-button.jpg' : [144, 418, 445, 106],
+    'img/press-button20.jpg' : [144, 418, 445, 106],
+    'img/press-button21.jpg' : [249, 498, 225, 47],
     'img/this-week-pick-up.JPG' : [243, 33, 442, 107],
-    'img/game-screen.JPG' : [11, 36, 355, 142],
-    'img/myclub-enter.JPG': [11, 36, 355, 142],
+    'img/game-screen20.JPG' : [11, 36, 355, 142],
+    'img/game-screen21.JPG' : [35, 87, 398, 171],
+    'img/myclub-enter20.JPG': [11, 36, 355, 142],
+    'img/myclub-enter21.JPG': [42, 85, 335, 155],
     'img/sure-start.JPG' : [19, 226, 461, 141],
     'img/proceed.JPG' : [9, 676, 552, 75],
     'img/club-house.JPG' : [296, 653, 260, 98],
-    'img/sim-game.JPG' : [85, 102, 450, 574],
+    'img/sim-game20.JPG' : [85, 102, 450, 574],
+    'img/sim-game21.JPG' : [85, 102, 450, 574],
     'img/kickoff.JPG' : [496, 595, 311, 127],
     'img/skip-graphic.JPG' : [971, 68, 295, 128],
     'img/highlights.JPG' : [11, 34, 530, 287],
     'img/next-finish.JPG' : [487, 532, 330, 175],
+    'img/additional-content.JPG' : [895, 298, 282, 84],
     'img/contract-manager-upd.JPG' : [420, 72, 503, 122],
     'img/game-proceed.JPG' : [11, 657, 316, 96],
     'img/ok.JPG' : [164, 377, 999, 299],
@@ -428,7 +433,7 @@ def start_game():
     global error_count
     logger.info('Starting interaction with %s', pes.getName())
     pes.focus()
-    if isok('img/press-button.jpg', 180):
+    if isok(f'img/press-button{pes_config["general"]["pes_version"]}.jpg', 180):
         press_A()
         time.sleep(20)
     while True:
@@ -437,9 +442,9 @@ def start_game():
             press_B()
         elif isok('img/ok.JPG',2):
             press_A()
-        elif isok('img/game-screen.JPG', 2, 0.7):
+        elif isok(f'img/game-screen{pes_config["general"]["pes_version"]}.JPG', 2, 0.7):
             turn_down(1)
-            if isok('img/myclub-enter.JPG', 1, 0.7):
+            if isok(f'img/myclub-enter{pes_config["general"]["pes_version"]}.JPG', 1, 0.7):
                 press_A()
                 if isok('img/sure-start.JPG', 15):
                     press_A()
@@ -458,6 +463,9 @@ def team_change(squad):
     if base_ok(60):
         press_X()
         if isok('img/squad-list.JPG', 60):
+            if isok('img/additional-content.JPG',3):
+                turn_down(3)
+                turn_up(2)
             turn_down(squad)
             time.sleep(1)
             press_A()
@@ -506,7 +514,7 @@ def play_one(mode=''):
     if base_ok(30):
         turn_left(3)
         # On sim game
-        if isok('img/sim-game.JPG', 30):
+        if isok(f'img/sim-game{pes_config["general"]["pes_version"]}.JPG', 30):
             press_A()
         # Sim match start
         if isok('img/kickoff.JPG', 30):
@@ -824,11 +832,11 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
                 found = False
                 for i in range(6):
                     try:
-                        surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
+                        surname = ''.join(char for char in recognize('surname') if ord(char) < 128 and not char.isdigit() and not char == ' ')
                     except 'Tcl_AsyncDelete':
                         logger.warning('Tcl_AsyncDelete occured, trying again')
                         time.sleep(2)
-                        surname = ''.join(char for char in recognize('surname','') if ord(char) < 128 and not char.isdigit() and not char == ' ')
+                        surname = ''.join(char for char in recognize('surname') if ord(char) < 128 and not char.isdigit() and not char == ' ')
 
                     print(surname)
                     if surname != '' and surname not in known_names:

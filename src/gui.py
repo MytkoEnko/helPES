@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.ttk import *
 import main as main
+from main import pes_config as pes_config
 import azure_vm as azure_virtual
 from tkinter import filedialog
 from tkinter import messagebox
@@ -891,7 +892,7 @@ Please double check - go to your team, filter players by costs you've chose in "
             main.logger.info("Updating GP and EXP trainers slots info")
             # GP
             self.gp_balance['state'] = '!disabled'
-            self.gp_balance_var.set(int(float(main.recognize('money')) * 1000))
+            self.gp_balance_var.set(int(main.recognize('money').replace(',', '').replace('.', '')))
             self.gp_balance['state'] = 'disabled'
             # EXP trainers
             self.exp['state'] = '!disabled'
@@ -903,6 +904,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         if main.base_ok():
             main.logger.info('Checking teams and manager contracts duration and coach/trainer slots left')
             formations = ''
+            add_content = 0
             for i in range(2):
                 main.base_ok()
                 main.press_X()
@@ -911,6 +913,12 @@ Please double check - go to your team, filter players by costs you've chose in "
                     # Recognize and check formations
                     message, first, second = '', True, True
                     main.time.sleep(1)  # Wait until team list opens
+                    print("check additional")
+                    if main.isok('img/additional-content.JPG',2):
+                        main.turn_down(3)
+                        main.turn_up(2)
+                        add_content = 1
+                    print("after check additional")
                     if main.recognize('formation1') != '4-3-3':
                         message += "First team doesn't have 4-3-3 formation. "
                         first = False
@@ -928,7 +936,7 @@ Please double check - go to your team, filter players by costs you've chose in "
                         main.logger.error(f'{message}')
                         break
                 if main.isok('img/squad-list.JPG', 60):
-                    main.turn_down(i + 1)
+                    main.turn_down(i + 1 + add_content)
                     main.time.sleep(0.5)
                     main.press_A()
                 if main.base_ok():
@@ -937,11 +945,11 @@ Please double check - go to your team, filter players by costs you've chose in "
                     main.turn_up(1)
                     if i + 1 == 1:
                         main.team_nr = 1
-                        main.contract_1 = int(main.recognize('contract_duration'))
+                        main.contract_1 = int(main.recognize('contract_duration').replace('\n','')[::-1])
                         main.logger.info('1\'st team contracts updated')
                     elif i + 1 == 2:
                         main.team_nr = 2
-                        main.contract_2 = int(main.recognize('contract_duration'))
+                        main.contract_2 = int(main.recognize('contract_duration').replace('\n','')[::-1])
                         main.logger.info('2\'nd team contracts updated')
                     main.turn_up(2)
                     main.turn_left(1)
