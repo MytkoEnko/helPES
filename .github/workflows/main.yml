@@ -30,8 +30,8 @@ jobs:
       with:
         args: |
           -O ./src/tesseract_bin/tessdata/eng.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/4.00/eng.traineddata
-          -O ./src/tesseract_bin/tessdata/equ.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/equ.traineddata
-          -O ./src/tesseract_bin/tessdata/osd.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/osd.traineddata
+          wget -O ./src/tesseract_bin/tessdata/equ.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/equ.traineddata
+          wget -O ./src/tesseract_bin/tessdata/osd.traineddata https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/osd.traineddata
 
 
     - name: Package Application
