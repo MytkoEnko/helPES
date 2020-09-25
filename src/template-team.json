@@ -4,9 +4,9 @@
   "clb": ["conv/cb.JPG", [1, 1, 0, 0], "@", "conv/cb_f.JPG"],
   "crb": ["conv/cb.JPG", [1, 2, 0, 0], "@", "conv/cb_f.JPG"],
   "rb": ["conv/rb.JPG", [1, 3, 0, 0], "@", "conv/rb_f.JPG"],
-  "cml": ["conv/cmf.JPG", [2, 0, 0, 0], "@", "conv/cmf_f.JPG"],
+  "cml": ["conv/cmf.JPG", [2, 0, 0, 0], "@", "conv/cm_f.JPG"],
   "dmf": ["conv/dmf.JPG", [2, 1, 0, 0], "@", "conv/dmf_f.JPG"],
-  "cmr": ["conv/cmf.JPG", [2, 2, 0, 0], "@", "conv/cmf_f.JPG"],
+  "cmr": ["conv/cmf.JPG", [2, 2, 0, 0], "@", "conv/cm_f.JPG"],
   "lwf": ["conv/lwf.JPG", [3, 0, 0, 0], "@", "conv/lwf_f.JPG"],
   "cf": ["conv/cf.JPG", [3, 1, 0, 0], "@", "conv/cf_f.JPG"],
   "rwf": ["conv/rwf.JPG", [3, 2, 0, 0], "@", "conv/rwf_f.JPG"]

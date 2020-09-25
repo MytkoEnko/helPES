@@ -55,7 +55,7 @@ game_number = 0
 gracefull_stop = False
 aborted = False
 shutdown = False
-error_threshold = 30
+error_threshold = 40
 pes_path = ''
 pesName = ''
 
@@ -93,10 +93,10 @@ def get_pes_exe(version="21"):
 
     default_pes_path = prgm_path + f'\Steam\steamapps\common\eFootball PES 20{version}\PES20{version}.exe'
     if isthere(default_pes_path):
-        print('Pes installed in default location:' + default_pes_path)
-        pes_config['general'][f'game_path{version}'] = repr(default_pes_path).replace("'",'"')
+        logger.info('Pes installed in default location:' + default_pes_path)
+        pes_config['general'][f'game_path{version}'] = default_pes_path
         write_configurations()
-        return repr(default_pes_path).replace("'",'"')
+        return default_pes_path
     else:
         lib_path = prgm_path + "\Steam\steamapps\libraryfolders.vdf"
         with open(lib_path, "r") as read_steam:
@@ -179,6 +179,15 @@ areas = {
     'conv/20.JP': [701, 294, 242, 77],
     'conv/25.JP': [701, 294, 242, 77],
     'conv/30.JP': [701, 294, 242, 77],
+    "conv/gk_f.JPG" : [729, 229, 199, 61],
+    "conv/lb_f.JPG" : [729, 229, 199, 61],
+    "conv/cb_f.JPG" : [729, 229, 199, 61],
+    "conv/rb_f.JPG" : [729, 229, 199, 61],
+    "conv/cm_f.JPG" : [729, 229, 199, 61],
+    "conv/dmf_f.JPG" : [729, 229, 199, 61],
+    "conv/lwf_f.JPG" : [729, 229, 199, 61],
+    "conv/cf_f.JPG" : [729, 229, 199, 61],
+    "conv/rwf_f.JPG" : [729, 229, 199, 61],
     'img/rating.JPG' : [471, 92, 361, 108],
     'img/reward.JPG' : [395, 106, 508, 272],
     'img/press-button20.jpg' : [144, 418, 445, 106],
@@ -188,7 +197,7 @@ areas = {
     'img/game-screen21.JPG' : [35, 87, 398, 171],
     'img/myclub-enter20.JPG': [11, 36, 355, 142],
     'img/myclub-enter21.JPG': [42, 85, 335, 155],
-    'img/sure-start.JPG' : [19, 226, 461, 141],
+    'img/sure-start.JPG' : [46, 249, 439, 313],
     'img/proceed.JPG' : [9, 676, 552, 75],
     'img/club-house.JPG' : [296, 653, 260, 98],
     'img/sim-game20.JPG' : [85, 102, 450, 574],
@@ -908,7 +917,6 @@ def initialize_pes():
     pes_launcher = App(f'{pes_path}')
     App.focus(pesName)
     pes = App(pesName)
-    print(pes_config['general']['pes_version'], pesName, pes_path + " from initialize")
     if not pes.isRunning():
         makebkp()
         pes_launcher.open()

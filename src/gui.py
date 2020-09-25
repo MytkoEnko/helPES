@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter.ttk import *
 import main as main
-from main import pes_config as pes_config
 import azure_vm as azure_virtual
 from tkinter import filedialog
 from tkinter import messagebox
@@ -257,7 +256,7 @@ class PesGui:
 
         self.label_players_cost = Label(self.pes_settings, text="Use players of max cost:")
 
-        self.label_sign_skip = Label(self.pes_settings, text="Skip (don't sign) nr of first scouts:")
+        self.label_sign_skip = Label(self.pes_settings, text="Skip (don't sign) nr of first scouts: [0 or 6+]")
 
         settings_entry = dict(width=35, state=DISABLED)
 
@@ -366,8 +365,8 @@ class PesGui:
 
         #Game path
         self.game_path = StringVar(value=eval(main.pes_path))
-        self.path_found_label = Label(self.checks, text="Game path: ", font='bold')
-        self.path_found_label['text'] += 'detected' if len(self.game_path.get()) != "NO_PES_INSTALLED" else 'unknown'
+        self.path_found_label = Label(self.checks, text="", font='bold')
+        self.path_found_label['text'] = f'Game path: {"detected" if len(self.game_path.get()) != "NO_PES_INSTALLED" else "unknown"}'
         self.path_found_label['foreground'] = 'green' if self.path_found_label['text'] == "Game path: detected" else 'red'
         self.path_button = Button(
             self.checks,
@@ -376,7 +375,7 @@ class PesGui:
         )
 
         self.path_found_label.grid(row=2, column=1)
-        self.path_button.grid(row=2, column=2)
+        #self.path_button.grid(row=2, column=2)
 
         # Tesseract check
         self.tesseract_label = Label(self.checks, text="Tesseract version:", font='bold')
@@ -727,7 +726,7 @@ Please double check - go to your team, filter players by costs you've chose in "
         self.filename = filedialog.askopenfilename(title="Choose your PES2020.exe file from installation folder", filetypes=[('PES202*.exe','PES202*.exe')])
         self.game_path.set(self.filename)
         if len(self.game_path.get()) != "NO_PES_INSTALLED":
-            self.path_found_label['text'] += 'Game path: detected'
+            self.path_found_label['text'] = 'Game path: detected'
             self.path_found_label['foreground'] = 'green'
             try:
                 main.pes_config['general'][f'game_path{main.pes_config["general"]["pes_version"]}'] = self.game_path.get()
