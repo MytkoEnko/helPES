@@ -13,7 +13,6 @@ from main import exc_info
 from requests import get
 from webbrowser import open_new_tab
 
-pes_config = main.pes_config
 new_release_url = 'https://github.com/MytkoEnko/helPES/releases/latest'
 report_issue_url = 'https://github.com/MytkoEnko/helPES/issues'
 donate_url = 'https://www.patreon.com/helPES'
@@ -26,7 +25,6 @@ youtube_url = 'https://www.youtube.com/playlist?list=PLURb2aKsWkfv6X-AwwU06_hLiW
 
 class PesGui:
     def __init__(self, master):
-        global pes_config
         main.pes_gui = True
 
         # ================== Style =======================
@@ -112,10 +110,10 @@ class PesGui:
         # --------- Select game version ---------
 
         #variables
-        self.pes_version = StringVar(value=pes_config['general']['pes_version'])
+        self.pes_version = StringVar(value=main.pes_config['general']['pes_version'])
 
-        self.pes_2020 = Radiobutton(self.version_select, text="PES2020", value='20', variable=self.pes_version, command=self.update_version_paths, state=DISABLED if len(pes_config['general']['game_path20']) < 3 else NORMAL)
-        self.pes_2021 = Radiobutton(self.version_select, text="PES2021", value='21', variable=self.pes_version, command=self.update_version_paths, state=DISABLED if len(pes_config['general']['game_path21']) < 3 else NORMAL)
+        self.pes_2020 = Radiobutton(self.version_select, text="PES2020", value='20', variable=self.pes_version, command=self.update_version_paths, state=DISABLED if len(main.pes_config['general']['game_path20']) < 3 else NORMAL)
+        self.pes_2021 = Radiobutton(self.version_select, text="PES2021", value='21', variable=self.pes_version, command=self.update_version_paths, state=DISABLED if len(main.pes_config['general']['game_path21']) < 3 else NORMAL)
 
         modes_grid = dict(sticky=W, pady=3, padx=4)
         self.pes_2020.grid(row=1, column=2, columnspan=1, **modes_grid)
@@ -134,7 +132,7 @@ class PesGui:
         )
 
         for variable in stats_variables:
-            setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            setattr(self, variable, IntVar(value=main.pes_config['gui'][variable]))
 
         stats_labels = dict(sticky=W, pady=3, padx=4)
         self.games_runtime = Label(self.stats, text="Games played").grid(row=0, column=2, **stats_labels)
@@ -166,12 +164,12 @@ class PesGui:
         self.team1_name = Label(self.actions, text="Team 1").grid(row=0, column=1, **actions_label_args)
         self.team2_name = Label(self.actions, text="Team 2").grid(row=1, column=1, **actions_label_args)
         #variables
-        self.team1_convert = BooleanVar(value=pes_config['gui']['team1_convert'])
-        self.team2_convert = BooleanVar(value=pes_config['gui']['team2_convert'])
-        self.team1_populate = BooleanVar(value=pes_config['gui']['team1_populate'])
-        self.team2_populate = BooleanVar(value=pes_config['gui']['team2_populate'])
-        self.convert_all = BooleanVar(value=pes_config['gui']['convert_all'])
-        self.sign_all = BooleanVar(value=pes_config['gui']['sign_all'])
+        self.team1_convert = BooleanVar(value=main.pes_config['gui']['team1_convert'])
+        self.team2_convert = BooleanVar(value=main.pes_config['gui']['team2_convert'])
+        self.team1_populate = BooleanVar(value=main.pes_config['gui']['team1_populate'])
+        self.team2_populate = BooleanVar(value=main.pes_config['gui']['team2_populate'])
+        self.convert_all = BooleanVar(value=main.pes_config['gui']['convert_all'])
+        self.sign_all = BooleanVar(value=main.pes_config['gui']['sign_all'])
 
         #add callback
         actions_variables = (
@@ -205,20 +203,20 @@ class PesGui:
 
         # ------------ Settings  ----------
         #variables
-        self.mail_send_var = BooleanVar(value=pes_config['gui']['mail_send_var'])
-        self.azure_vm_var = BooleanVar(value=pes_config['gui']['azure_vm_var'])
-        self.shutdown_var = BooleanVar(value=pes_config['gui']['shutdown_var'])
-        self.players_cost_var = IntVar(value=pes_config['gui']['players_cost_var'])
-        self.delay_var = IntVar(value=pes_config['gui']['delay_var'])
-        self.sendgrid_api_key = StringVar(value=pes_config['secrets']['sendgrid_api_key'])
-        self.email_address = StringVar(value=pes_config['general']['email_address'])
-        self.az_client_id = StringVar(value=pes_config['secrets']['az_client_id'])
-        self.az_secret = StringVar(value=pes_config['secrets']['az_secret'])
-        self.az_tenant = StringVar(value=pes_config['secrets']['az_tenant'])
-        self.az_subscription_id = StringVar(value=pes_config['secrets']['az_subscription_id'])
-        self.az_group_name = StringVar(value=pes_config['general']['az_group_name'])
-        self.az_vm_name = StringVar(value=pes_config['general']['az_vm_name'])
-        self.sign_skip = IntVar(value=pes_config['gui']['sign_skip'])
+        self.mail_send_var = BooleanVar(value=main.pes_config['gui']['mail_send_var'])
+        self.azure_vm_var = BooleanVar(value=main.pes_config['gui']['azure_vm_var'])
+        self.shutdown_var = BooleanVar(value=main.pes_config['gui']['shutdown_var'])
+        self.players_cost_var = IntVar(value=main.pes_config['gui']['players_cost_var'])
+        self.delay_var = IntVar(value=main.pes_config['gui']['delay_var'])
+        self.sendgrid_api_key = StringVar(value=main.pes_config['secrets']['sendgrid_api_key'])
+        self.email_address = StringVar(value=main.pes_config['general']['email_address'])
+        self.az_client_id = StringVar(value=main.pes_config['secrets']['az_client_id'])
+        self.az_secret = StringVar(value=main.pes_config['secrets']['az_secret'])
+        self.az_tenant = StringVar(value=main.pes_config['secrets']['az_tenant'])
+        self.az_subscription_id = StringVar(value=main.pes_config['secrets']['az_subscription_id'])
+        self.az_group_name = StringVar(value=main.pes_config['general']['az_group_name'])
+        self.az_vm_name = StringVar(value=main.pes_config['general']['az_vm_name'])
+        self.sign_skip = IntVar(value=main.pes_config['gui']['sign_skip'])
 
         #add callback
         settings_callbacks = (
@@ -335,8 +333,8 @@ class PesGui:
 
         # --------- Modes -------------
         #variables
-        self.which_mode = StringVar(value=pes_config['gui']['which_mode'])
-        self.games_number = IntVar(None,pes_config['gui']['games_number'])
+        self.which_mode = StringVar(value=main.pes_config['gui']['which_mode'])
+        self.games_number = IntVar(None,main.pes_config['gui']['games_number'])
         self.games_to_play = IntVar(None,value=self.games_number.get())
 
         self.mode_standard = Radiobutton(self.modes, text="Standard (Continue previous loop until exp trainers/scouts slots empty)", value='standard', variable=self.which_mode)
@@ -428,10 +426,10 @@ class PesGui:
             "gp_balance_var"
         )
         for variable in play_variables:
-            setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            setattr(self, variable, IntVar(value=main.pes_config['gui'][variable]))
 
         # not standard variables:
-        self.current_team_var = IntVar(value=pes_config['gui']['current_team_var'])
+        self.current_team_var = IntVar(value=main.pes_config['gui']['current_team_var'])
         self.errors_var = IntVar(value=0)
         self.run_status = StringVar(value='Starting')
 
@@ -536,7 +534,7 @@ class PesGui:
             getattr(self, variable).trace_variable("w", self.save_configs)
 
         for variable in actions_variables:
-            #setattr(self, variable, IntVar(value=pes_config['gui'][variable]))
+            #setattr(self, variable, IntVar(value=main.pes_config['gui'][variable]))
             getattr(self, variable).trace_variable("w", self.save_configs)
 
         for variable in stats_variables:
@@ -622,10 +620,11 @@ class PesGui:
             self.start_button['state'] = '!disabled'
 
     def save_configs(self, *args):
-        global pes_config
-        for section in pes_config.keys():
-            for key,value in pes_config[section].items():
-                pes_config[section][key] = getattr(self, key).get()
+        self.game_path20 = StringVar(value=main.pes_config['general']['game_path20'])
+        self.game_path21 = StringVar(value=main.pes_config['general']['game_path21'])
+        for section in main.pes_config.keys():
+            for key,value in main.pes_config[section].items():
+                main.pes_config[section][key] = getattr(self, key).get()
         main.write_configurations()
         self.start_toggle()
 
@@ -657,7 +656,7 @@ class PesGui:
         main.set_paths(self.pes_version.get())
         self.game_path.set(eval(main.pes_path))
         self.status['text'] = "Path: " + self.game_path.get()
-        main.pesName = f'eFootball PES 20{pes_config["general"]["pes_version"]}'
+        main.pesName = f'eFootball PES 20{main.pes_config["general"]["pes_version"]}'
         self.settings_toggle_update()
 
     def print_message(self):
@@ -730,9 +729,8 @@ Please double check - go to your team, filter players by costs you've chose in "
         if len(self.game_path.get()) != "NO_PES_INSTALLED":
             self.path_found_label['text'] += 'Game path: detected'
             self.path_found_label['foreground'] = 'green'
-            global pes_config
             try:
-                pes_config['general'][f'game_path{pes_config["general"]["pes_version"]}'] = self.game_path.get()
+                main.pes_config['general'][f'game_path{main.pes_config["general"]["pes_version"]}'] = self.game_path.get()
             except:
                 # HERE POPUP GOES
                 main.logger.error(f'Something went wrong: {exc_info()}')
