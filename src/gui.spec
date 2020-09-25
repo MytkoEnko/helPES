@@ -7,6 +7,7 @@ a = Analysis(['gui.py'],
              pathex=['C:\\Users\\User\\PycharmProjects\\helPES'],
              binaries=[],
              datas=[
+                ('./tesseract_bin', 'tesseract_bin/')
                 ('./conv', 'conv/'),
                 ('./img', 'img/'),
                 ('./sign', 'sign/'),
