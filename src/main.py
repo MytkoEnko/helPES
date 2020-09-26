@@ -490,9 +490,9 @@ def team_change(squad):
         press_X()
         if isok('img/squad-list.JPG', 60):
             if isok('img/additional-content.JPG',3):
-                turn_down(3)
-                turn_up(2)
-            turn_down(squad)
+                turn_down(squad + 1)
+            else:
+                turn_down(squad)
             time.sleep(1)
             press_A()
         global team_nr
