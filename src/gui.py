@@ -968,7 +968,10 @@ Please double check - go to your team, filter players by costs you've chose in "
                                 self.scouts_left_var.set(0)
                                 main.logger.info('No scouts, 150 can receive')
                             else:
-                                scouts_there = int(main.recognize('scouts').split('/')[1])
+                                try:
+                                    scouts_there = int(main.recognize('scouts').split('/')[1])
+                                except IndexError:
+                                    scouts_there = 5
                                 self.scouts_left_var.set(scouts_there)
                                 main.logger.info(f'{scouts_there} scout slots taken, {150 - scouts_there} left.')
                                 main.press_B()

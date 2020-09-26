@@ -174,29 +174,36 @@ spots = {
     'formation2' : ([821, 526, 123, 38], "@")
 }
 areas = {
-    'conv/10.JP' : [701, 294, 242, 77],
-    'conv/15.JP': [701, 294, 242, 77],
-    'conv/20.JP': [701, 294, 242, 77],
-    'conv/25.JP': [701, 294, 242, 77],
-    'conv/30.JP': [701, 294, 242, 77],
+    'conv/10.JPG': [701, 294, 242, 77],
+    'conv/15.JPG': [701, 294, 242, 77],
+    'conv/20.JPG': [701, 294, 242, 77],
+    'conv/25.JPG': [701, 294, 242, 77],
+    'conv/30.JPG': [701, 294, 242, 77],
     "conv/gk_f.JPG" : [729, 229, 199, 61],
-    "conv/lb_f.JPG" : [729, 229, 199, 61],
-    "conv/cb_f.JPG" : [729, 229, 199, 61],
-    "conv/rb_f.JPG" : [729, 229, 199, 61],
-    "conv/cm_f.JPG" : [729, 229, 199, 61],
-    "conv/dmf_f.JPG" : [729, 229, 199, 61],
-    "conv/lwf_f.JPG" : [729, 229, 199, 61],
-    "conv/cf_f.JPG" : [729, 229, 199, 61],
-    "conv/rwf_f.JPG" : [729, 229, 199, 61],
+    "conv/lb_f.JPG": [729, 229, 199, 61],
+    "conv/cb_f.JPG": [729, 229, 199, 61],
+    "conv/rb_f.JPG": [729, 229, 199, 61],
+    "conv/cm_f.JPG": [729, 229, 199, 61],
+    "conv/dmf_f.JPG": [729, 229, 199, 61],
+    "conv/lwf_f.JPG": [729, 229, 199, 61],
+    "conv/cf_f.JPG": [729, 229, 199, 61],
+    "conv/rwf_f.JPG": [729, 229, 199, 61],
+    "conv/on_team.JPG" : [10, 191, 227, 291],
+    "conv/reserves.JPG" : [879, 88, 374, 159],
+    "conv/filtered.JPG" : [47, 64, 711, 546],
+    "conv/player-menu.JPG" : [212, 148, 363, 224],
+    "conv/convert.JPG" : [268, 253, 738, 228],
+    "conv/no.JPG" : [234, 227, 860, 377],
+    "conv/converted.JPG" : [166, 78, 951, 332],
     'img/rating.JPG' : [471, 92, 361, 108],
     'img/reward.JPG' : [395, 106, 508, 272],
-    'img/press-button20.jpg' : [144, 418, 445, 106],
-    'img/press-button21.jpg' : [249, 498, 225, 47],
+    'img/press-button20.jpg' : [127, 360, 493, 250],
+    'img/press-button21.jpg' : [127, 360, 493, 250],
     'img/this-week-pick-up.JPG' : [243, 33, 442, 107],
-    'img/game-screen20.JPG' : [11, 36, 355, 142],
-    'img/game-screen21.JPG' : [35, 87, 398, 171],
-    'img/myclub-enter20.JPG': [11, 36, 355, 142],
-    'img/myclub-enter21.JPG': [42, 85, 335, 155],
+    'img/game-screen20.JPG' : [9, 32, 348, 227],
+    'img/game-screen21.JPG' : [9, 32, 348, 227],
+    'img/myclub-enter20.JPG': [9, 32, 348, 227],
+    'img/myclub-enter21.JPG': [9, 32, 348, 227],
     'img/sure-start.JPG' : [46, 249, 439, 313],
     'img/proceed.JPG' : [9, 676, 552, 75],
     'img/club-house.JPG' : [296, 653, 260, 98],
@@ -211,6 +218,16 @@ areas = {
     'img/game-proceed.JPG' : [11, 657, 316, 96],
     'img/ok.JPG' : [164, 377, 999, 299],
     'img/coins.JPG' : [1085, 59, 50, 42],
+    'sign/scout.JPG' : [348, 241, 531, 397],
+    'sign/sign-enter.JPG': [86, 33, 649, 426],
+    'sign/choose-slot.JPG': [44, 150, 532, 322],
+    'sign/confirm.JPG': [9, 620, 638, 134],
+    'sign/chosed-trainer.JPG': [26, 151, 492, 290],
+    'sign/sure.JPG': [145, 142, 994, 463],
+    'sign/skip.JPG': [11, 602, 510, 151],
+    'sign/confirm-player.JPG': [627, 115, 204, 127],
+    'sign/next.JPG': [12, 302, 861, 297],
+    'sign/added.JPG': [412, 219, 459, 184],
 }
 error_count = 0
 # Team template
@@ -343,8 +360,8 @@ def isok(img, seconds, similarity=0.89):
         area_coord = pes_region
 
 
-    #pes_region.highlight(1)
-    #logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
+    # pes_region.highlight(1)
+    # logger.debug('PES height: %s, width: %s, position(x,y): %s, %s', pes_region.getH(), pes_region.getW(), pes_region.getX(), pes_region.getY())
 
     if area_coord.exists(Pattern(img).similar(similarity), seconds):
         time.sleep(0.7)
@@ -621,7 +638,7 @@ def sign_all(fivestars=0):
                 if isok('sign/confirm.JPG', 9):
                     press_A()
                     if isok('sign/chosed-trainer.JPG', 9):
-                        turn_down(3)
+                        turn_up(1)
                         press_A()
                     if isok('sign/sure.JPG', 9):
                         turn_right(1)
@@ -813,6 +830,7 @@ def smart_players_convert(which_teams=12, populate=True, execute=True):
             if isok(value[3],1.5):
                 logger.info('Position %s filter applied', key)
             else:
+                error_count = 0
                 while not isok(value[3],1):
                     turn_left(1)
             turn_down(2)
