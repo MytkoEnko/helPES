@@ -567,7 +567,8 @@ def play_one(mode=''):
         if isok('img/next-finish.JPG', 230):
             press_A()
         while True:
-            if isok('img/game-proceed.JPG', 2) and not isok('img/contract-manager-upd.JPG', 0.5):
+            time.sleep(1)
+            if isok('img/game-proceed.JPG', 2) and not isok('img/contract-manager-upd.JPG', 1):
                 press_A()
             elif isok('img/contract-manager-upd.JPG', 1):
                 break
