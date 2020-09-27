@@ -162,7 +162,7 @@ team_nr = 0
 pes_frame = []
 spots = {
     # use '@' to use default
-    'money' : ([987, 67, 79, 29], '--psm 13'),
+    'money' : ([987, 67, 79, 29], '-c tessedit_char_whitelist=0123456789, --psm 13'),
     'player_position' : ([957, 228, 51, 27], '-c tessedit_char_whitelist=BCDFMGKLRSW --psm 13'), #[949, 223, 69, 33],
     'player_rating' : ([921, 248, 93, 105], '-c tessedit_char_whitelist=0123456789 --psm 13'),
     'contract_duration' : ([1087, 484, 114, 46], '-c tessedit_char_whitelist=0123456789 --psm 5'),
@@ -188,7 +188,7 @@ areas = {
     "conv/lwf_f.JPG": [729, 229, 199, 61],
     "conv/cf_f.JPG": [729, 229, 199, 61],
     "conv/rwf_f.JPG": [729, 229, 199, 61],
-    "conv/on_team.JPG" : [10, 191, 227, 291],
+    "conv/on_team.JPG" : [11, 219, 207, 285],
     "conv/reserves.JPG" : [879, 88, 374, 159],
     "conv/filtered.JPG" : [47, 64, 711, 546],
     "conv/player-menu.JPG" : [212, 148, 363, 224],
