@@ -466,7 +466,7 @@ def start_game():
         error_count = 0
         if isok('img/this-week-pick-up.JPG', 2):
             press_B()
-        elif isok('img/ok.JPG',2):
+        elif isok('img/ok.JPG',2, 0.85):
             press_A()
         elif isok(f'img/game-screen{pes_config["general"]["pes_version"]}.JPG', 2, 0.7):
             turn_down(1)
@@ -478,7 +478,7 @@ def start_game():
     # Proceed to home
     while True:
         error_count = 0
-        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 3) or isok('img/close.JPG', 2):
+        if isok('img/proceed.JPG', 2) or isok('img/ok.JPG', 3, 0.85) or isok('img/close.JPG', 2):
             press_A()
         elif base_ok(2):
             logger.info("Game started successfully, logged in to game, can proceed with scripts")
