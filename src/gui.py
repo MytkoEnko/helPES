@@ -498,7 +498,7 @@ class PesGui:
         # Gui handler
         text_handler = self.TextHandler(self.logs)
         text_handler.setFormatter(formatter)
-        text_handler.setLevel(logging.DEBUG)
+        text_handler.setLevel(logging.INFO)
 
         # Add handlers to logger
         logger.addHandler(text_handler)

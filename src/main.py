@@ -292,26 +292,32 @@ def simulate_button(button,long=0.1):
 
 def press_A():
     simulate_button(Key.ENTER)
+    logger.info('Button {A} pressed')
     return
 
 def press_B():
     simulate_button(Key.ESC)
+    logger.info('Button {B} pressed')
     return
 
 def press_X():
     simulate_button(Key.BACKSPACE)
+    logger.info('Button {X} pressed')
     return
 
 def press_Y():
     simulate_button(Key.CTRL)
+    logger.info('Button {Y} pressed')
     return
 
 def press_menu():
     simulate_button(Key.MINUS, 0.6)
+    logger.info('Button {MENU} pressed')
     return
 
 def press_rs():
     simulate_button(Key.ADD)
+    logger.info('Button {RS} pressed')
     return
 
 # First simulate turn mechanism, than methods for each direction using it
