@@ -9,7 +9,7 @@
 ![YouTube Video Likes](https://img.shields.io/youtube/likes/1aa6YVsSKeM?style=social)
 
 ![helPES logo](src/logo.png "Anna Berkowska's helPES logo")
-[![Donate](https://img.shields.io/badge/Download-helPES-green?style=for-the-badge&logo=windows)](https://github.com/MytkoEnko/helPES/releases/download/v1.1.0/helPES-v1.1.0.zip)
+[![Donate](https://img.shields.io/badge/Download-helPES-green?style=for-the-badge&logo=windows)](https://github.com/MytkoEnko/helPES/releases/download/v1.1.1/helPES-v1.1.1.zip)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/donate/?token=ED2KScvCaoOMELItg0T_ulvcYIlL0F5O5fRLDfhN6GCx-6yKAKmNYndxQj5ZhoCasL_PSG&country.x=PL&locale.x=PL)
 [![Donate](https://img.shields.io/badge/Donate-patreon-red)](https://www.patreon.com/helPES)
 -----
