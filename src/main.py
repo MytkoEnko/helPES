@@ -638,10 +638,13 @@ def sign_all(fivestars=0):
                 time.sleep(0.5)
                 if fivestars:
                     turn_down(fivestars)
-                    if int(recognize('scouts').split('/')[0]) == int(fivestars):
-                        press_B()
-                        logger.info('No scouts left or only skipped left. Sign all script finished, going back')
-                        break
+                    try:
+                        if int(recognize('scouts').split('/')[0]) == int(fivestars):
+                            press_B()
+                            logger.info('No scouts left or only skipped left. Sign all script finished, going back')
+                            break
+                    except:
+                        logger.error(f'Something went wrong during scouts signing. Make sure you have at least {fivestars} scouts')
                 if isok('sign/confirm.JPG', 9):
                     press_A()
                     if isok('sign/chosed-trainer.JPG', 9):
