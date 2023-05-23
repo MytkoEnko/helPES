@@ -2,7 +2,7 @@ Lackey==0.7.3
 opencv-python==4.4.0.44
 Pillow>=7.1.0
 pytesseract==0.3.6
-requests==2.24.0
+requests==2.31.0
 vdf
 sendgrid==6.4.7
 azure-common==1.1.25
